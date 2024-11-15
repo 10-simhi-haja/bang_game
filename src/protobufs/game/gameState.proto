@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "../global/global.proto";
+import "../data/gameData.proto";
+import "../data/characterData.proto";
+
+package gameState;
+
+// 게임 준비(역할 및 캐릭터 셔플)
+message C2SGamePrepareRequest {
+}
+
+message S2CGamePrepareResponse {
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+
+message S2CGamePrepareNotification {
+    RoomData room = 1;
+}
+
+// 게임 시작
+message C2SGameStartRequest {
+}
+
+message S2CGameStartResponse {
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+
+message S2CGameStartNotification {
+    GameStateData gameState = 1;
+    repeated UserData users = 2;
+    repeated CharacterPositionData characterPositions = 3;
+}

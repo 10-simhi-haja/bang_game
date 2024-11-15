@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+import "../global/global.proto";
+import "../data/cardData.proto";
+import "../data/characterData.proto";
+import "../data/gameData.proto";
+
+package game;
+
+// 캐릭터 이동
+message C2SPositionUpdateRequest {
+    double x = 1;
+    double y = 2;
+}
+message S2CPositionUpdateResponse {
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+message S2CPositionUpdateNotification {
+    repeated CharacterPositionData characterPositions = 1;
+}
+
+// 카드 사용
+message C2SUseCardRequest {
+    CardType cardType = 1;
+    string targetUserId = 2; // 타겟 없으면 빈 값
+}
+message S2CUseCardResponse { // 성공 여부만 반환하고 대상 유저 효과는 S2CUserUpdateNotification로 통지
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+
+// 카드 효과 알림
+message S2CUseCardNotification {
+    CardType cardType = 1;
+    string userId = 2;
+    string targetUserId = 3; // 타겟 없으면 빈 값
+}
+message S2CEquipCardNotification {
+    CardType cardType = 1;
+    string userId = 2;
+}
+message S2CCardEffectNotification {
+    CardType cardType = 1;
+    string userId = 2;
+    bool success = 3;
+}
+
+// 플리마켓
+message S2CFleaMarketNotification {
+    repeated CardType cardTypes = 1;
+    repeated int32 pickIndex = 2;
+}
+message C2SFleaMarketPickRequest {
+    int32 pickIndex = 1;
+}
+message S2CFleaMarketPickResponse {
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+
+// 유저 정보 업데이트(카드 사용, 체력 감소 등 유저의 상태가 바뀌었을 때)
+message S2CUserUpdateNotification {
+    repeated UserData user = 1;
+}
+
+// Phase 업데이트
+message S2CPhaseUpdateNotification {
+    PhaseType phaseType = 1; // DAY 1, EVENING 2, END 3
+    int64 nextPhaseAt = 2; // 다음 페이즈 시작 시점(밀리초 타임스탬프)
+    repeated CharacterPositionData characterPositions = 3; // 변경된 캐릭터 위치
+}
+
+// 리액션(공격을 받았을 때, 쉴드 대신 피하기/피해 입기 선택)
+message C2SReactionRequest {
+    ReactionType reactionType = 1; // NOT_USE_CARD = 1
+}
+message S2CReactionResponse {
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+
+// 턴 종료시 (phaseType 3) 카드 버리기
+message C2SDestroyCardRequest {
+    repeated CardData destroyCards = 1;
+}
+message S2CDestroyCardResponse {
+    repeated CardData handCards = 1;
+}
+
+// 게임 종료
+message S2CGameEndNotification {
+    repeated string winners = 1;
+    WinType winType = 2;
+}
+
+// 카드 선택(흡수/신기루 카드 사용시)
+message C2SCardSelectRequest {
+    SelectCardType selectType = 1; // 0: 핸드, 1: 장비, 2: 무기, 3: 디버프
+    CardType selectCardType = 2; // selectType이  0일 경우 0, / 1, 2, 3일 경우 원하는 장비의 cardType
+}
+message S2CCardSelectResponse {
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+
+// 디버프
+message C2SPassDebuffRequest {
+    string targetUserId = 1;
+    CardType debuffCardType = 2;
+}
+message S2CPassDebuffResponse {
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+// 폭발 5초 전에 알려주기
+message S2CWarningNotification {
+    WarningType warningType = 1;
+    int64 expectedAt = 2; // 밀리초 타임스탬프
+}
+
+// 효과 알림(레이저 조준, 레이더, 스텔스, 자동쉴드...)
+message S2CAnimationNotification {
+    string userId = 1;
+    AnimationType animationType = 2;
+}

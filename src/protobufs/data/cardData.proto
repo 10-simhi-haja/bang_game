@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "../global/global.proto";
+
+package cardData;
+
+// 카드
+message CardData {
+    CardType type = 1;
+    int32 count = 2;
+}
