@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import "../global/global.proto";
+import "./cardData.proto";
+
+package characterData;
+
+// 캐릭터
+message CharacterData {
+    CharacterType characterType = 1;
+    RoleType roleType = 2;
+    int32 hp = 3;
+    int32 weapon = 4;
+    CharacterStateInfoData stateInfo = 5;
+    repeated int32 equips = 6;
+    repeated int32 debuffs = 7;
+    repeated CardData handCards = 8;
+    int32 bbangCount = 9;
+    int32 handCardsCount = 10;
+}
+
+message CharacterPositionData {
+    string id = 1;
+    double x = 2;
+    double y = 3;
+}
+
+message CharacterStateInfoData {
+    CharacterStateType state = 1;
+    CharacterStateType nextState = 2;
+    int64 nextStateAt = 3; // state가 nextState로 풀리는 밀리초 타임스탬프. state가 NONE이면 0
+    string stateTargetUserId = 4; // state에 target이 있을 경우
+}

@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+import "../global/global.proto";
+import "../data/gameData.proto";
+
+package room;
+
+// 방 생성
+message C2SCreateRoomRequest {
+    string name = 1;
+    int32 maxUserNum = 2;
+}
+message S2CCreateRoomResponse {
+    bool success = 1;
+    RoomData room = 2;
+    GlobalFailCode failCode = 3;
+}
+
+// 방 목록 조회
+message C2SGetRoomListRequest {
+}
+message S2CGetRoomListResponse{
+    repeated RoomData rooms = 1;
+}
+
+// 방 참가
+message C2SJoinRoomRequest {
+    int32 roomId = 1;
+}
+message S2CJoinRoomResponse {
+    bool success = 1;
+    RoomData room = 2;
+    GlobalFailCode failCode = 3;
+}
+
+// 랜덤으로 방 입장
+message C2SJoinRandomRoomRequest {
+    int32 roomId = 1;
+}
+message S2CJoinRandomRoomResponse {
+    bool success = 1;
+    RoomData room = 2;
+    GlobalFailCode failCode = 3;
+}
+
+// 방 참가 알림
+message S2CJoinRoomNotification {
+    UserData joinUser = 1;
+}
+
+// 방을 떠남
+message C2SLeaveRoomRequest {
+}
+message S2CLeaveRoomResponse {
+    bool success = 1;
+    GlobalFailCode failCode = 2;
+}
+message S2CLeaveRoomNotification {
+    string userId = 1;
+}
