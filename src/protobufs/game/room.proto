@@ -12,15 +12,15 @@ message C2SCreateRoomRequest {
 }
 message S2CCreateRoomResponse {
     bool success = 1;
-    RoomData room = 2;
-    GlobalFailCode failCode = 3;
+    RoomData room = 2;              // gameData.proto
+    GlobalFailCode failCode = 3;    // global.proto
 }
 
 // 방 목록 조회
 message C2SGetRoomListRequest {
 }
 message S2CGetRoomListResponse{
-    repeated RoomData rooms = 1;
+    repeated RoomData rooms = 1;    // gameData.proto
 }
 
 // 방 참가
@@ -29,13 +29,12 @@ message C2SJoinRoomRequest {
 }
 message S2CJoinRoomResponse {
     bool success = 1;
-    RoomData room = 2;
-    GlobalFailCode failCode = 3;
+    RoomData room = 2;              // gameData.proto
+    GlobalFailCode failCode = 3;    // global.proto
 }
 
 // 랜덤으로 방 입장
 message C2SJoinRandomRoomRequest {
-    int32 roomId = 1;
 }
 message S2CJoinRandomRoomResponse {
     bool success = 1;
@@ -56,5 +55,5 @@ message S2CLeaveRoomResponse {
     GlobalFailCode failCode = 2;
 }
 message S2CLeaveRoomNotification {
-    string userId = 1;
+    int64 userId = 1;
 }
