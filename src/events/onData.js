@@ -19,7 +19,7 @@ const onData = (socket) => async (data) => {
     let offset = 0;
 
     // 2. 패킷 타입 - 핸들러 (2 bytes)
-    const packetType = socket.buffer.readUInt16LE(offset);
+    const packetType = socket.buffer.readUInt16BE(offset);
     offset += config.packet.payloadOneofCaseLength; // 2
 
     // 3. 클라이언트 버전 길이 (1 byte)
@@ -38,7 +38,7 @@ const onData = (socket) => async (data) => {
     }
 
     // 5. 패킷 시퀀스 (4 bytes)
-    const sequence = socket.buffer.readUInt32LE(offset);
+    const sequence = socket.buffer.readUInt32BE(offset);
     offset += config.packet.sequenceLength;
     const isValidSequence = validateSequence(socket, sequence);
     if (!isValidSequence) {
@@ -48,7 +48,7 @@ const onData = (socket) => async (data) => {
       );
     }
     // 6. 페이로드 길이 (4 bytes)
-    const payloadLength = socket.buffer.readUInt32LE(offset);
+    const payloadLength = socket.buffer.readUInt32BE(offset);
     offset += config.packet.payloadLength;
 
     if (socket.buffer.length >= payloadLength + totalHeaderLength) {
