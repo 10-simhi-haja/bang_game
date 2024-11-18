@@ -102,6 +102,7 @@ export const prepareRole = (playersCount) => {
   }
 
   console.log(roles);
+  return roles;
 };
 const prepare = (num) => {};
 
@@ -115,11 +116,20 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     const game = getGameSessionByOwnerId(owner.id);
 
     // 방 인원수
-    game.users.length;
+    const playerCount = game.users.length;
 
-    // 분배 함수 필요인자 (인원수)
+    prepareCharacter(playerCount);
+    prepareRole(playerCount);
 
-    // 2. 역할, 캐릭터 분배를 한다.
-    // 3. 해당 방 정보를 방 인원들에게 noti한다.
+    const roomData = game.getRoomData();
+
+    // 성공 실패 응답 해당유저에게 보내고,
+
+    // 노티 해당 게임내 플레이어들에게 전부 보내고.
+    users = game.getUsers();
+
+    users.forEach((user) => {
+      gamePreapareNotification(roomData, user);
+    });
   } catch (error) {}
 };
