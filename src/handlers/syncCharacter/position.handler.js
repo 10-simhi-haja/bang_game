@@ -1,6 +1,7 @@
 import { getGameSession } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import { PACKET_TYPE } from '../../constants/header.js';
+import { createNotificationPacket } from '../../utils/packet/notification/game.notification.js';
 
 const packetType = PACKET_TYPE;
 
@@ -27,6 +28,7 @@ const handlePositionUpdate = async ({ socket, payload }) => {
 
     if (success) {
       // 위치 업데이트 성공 응답 생성
+      // 시퀀스 내용 추가
       const positionResponse = createResponse({
         success: true,
         type: packetType.POSITION_UPDATE_RESPONSE,
@@ -35,7 +37,7 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       socket.write(positionResponse);
 
       // 상대 플레이어에게 위치 업데이트 알림 전송
-      const positionNotification = createResponse({
+      const positionNotification = createNotificationPacket({
         characterPositions: [{ userId: user.id, x: payload.x, y: payload.y }],
         type: packetType.POSITION_UPDATE_NOTIFICATION,
         success: true,
