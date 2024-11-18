@@ -12,179 +12,179 @@ const handlers = {
   },
   [packetType.REGISTER_RESPONSE]: {
     handler: undefined,
-    protoType: 'C2SRegisterResponse',
+    protoType: 'auth.C2SRegisterResponse',
   },
   [packetType.LOGIN_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SLoginRequest',
+    protoType: 'auth.C2SLoginRequest',
   },
   [packetType.LOGIN_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CLoginResponse', ///
+    protoType: 'auth.S2CLoginResponse', ///
   },
   [packetType.CREATE_ROOM_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SCreateRoomRequest',
+    protoType: 'room.C2SCreateRoomRequest',
   },
   [packetType.CREATE_ROOM_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CCreateRoomResponse',
+    protoType: 'room.S2CCreateRoomResponse',
   },
   [packetType.GET_ROOM_LIST_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SGetRoomListRequest',
+    protoType: 'room.C2SGetRoomListRequest',
   },
   [packetType.GET_ROOM_LIST_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CGetRoomListResponse',
+    protoType: 'room.S2CGetRoomListResponse',
   },
   [packetType.JOIN_ROOM_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SJoinRoomRequest',
+    protoType: 'room.C2SJoinRoomRequest',
   },
   [packetType.JOIN_ROOM_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CJoinRoomResponse',
+    protoType: 'room.S2CJoinRoomResponse',
   },
   [packetType.JOIN_RANDOM_ROOM_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SJoinRandomRoomRequest',
+    protoType: 'room.C2SJoinRandomRoomRequest',
   },
   [packetType.JOIN_RANDOM_ROOM_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CJoinRandomRoomResponse',
+    protoType: 'room.S2CJoinRandomRoomResponse',
   },
   [packetType.JOIN_ROOM_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CJoinRoomNotification',
+    protoType: 'room.S2CJoinRoomNotification',
   },
   [packetType.LEAVE_ROOM_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SLeaveRoomRequest',
+    protoType: 'room.C2SLeaveRoomRequest',
   },
   [packetType.LEAVE_ROOM_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CLeaveRoomResponse',
+    protoType: 'room.S2CLeaveRoomResponse',
   },
   [packetType.LEAVE_ROOM_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CLeaveRoomNotification',
+    protoType: 'room.S2CLeaveRoomNotification',
   },
   [packetType.GAME_PREPARE_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SGamePrepareRequest',
+    protoType: 'gameState.C2SGamePrepareRequest',
   },
   [packetType.GAME_PREPARE_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CGamePrepareResponse',
+    protoType: 'gameState.S2CGamePrepareResponse',
   },
   [packetType.GAME_PREPARE_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CGamePrepareNotification',
+    protoType: 'gameState.S2CGamePrepareNotification',
   },
   [packetType.GAME_START_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SGameStartRequest ',
+    protoType: 'gameState.C2SGameStartRequest ',
   },
   [packetType.GAME_START_RESPONSE]: {
     handler: undefined,
-    protoType: 'C2SGameStartResponse',
+    protoType: 'gameState.C2SGameStartResponse',
   },
   [packetType.GAME_START_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'C2SGameStartNotification',
+    protoType: 'gameState.C2SGameStartNotification',
   },
   [packetType.POSITION_UPDATE_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SPositionUpdateRequest',
+    protoType: 'game.C2SPositionUpdateRequest',
   },
   [packetType.POSITION_UPDATE_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CPositionUpdateNotification',
+    protoType: 'game.S2CPositionUpdateNotification',
   },
   [packetType.USE_CARD_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SUseCardRequest',
+    protoType: 'game.C2SUseCardRequest',
   },
   [packetType.USE_CARD_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CUseCardResponse',
+    protoType: 'game.S2CUseCardResponse',
   },
   [packetType.USE_CARD_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CUseCardNotification',
+    protoType: 'game.S2CUseCardNotification',
   },
   [packetType.EQUIP_CARD_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CEquipCardNotification',
+    protoType: 'game.S2CEquipCardNotification',
   },
   [packetType.CARD_EFFECT_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CCardEffectNotification ',
+    protoType: 'game.S2CCardEffectNotification ',
   },
   [packetType.FLEA_MARKET_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CFleaMarketNotification',
+    protoType: 'game.S2CFleaMarketNotification',
   },
   [packetType.FLEA_MARKET_PICK_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SFleaMarketPickRequest',
+    protoType: 'game.C2SFleaMarketPickRequest',
   },
   [packetType.FLEA_MARKET_PICK_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CFleaMarketPickResponse',
+    protoType: 'game.S2CFleaMarketPickResponse',
   },
   [packetType.USER_UPDATE_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CUserUpdateNotification',
+    protoType: 'game.S2CUserUpdateNotification',
   },
   [packetType.PHASE_UPDATE_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CPhaseUpdateNotification',
+    protoType: 'game.S2CPhaseUpdateNotification',
   },
   [packetType.REACTION_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SReactionRequest',
+    protoType: 'game.C2SReactionRequest',
   },
   [packetType.REACTION_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CReactionResponse',
+    protoType: 'game.S2CReactionResponse',
   },
   [packetType.DESTROY_CARD_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SDestroyCardRequest',
+    protoType: 'game.C2SDestroyCardRequest',
   },
   [packetType.DESTROY_CARD_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CDestroyCardResponse',
+    protoType: 'game.S2CDestroyCardResponse',
   },
   [packetType.GAME_END_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CGameEndNotification',
+    protoType: 'game.S2CGameEndNotification',
   },
   [packetType.CARD_SELECT_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SCardSelectRequest',
+    protoType: 'game.C2SCardSelectRequest',
   },
   [packetType.CARD_SELECT_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CCardSelectResponse',
+    protoType: 'game.S2CCardSelectResponse',
   },
   [packetType.PASS_DEBUFF_REQUEST]: {
     handler: undefined,
-    protoType: 'C2SPassDebuffRequest',
+    protoType: 'game.C2SPassDebuffRequest',
   },
   [packetType.PASS_DEBUFF_RESPONSE]: {
     handler: undefined,
-    protoType: 'S2CPassDebuffResponse',
+    protoType: 'game.S2CPassDebuffResponse',
   },
   [packetType.WARNING_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CWarningNotification',
+    protoType: 'game.S2CWarningNotification',
   },
   [packetType.ANIMATION_NOTIFICATION]: {
     handler: undefined,
-    protoType: 'S2CAnimationNotification',
+    protoType: 'game.S2CAnimationNotification',
   },
 };
 

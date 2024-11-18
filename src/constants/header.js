@@ -89,3 +89,39 @@ export const PACKET_TYPE = {
   // 효과 알림
   ANIMATION_NOTIFICATION: 46,
 };
+
+export const CHARACTER_TYPE = {
+  NONE_CHARACTER: 0,
+  RED: 1, // 빨강이
+  SHARK: 3, // 상어군
+  MALANG: 5, // 말랑이
+  FROGGY: 7, // 개굴군
+  PINK: 8, // 핑크군
+  SWIM_GLASSES: 9, // 물안경군
+  MASK: 10, // 가면군
+  DINOSAUR: 12, // 공룡이
+  PINK_SLIME: 13, // 핑크슬라임
+};
+
+export const ROLE_TYPE = {
+  NONE_ROLE: 0,
+  TARGET: 1,
+  BODYGUARD: 2,
+  HITMAN: 3,
+  PSYCHOPATH: 4,
+};
+
+// - 2인 : 타겟1, 히트맨1
+// - 3인 : 타겟1, 히트맨1, 싸이코패스1
+// - 4인 : 타겟1, 히트맨2, 싸이코패스1
+// - 5인 : 타겟1, 보디가드1, 히트맨2, 싸이코패스1
+// - 6인 : 타겟1, 보디가드1, 히트맨3, 싸이코패스1
+// - 7인 : 타겟1, 보디가드2, 히트맨3, 싸이코패스1
+export const ROLES_DISTRIBUTION = {
+  2: { TARGET: 1, HITMAN: 1 },
+  3: { TARGET: 1, HITMAN: 1, PSYCHOPATH: 1 },
+  4: { TARGET: 1, HITMAN: 2, PSYCHOPATH: 1 },
+  5: { TARGET: 1, BODYGUARD: 1, HITMAN: 2, PSYCHOPATH: 1 },
+  6: { TARGET: 1, BODYGUARD: 1, HITMAN: 3, PSYCHOPATH: 1 },
+  7: { TARGET: 1, BODYGUARD: 2, HITMAN: 3, PSYCHOPATH: 1 },
+};

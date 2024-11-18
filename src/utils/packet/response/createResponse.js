@@ -3,7 +3,7 @@ import config from '../../../config/config.js';
 import { getProtoMessages } from '../../../init/loadProtos.js';
 import PACKET_MAPS from '../../../protobufs/packetMaps.js';
 
-export const createResponse = (packetType, payloadData = {}, sequence) => {
+export const createResponse = (packetType, sequence, payloadData = {}) => {
   // 1. 패킷 타입
   const typeBuffer = Buffer.alloc(config.packet.payloadOneofCaseLength);
   typeBuffer.writeUInt16BE(packetType);
