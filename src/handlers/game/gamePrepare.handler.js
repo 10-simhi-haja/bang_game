@@ -49,6 +49,19 @@ const {
 //     int32 count = 2; 카드 갯수
 // }
 
+// message C2SGamePrepareRequest {
+
+// }
+
+// message S2CGamePrepareResponse {
+//     bool success = 1;
+//     GlobalFailCode failCode = 2;
+// }
+
+// message S2CGamePrepareNotification {
+//     RoomData room = 1;
+// }
+
 export const prepareCharacter = (playersCount) => {
   if (!playersCount) {
     throw new Error('플레이어 수를 지정하지 않았습니다.');
@@ -129,7 +142,11 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     users = game.getUsers();
 
     users.forEach((user) => {
-      gamePreapareNotification(roomData, user);
+      const noti = gamePreapareNotification(roomData, user);
+      const roomUserSocket = user.socket;
+      roomUserSocket.write(noti);
     });
+
+    // 크리에이트 리스폰스(성공여부, 실패코드)
   } catch (error) {}
 };
