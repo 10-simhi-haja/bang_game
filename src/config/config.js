@@ -8,7 +8,16 @@
  * 2. header.js
  */
 
-import { PORT, HOST, CLIENT_VERSION } from '../constants/env.js';
+import {
+  PORT,
+  HOST,
+  CLIENT_VERSION,
+  DB_NAME,
+  DB_USER,
+  DB_PASSWORD,
+  DB_HOST,
+  DB_PORT,
+} from '../constants/env.js';
 import {
   TOTAL_HEADER_LENGTH,
   PAYLOAD_ONEOF_CASE_LENGTH,
@@ -16,6 +25,9 @@ import {
   SEQUENCE_LENGTH,
   PAYLOAD_LENGTH,
   PACKET_TYPE,
+  CHARACTER_TYPE,
+  ROLE_TYPE,
+  ROLES_DISTRIBUTION,
 } from '../constants/header.js';
 
 const config = {
@@ -33,6 +45,22 @@ const config = {
     sequenceLength: SEQUENCE_LENGTH,
     payloadLength: PAYLOAD_LENGTH,
     packetType: PACKET_TYPE,
+  },
+  character: {
+    characterType: CHARACTER_TYPE,
+  },
+  role: {
+    roleType: ROLE_TYPE,
+    rolesDistribution: ROLES_DISTRIBUTION,
+  },
+  databases: {
+    USER_DB: {
+      name: DB_NAME,
+      user: DB_USER,
+      password: DB_PASSWORD,
+      host: DB_HOST,
+      port: DB_PORT,
+    },
   },
 };
 
