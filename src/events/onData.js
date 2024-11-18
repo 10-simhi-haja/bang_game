@@ -66,6 +66,8 @@ const onData = (socket) => async (data) => {
         handleError(socket, error);
         break;
       }
+    } else {
+      break;
     }
   }
 };
