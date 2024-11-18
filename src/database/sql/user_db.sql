@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS user
+(
+    account_id  INT AUTO_INCREMENT PRIMARY KEY,
+    nicname     VARCHAR(255) UNIQUE,
+    email       VARCHAR(255) UNIQUE,
+    password    VARCHAR(255),
+    create_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
