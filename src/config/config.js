@@ -15,6 +15,7 @@ import {
   VERSION_LENGTH,
   SEQUENCE_LENGTH,
   PAYLOAD_LENGTH,
+  PACKET_TYPE,
 } from '../constants/header.js';
 
 const config = {
@@ -31,6 +32,7 @@ const config = {
     versionLength: VERSION_LENGTH,
     sequenceLength: SEQUENCE_LENGTH,
     payloadLength: PAYLOAD_LENGTH,
+    pcaket: PACKET_TYPE,
   },
 };
 
