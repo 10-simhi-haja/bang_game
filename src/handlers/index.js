@@ -1,6 +1,7 @@
 import CustomError from '../utils/errors/customError.js';
 import ErrorCodes from './../utils/errors/errorCodes.js';
 import config from '../config/config.js';
+import handlePositionUpdate from './syncCharacter/position.handler.js';
 
 const { packetType } = config.packet;
 
@@ -94,12 +95,8 @@ const handlers = {
     protoType: 'C2SGameStartNotification',
   },
   [packetType.POSITION_UPDATE_REQUEST]: {
-    handler: undefined,
+    handler: handlePositionUpdate,
     protoType: 'C2SPositionUpdateRequest',
-  },
-  [packetType.POSITION_UPDATE_NOTIFICATION]: {
-    handler: undefined,
-    protoType: 'S2CPositionUpdateNotification',
   },
   [packetType.USE_CARD_REQUEST]: {
     handler: undefined,
