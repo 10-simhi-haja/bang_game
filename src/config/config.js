@@ -16,6 +16,9 @@ import {
   SEQUENCE_LENGTH,
   PAYLOAD_LENGTH,
   PACKET_TYPE,
+  CHARACTER_TYPE,
+  ROLE_TYPE,
+  ROLES_DISTRIBUTION,
 } from '../constants/header.js';
 
 const config = {
@@ -33,6 +36,13 @@ const config = {
     sequenceLength: SEQUENCE_LENGTH,
     payloadLength: PAYLOAD_LENGTH,
     packetType: PACKET_TYPE,
+  },
+  character: {
+    characterType: CHARACTER_TYPE,
+  },
+  role: {
+    roleType: ROLE_TYPE,
+    rolesDistribution: ROLES_DISTRIBUTION,
   },
 };
 
