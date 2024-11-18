@@ -20,6 +20,7 @@ const packetNames = {
   },
   game: {
     C2SPositionUpdateRequest: 'game.C2SPositionUpdateRequest',
+    S2CPositionUpdateResponse: 'game.S2CPositionUpdateResponse',
     S2CPositionUpdateNotification: 'game.S2CPositionUpdateNotification',
 
     C2SUseCardRequest: 'game.C2SUseCardRequest',

@@ -1,7 +1,13 @@
+import { PACKET_TYPE } from '../constants/header.js';
 import CustomError from '../utils/errors/customError.js';
-import ErrorCodes from './../utils/errors/errorCodes';
+import ErrorCodes from './../utils/errors/errorCodes.js';
 
-const handlers = {};
+const handlers = {
+  // [PACKET_TYPE.REGISTER_REQUEST]: {
+  //   handler: test,
+  //   protoType: 'test',
+  // },
+};
 
 export const getHandlerByPacketType = (PacketType) => {
   if (!handlers[PacketType]) {

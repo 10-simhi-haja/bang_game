@@ -23,7 +23,7 @@ message S2CPositionUpdateNotification {
 // 카드 사용
 message C2SUseCardRequest {
     CardType cardType = 1;
-    string targetUserId = 2; // 타겟 없으면 빈 값
+    int64 targetUserId = 2; // 타겟 없으면 빈 값
 }
 message S2CUseCardResponse { // 성공 여부만 반환하고 대상 유저 효과는 S2CUserUpdateNotification로 통지
     bool success = 1;
@@ -33,16 +33,16 @@ message S2CUseCardResponse { // 성공 여부만 반환하고 대상 유저 효�
 // 카드 효과 알림
 message S2CUseCardNotification {
     CardType cardType = 1;
-    string userId = 2;
-    string targetUserId = 3; // 타겟 없으면 빈 값
+    int64 userId = 2;
+    int64 targetUserId = 3; // 타겟 없으면 빈 값
 }
 message S2CEquipCardNotification {
     CardType cardType = 1;
-    string userId = 2;
+     int64 userId = 2;
 }
 message S2CCardEffectNotification {
     CardType cardType = 1;
-    string userId = 2;
+    int64 userId = 2;
     bool success = 3;
 }
 
@@ -106,7 +106,7 @@ message S2CCardSelectResponse {
 
 // 디버프
 message C2SPassDebuffRequest {
-    string targetUserId = 1;
+    int64 targetUserId = 1;
     CardType debuffCardType = 2;
 }
 message S2CPassDebuffResponse {
@@ -121,6 +121,6 @@ message S2CWarningNotification {
 
 // 효과 알림(레이저 조준, 레이더, 스텔스, 자동쉴드...)
 message S2CAnimationNotification {
-    string userId = 1;
+    int64 userId = 1;
     AnimationType animationType = 2;
 }

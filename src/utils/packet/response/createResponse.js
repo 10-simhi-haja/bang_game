@@ -5,7 +5,7 @@ import PACKET_MAPS from '../../../protobufs/packetMaps.js';
 
 export const createResponse = (packetType, payloadData = {}, sequence) => {
   // 1. 패킷 타입
-  const typeBuffer = Buffer.alloc(config.packet.typeLength);
+  const typeBuffer = Buffer.alloc(config.packet.payloadOneofCaseLength);
   typeBuffer.writeUInt16BE(packetType);
   // 2. 버전
   const versionLengthBuffer = Buffer.alloc(config.packet.versionLength);

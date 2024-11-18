@@ -7,9 +7,9 @@ package auth;
 
 //회원가입 및 로그인 패킷
 message C2SRegisterRequest {
-    string id = 1;
-    string password = 2;
-    string email = 3;
+    string email = 1;
+    string nickname = 2;
+    string password = 3;
 }
 
 message S2CRegisterResponse {
@@ -19,7 +19,7 @@ message S2CRegisterResponse {
 }
 
 message C2SLoginRequest {
-    string id = 1;
+    string email = 1;
     string password = 2;
 }
 
