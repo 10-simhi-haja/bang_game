@@ -32,7 +32,7 @@ const config = {
     versionLength: VERSION_LENGTH,
     sequenceLength: SEQUENCE_LENGTH,
     payloadLength: PAYLOAD_LENGTH,
-    pcaket: PACKET_TYPE,
+    pcaketType: PACKET_TYPE,
   },
 };
 
