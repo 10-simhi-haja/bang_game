@@ -9,14 +9,11 @@ const registerHandler = async ({ socket, payload }) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  console.log('password: ', password);
-  console.log('hashedPassword: ', hashedPassword);
-
   let user = await findUser(nickname, email);
   console.log(user);
   if (user === undefined) {
     console.log('회원가입 성공');
-    createUser(nickname, email, password);
+    createUser(nickname, email, hashedPassword);
     responseData.success = true;
     responseData.message = '회원가입 성공';
     responseData.failCode = 0;
@@ -29,8 +26,8 @@ const registerHandler = async ({ socket, payload }) => {
 
   const registerResponsePacket = createResponse(
     config.packet.packetType.REGISTER_RESPONSE,
-    responseData,
     socket.sequence,
+    responseData,
   );
 
   socket.write(registerResponsePacket);
