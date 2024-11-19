@@ -1,13 +1,25 @@
-import handleError from '../../utils/errors/errorHandler.js';
-import { v4 as uuidv4 } from 'uuid';
-import { createResponse } from '../../utils/packet/response/createResponse.js';
 import config from '../../config/config.js';
-import { addGameSession } from '../../sessions/game.session.js';
-import { getUserBySocket } from '../../sessions/user.session.js';
+import { getGameSessionById } from '../../sessions/game.session.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const joinRoomHandler = async ({ socket, payload }) => {
   try {
-   const roomId = 
+    const roomId = payload.roomId;
+    const room = getGameSessionById(roomId);
+
+    const responseData = {
+      success: true,
+      room: room,
+      failcode: 0,
+    };
+
+    const joinRoomResponse = createResponse(
+      config.packet.packetType.JOIN_ROOM_RESPONSE,
+      socket.sequence,
+      responseData,
+    );
+
+    socket.write(joinRoomResponse);
   } catch (error) {
     handleError(socket, error);
   }
