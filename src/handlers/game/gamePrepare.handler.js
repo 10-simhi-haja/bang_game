@@ -1,4 +1,6 @@
 import config from '../../config/config.js';
+import { getGameSessionByUser } from '../../sessions/game.session.js';
+import { getUserBySocket } from '../../sessions/user.session.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -126,13 +128,17 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     // 1. 방장의 소켓으로 prepare 요청이 들어온다.
     // 1-1. ownerId로 game세션을 찾을수 있어야함.
     const owner = getUserByScoket(socket);
-    const game = getGameSessionByOwnerId(owner.id);
+    const game = getGameSessionByUser(owner);
 
     // 방 인원수
-    const playerCount = game.users.length;
+    // const playerCount = game.users.length;
+    // 임시
+    const playerCount = payload.length;
 
-    prepareCharacter(playerCount);
-    prepareRole(playerCount);
+    const preparedCharacter = prepareCharacter(playerCount); // 배열
+    const preparedRole = prepareRole(playerCount); // 배열
+
+    game.setPrepare(preparedCharacter, preparedRole);
 
     const roomData = game.getRoomData();
 
