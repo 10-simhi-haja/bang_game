@@ -64,7 +64,7 @@ const handlers = {
     protoType: 'room.S2CJoinRoomNotification',
   },
   [packetType.LEAVE_ROOM_REQUEST]: {
-    handler: reaveRoomHandler,
+    handler: leaveRoomHandler,
     protoType: 'room.C2SLeaveRoomRequest',
   },
   [packetType.LEAVE_ROOM_RESPONSE]: {
