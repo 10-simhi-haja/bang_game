@@ -21,13 +21,15 @@ export const getGameSessionById = (id) => {
 };
 
 export const getGameSessionBySocket = (socket) => {
-  return gameSessions.find((session) => session.users.some((user) => user.socket === socket));
+  return gameSessions.find((session) =>
+    session.getAllUsers().some((user) => user.socket === socket),
+  );
 };
 
 // 유저가 속한 게임찾기
 export const getGameSessionByUser = (user) => {
   return gameSessions.find((session) =>
-    session.users.some((sessionUser) => sessionUser.id === user.id),
+    session.getAllUsers().some((sessionUser) => sessionUser.id === user.id),
   );
 };
 

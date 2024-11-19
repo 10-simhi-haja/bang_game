@@ -19,6 +19,10 @@ class Game {
     // this.intervalManager = new IntervalManager();
   }
 
+  getAllUsers() {
+    return Object.values(this.users).map((entry) => entry.user);
+  }
+
   getRoomData() {
     return {
       id: this.id,
