@@ -34,7 +34,7 @@ const sendPositionUpdateToOpponents = (gameSession, updatedUserId, payload) => {
 const startPeriodicPositionUpdates = (gameSession) => {
   setInterval(() => {
     gameSession.users.forEach((currentUser) => {
-      const { id, socket, position } = currentUser;
+      const { id, position } = currentUser;
       sendPositionUpdateToOpponents(gameSession, id, { x: position.x, y: position.y });
     });
   }, 1000);
@@ -46,12 +46,12 @@ const handlePositionUpdate = async (socket, payload) => {
     const { x, y } = payload;
     const gameSession = getGameSessionBySocket(socket);
     if (!gameSession) {
-      throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
+      throw { message: '해당 유저의 게임 세션이 존재하지 않습니다.', failCode: 2 };
     }
 
     const currentUser = gameSession.users.find((user) => user.socket === socket);
     if (!currentUser) {
-      throw new Error('유저가 존재하지 않습니다.');
+      throw { message: '유저가 존재하지 않습니다.', failCode: 3 };
     }
 
     // 위치 업데이트 호출
@@ -59,15 +59,15 @@ const handlePositionUpdate = async (socket, payload) => {
 
     if (success) {
       const positionResponse = createResponse(packetType.POSITION_UPDATE_RESPONSE, 0, {
-        x,
-        y,
+        success: true,
+        failCode: 0,
       });
       socket.write(positionResponse);
 
       // 위치를 업데이트 시 바로 상대에게 전송
       sendPositionUpdateToOpponents(gameSession, currentUser.id, { x, y });
     } else {
-      throw new Error('캐릭터 위치 업데이트에 실패하였습니다.');
+      throw { message: '캐릭터 위치 업데이트에 실패하였습니다.', failCode: 1 };
     }
 
     // 주기적으로 위치 정보를 전송하도록 타이머 시작 (한 번만 시작)
@@ -80,7 +80,7 @@ const handlePositionUpdate = async (socket, payload) => {
 
     const errorResponse = createResponse(packetType.POSITION_UPDATE_RESPONSE, 0, {
       success: false,
-      data: { message: error.message || 'Error updating position', failCode: 1 },
+      failCode: error.failCode || 1,
     });
     socket.write(errorResponse);
   }
