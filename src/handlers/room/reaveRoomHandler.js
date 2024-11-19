@@ -14,8 +14,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
 
-    console.log('방을 나갈 유저 정보: ', user);
-    console.log('방을 정보: ', room);
+    console.log('방을 정보: ', room.id);
 
     // removeUserBySocket(socket);
     // console.log('남아 있는 유저: ', getUserSessions().length);

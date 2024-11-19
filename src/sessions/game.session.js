@@ -21,16 +21,16 @@ export const getGameSessionById = (id) => {
 };
 
 export const getGameSessionBySocket = (socket) => {
-  return gameSessions.find((session) => session.users.some((user) => user.socket === socket));
+  return gameSessions.find((session) =>
+    session.getAllUsers().some((user) => user.socket === socket),
+  );
 };
 
 // 유저가 속한 게임찾기
 export const getGameSessionByUser = (user) => {
-  console.log('유저!!!!!!!!!!!!!!!!', user);
-  const test = gameSessions.find((session) =>
-    session.users.some((sessionUser) => sessionUser.id === user.id),
+  return gameSessions.find((session) =>
+    session.getAllUsers().some((sessionUser) => sessionUser.id === user.id),
   );
-  return test;
 };
 
 export const getAllGameSessions = () => {
