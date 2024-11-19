@@ -33,7 +33,7 @@ const loginHandler = async ({ socket, payload }) => {
     }
 
     // 동일한 유저가 접속 중인지 확인
-    let isUserSession = getUserById(user.accountId);
+    let isUserSession = getUserById(user.account_id);
     if (isUserSession) {
       throw new CustomError(
         ErrorCodes.DUPLICATED_USER_CONNECT,
@@ -45,8 +45,9 @@ const loginHandler = async ({ socket, payload }) => {
     // const token = jwt.sign(user, config.jwt.key);
     const token = createJWT(email);
 
-    await addUser(socket, token, user.nickname);
+    await addUser(socket, user.account_id, user.nickname);
 
+    socket.account_id = user.account_id;
     // 마지막 접속 기록 업데이트
     updateUserLogin(email);
 
@@ -55,7 +56,7 @@ const loginHandler = async ({ socket, payload }) => {
       success: true,
       message: '로그인 성공',
       token,
-      myInfo: { id: token, nickname: user.nickname, character: {} },
+      myInfo: { id: user.account_id, nickname: user.nickname, character: {} },
       failCode: 0,
     };
 

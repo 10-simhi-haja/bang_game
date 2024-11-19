@@ -10,7 +10,7 @@ const createRoomHnadler = async ({ socket, payload }) => {
     const { name, maxUserNum } = payload;
     let roomData = {
       id: uuidv4(),
-      ownerId: socket.account_id,
+      ownerId: getUserBySocket(socket).userId,
       name: name,
       maxUserNum: maxUserNum,
       state: config.roomStateType.wait,
