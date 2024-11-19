@@ -1,9 +1,9 @@
 import USER_SQL_QUERIES from './user.queries.js';
 import dbPool from './../database.js';
 
-export const findUser = async (nicname, email) => {
+export const findUser = async (nickname, email) => {
   try {
-    const [rows] = await dbPool.query(USER_SQL_QUERIES.FIND_USER, [nicname, email]);
+    const [rows] = await dbPool.query(USER_SQL_QUERIES.FIND_USER, [nickname, email]);
     console.log(rows);
     return rows[0];
   } catch (error) {
@@ -11,12 +11,12 @@ export const findUser = async (nicname, email) => {
   }
 };
 
-export const findUserNicname = async (nicname) => {
+export const findUserNickname = async (nickname) => {
   try {
-    const [rows] = await dbPool.query(USER_SQL_QUERIES.FIND_USER_NICNAME, [nicname]);
+    const [rows] = await dbPool.query(USER_SQL_QUERIES.FIND_USER_NICKNAME, [nickname]);
     return rows[0];
   } catch (error) {
-    console.error('[SQL] findUserNicname 오류: ', error);
+    console.error('[SQL] findUserNickname 오류: ', error);
   }
 };
 
@@ -29,9 +29,9 @@ export const findUserEmail = async (email) => {
   }
 };
 
-export const createUser = async (nicname, email, password) => {
+export const createUser = async (nickname, email, password) => {
   try {
-    await dbPool.query(USER_SQL_QUERIES.CREATE_USER, [nicname, email, password]);
+    await dbPool.query(USER_SQL_QUERIES.CREATE_USER, [nickname, email, password]);
   } catch (error) {
     console.error('[SQL] createUser 오류: ', error);
   }
