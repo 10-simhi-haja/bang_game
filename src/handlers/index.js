@@ -7,6 +7,7 @@ import handleUserUpdate from './syncCharacter/userUpdate.handler.js';
 import loginHandler from './user/loginHandler.js';
 import roomListHnadler from './room/roomListHandler.js';
 import createRoomHnadler from './room/createRoomHandler.js';
+import handleDestroyCardRequest from './card/destroyCard.handler.js';
 
 const { packetType } = config.packet;
 
@@ -156,7 +157,7 @@ const handlers = {
     protoType: 'game.S2CReactionResponse',
   },
   [packetType.DESTROY_CARD_REQUEST]: {
-    handler: undefined,
+    handler: handleDestroyCardRequest,
     protoType: 'game.C2SDestroyCardRequest',
   },
   [packetType.DESTROY_CARD_RESPONSE]: {
