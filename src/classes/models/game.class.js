@@ -21,6 +21,7 @@ class Game {
       users: this.users.map((user) => user.getUserData()),
     };
   }
+
   // 게임 상태 변경
   changeState(newState) {
     this.state = newState;

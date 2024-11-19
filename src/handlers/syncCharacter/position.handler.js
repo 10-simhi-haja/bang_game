@@ -4,6 +4,43 @@ import { PACKET_TYPE } from '../../constants/header.js';
 
 const packetType = PACKET_TYPE;
 
+// 유저 위치 업데이트 함수
+const updateCharacterPosition = (gameSession, userId, x, y) => {
+  const targetUser = gameSession.users.find((user) => user.id === userId);
+  if (!targetUser) return false;
+
+  targetUser.position = { x, y };
+  return true;
+};
+
+// 상대 유저들에게 위치 업데이트 전송 함수
+const sendPositionUpdateToOpponents = (gameSession, updatedUserId, payload) => {
+  gameSession.users.forEach((user) => {
+    if (user.id !== updatedUserId) {
+      const notification = Buffer.alloc(10);
+      // 패킷 타입 설정
+      notification.writeUInt16BE(packetType.POSITION_UPDATE_NOTIFICATION, 0);
+
+      // 좌표 값
+      notification.writeUInt32BE(payload.x, 2);
+      notification.writeUInt32BE(payload.y, 6);
+
+      user.socket.write(notification);
+    }
+  });
+};
+
+// 주기적으로 위치 정보를 전송하는 함수
+const startPeriodicPositionUpdates = (gameSession) => {
+  setInterval(() => {
+    gameSession.users.forEach((currentUser) => {
+      const { id, socket, position } = currentUser;
+      sendPositionUpdateToOpponents(gameSession, id, { x: position.x, y: position.y });
+    });
+  }, 1000);
+};
+
+// 위치 업데이트 요청 핸들러
 const handlePositionUpdate = async ({ socket, payload }) => {
   try {
     const gameSession = getGameSessionBySocket(socket);
@@ -11,17 +48,13 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
     }
 
-    const user = gameSession.users.find((user) => user.socket === socket);
-    if (!user) {
+    const currentUser = gameSession.users.find((user) => user.socket === socket);
+    if (!currentUser) {
       throw new Error('유저가 존재하지 않습니다.');
     }
 
-    const opponent = gameSession.users.find((user) => user.socket !== socket);
-    if (!opponent) {
-      throw new Error('상대 유저가 존재하지 않습니다.');
-    }
-
-    const success = gameSession.updateCharacterPosition(user.id, payload.x, payload.y);
+    // 위치 업데이트 호출
+    const success = updateCharacterPosition(gameSession, currentUser.id, payload.x, payload.y);
 
     if (success) {
       const positionResponse = createResponse(packetType.POSITION_UPDATE_RESPONSE, 0, {
@@ -30,16 +63,16 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       });
       socket.write(positionResponse);
 
-      // 수정 필요
-      // 알림 로직은 리스폰스로 보내면 요청이 올때 응답을 해서 주기적으로 보내야하는 알림 로직과는 맞지 않음
-      const positionNotification = createResponse(packetType.POSITION_UPDATE_NOTIFICATION, 0, {
-        characterPositions: [{ userId: user.id, x: payload.x, y: payload.y }],
-        type: packetType.POSITION_UPDATE_NOTIFICATION,
-        success: true,
-      });
-      opponent.socket.write(positionNotification);
+      // 위치를 업데이트 시 바로 상대에게 전송
+      sendPositionUpdateToOpponents(gameSession, currentUser.id, { x: payload.x, y: payload.y });
     } else {
       throw new Error('캐릭터 위치 업데이트에 실패하였습니다.');
+    }
+
+    // 주기적으로 위치 정보를 전송하도록 타이머 시작 (한 번만 시작)
+    if (!gameSession.isPeriodicUpdateStarted) {
+      gameSession.isPeriodicUpdateStarted = true;
+      startPeriodicPositionUpdates(gameSession);
     }
   } catch (error) {
     console.error('위치 업데이트 중 에러 발생:', error.message);
