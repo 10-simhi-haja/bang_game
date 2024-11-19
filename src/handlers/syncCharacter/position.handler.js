@@ -1,7 +1,6 @@
 import { getGameSession } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import { PACKET_TYPE } from '../../constants/header.js';
-import { createNotificationPacket } from '../../utils/packet/notification/game.notification.js';
 
 const packetType = PACKET_TYPE;
 
@@ -37,11 +36,11 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       socket.write(positionResponse);
 
       // 상대 플레이어에게 위치 업데이트 알림 전송
-      const positionNotification = createNotificationPacket({
-        characterPositions: [{ userId: user.id, x: payload.x, y: payload.y }],
-        type: packetType.POSITION_UPDATE_NOTIFICATION,
-        success: true,
-      });
+      // const positionNotification = createNotificationPacket({
+      //   characterPositions: [{ userId: user.id, x: payload.x, y: payload.y }],
+      //   type: packetType.POSITION_UPDATE_NOTIFICATION,
+      //   success: true,
+      // });
       opponent.socket.write(positionNotification);
     } else {
       throw new Error('캐릭터 위치 업데이트에 실패하였습니다.');
