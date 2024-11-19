@@ -4,6 +4,7 @@ import config from '../config/config.js';
 import handlePositionUpdate from './syncCharacter/position.handler.js';
 import registerHandler from './user/registerHandler.js';
 import handleUserUpdate from './syncCharacter/syncCharacter.handler.js';
+import loginHandler from './user/loginHandler.js';
 
 const { packetType } = config.packet;
 
@@ -17,7 +18,7 @@ const handlers = {
     protoType: 'auth.C2SRegisterResponse',
   },
   [packetType.LOGIN_REQUEST]: {
-    handler: undefined,
+    handler: loginHandler,
     protoType: 'auth.C2SLoginRequest',
   },
   [packetType.LOGIN_RESPONSE]: {
