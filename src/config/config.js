@@ -17,6 +17,7 @@ import {
   DB_PASSWORD,
   DB_HOST,
   DB_PORT,
+  JWT_SECRET_KEY,
 } from '../constants/env.js';
 import {
   TOTAL_HEADER_LENGTH,
@@ -61,6 +62,9 @@ const config = {
       host: DB_HOST,
       port: DB_PORT,
     },
+  },
+  jwt: {
+    key: JWT_SECRET_KEY,
   },
 };
 
