@@ -2,8 +2,11 @@ import User from '../classes/models/user.class.js';
 import { v4 as uuidv4 } from 'uuid';
 import { userSessions } from './sessions.js';
 
-export const addUser = (socket) => {
-  const user = new User(uuidv4(), socket);
+export const addUser = async (socket, token, nickname, character) => {
+  const user = new User(socket, token, nickname, character);
+  console.log(user);
+  //token은 User Class에 의해 userId가 될 겁니다.
+  //그래서 토큰을 비교해야한다면 userId로 비교하세요
   userSessions.push(user);
   return user;
 };
