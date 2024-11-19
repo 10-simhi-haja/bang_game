@@ -133,9 +133,15 @@ class Game {
   // 자신을 제외한 유저들 배열
   getOpponents(userId) {
     if (!this.users[userId]) {
-      return []; // 유저가 없으면 빈 배열 반환
+      console.log('겟 오퍼넌트 빈유저 반환');
+      return null; // 유저가 없으면 빈 배열 반환
     }
 
+    console.log(
+      `겟 오퍼넌트 실행 : ${Object.keys(this.users)
+        .filter((key) => key !== userId)
+        .map((key) => this.users[key])}`,
+    );
     return Object.keys(this.users) // 모든 유저 ID 가져오기
       .filter((key) => key !== userId) // userId와 다른 유저 필터링
       .map((key) => this.users[key]); // 상대방 유저 데이터 배열로 반환

@@ -3,7 +3,6 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import config from '../../config/config.js';
 import { addGameSession } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
-import { joinRoomNotification } from '../../utils/notification/prepare.notification.js';
 
 let count = 0;
 const createRoomHandler = async ({ socket, payload }) => {
@@ -37,17 +36,6 @@ const createRoomHandler = async ({ socket, payload }) => {
       socket.sequence,
       responseData,
     );
-
-    const userData = {
-      id: user.id,
-      nickname: user.nickname,
-      characterData: gameSession.users[user.id].characterData,
-    };
-
-    console.log(user);
-
-    const noti = joinRoomNotification(userData, user);
-    socket.write(noti);
 
     socket.write(createRoomResponse);
   } catch (error) {

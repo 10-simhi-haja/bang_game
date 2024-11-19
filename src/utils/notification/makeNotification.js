@@ -36,7 +36,7 @@ const makeNotification = (packetType, payload, user) => {
     payload: fieldName,
     [fieldName]: payload,
   };
-  const payloadBuffer = protoMessages.GamePacket.encode(data).finish();
+  const payloadBuffer = protoMessages.packet.GamePacket.encode(data).finish();
 
   const payloadLengthBuffer = Buffer.alloc(PACKET_PAYLOAD_LENGTH);
   payloadLengthBuffer.writeUintBE(payloadBuffer.length, 0, PACKET_PAYLOAD_LENGTH);

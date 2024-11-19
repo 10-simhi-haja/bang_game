@@ -5,9 +5,9 @@ const {
   packet: { packetType: PACKET_TYPE },
 } = config;
 
-// enemyTowerAttackNotification
-export const prepareNotification = (roomData, user) => {
-  const packetType = PACKET_TYPE.GAME_PREPARE_NOTIFICATION;
-  const payload = { roomData };
+export const createJoinRoomNotification = (joinUserData, user) => {
+  const packetType = PACKET_TYPE.JOIN_ROOM_NOTIFICATION;
+  const payload = { joinUserData };
+  console.log(`노티 내부 : ${user.nickname}`);
   return makeNotification(packetType, payload, user);
 };
