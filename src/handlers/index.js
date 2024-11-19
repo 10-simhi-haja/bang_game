@@ -64,7 +64,7 @@ const handlers = {
     protoType: 'room.S2CJoinRoomNotification',
   },
   [packetType.LEAVE_ROOM_REQUEST]: {
-    handler: undefined,
+    handler: reaveRoomHandler,
     protoType: 'room.C2SLeaveRoomRequest',
   },
   [packetType.LEAVE_ROOM_RESPONSE]: {
@@ -89,7 +89,7 @@ const handlers = {
   },
   [packetType.GAME_START_REQUEST]: {
     handler: undefined,
-    protoType: 'gameState.C2SGameStartRequest ',
+    protoType: 'gameState.C2SGameStartRequest',
   },
   [packetType.GAME_START_RESPONSE]: {
     handler: undefined,
