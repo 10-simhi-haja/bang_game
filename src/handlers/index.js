@@ -8,6 +8,7 @@ import roomListHandler from './room/roomListHandler.js';
 import createRoomHandler from './room/createRoomHandler.js';
 import joinRoomHandler from './room/joinRoomHandler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
+import leaveRoomHandler from './room/leaveRoomHandler.js';
 
 const { packetType } = config.packet;
 
