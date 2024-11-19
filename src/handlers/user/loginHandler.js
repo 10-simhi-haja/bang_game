@@ -6,6 +6,7 @@ import ErrorCodes from '../../utils/errors/errorCodes.js';
 import handleError from './../../utils/errors/errorHandler.js';
 import config from '../../config/config.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import { addUser, getUserById } from '../../sessions/user.session.js';
 
 const loginHandler = async ({ socket, payload }) => {
   try {
@@ -31,8 +32,17 @@ const loginHandler = async ({ socket, payload }) => {
     }
 
     // 동일한 유저가 접속 중인지 확인
+    let isUserSession = getUserById(user.account_id);
+    if (isUserSession) {
+      throw new CustomError(
+        ErrorCodes.DUPLICATED_USER_CONNECT,
+        '해당 유저는 이미 존재한다.',
+        socket.sequence,
+      );
+    }
 
     // 유저 세션에 추가
+    addUser(socket);
 
     // JWT 토큰 생성
     const userJWT = jwt.sign(user, config.jwt.key);
