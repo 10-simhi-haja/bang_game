@@ -4,6 +4,7 @@ import config from '../config/config.js';
 import handlePositionUpdate from './syncCharacter/position.handler.js';
 import registerHandler from './user/registerHandler.js';
 import loginHandler from './user/loginHandler.js';
+import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
 
 const { packetType } = config.packet;
 
@@ -73,7 +74,7 @@ const handlers = {
     protoType: 'room.S2CLeaveRoomNotification',
   },
   [packetType.GAME_PREPARE_REQUEST]: {
-    handler: undefined,
+    handler: gamePrepareRequestHandler,
     protoType: 'gameState.C2SGamePrepareRequest',
   },
   [packetType.GAME_PREPARE_RESPONSE]: {
