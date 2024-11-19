@@ -1,4 +1,4 @@
-import { getGameSession } from '../../sessions/game.session.js';
+import { getGameSessionBySocket } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import { PACKET_TYPE } from '../../constants/header.js';
 
@@ -6,7 +6,7 @@ const packetType = PACKET_TYPE;
 
 const handlePositionUpdate = async ({ socket, payload }) => {
   try {
-    const gameSession = getGameSession(socket);
+    const gameSession = getGameSessionBySocket(socket);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
     }

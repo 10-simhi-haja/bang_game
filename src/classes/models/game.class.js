@@ -2,18 +2,36 @@
 import User from './user.class.js';
 
 class Game {
-  constructor(users = []) {
-    this.user = new User(users);
+  constructor(roomData) {
+    this.id = roomData.id;
+    this.ownerId = roomData.ownerId;
+    this.name = roomData.name;
+    this.maxUserNum = roomData.maxUserNum;
+    this.state = roomData.state; // WAIT, PREPARE, INGAME
+    this.users = roomData.users.map((userData) => new User(userData));
   }
 
-  // 게임 내 캐릭터의 위치 업데이트
-  updateCharacterPosition(userId, x, y) {
-    const user = this.user.getUserById(userId);
-    if (user) {
-      user.position = { x, y };
-      return true;
+  getRoomData() {
+    return {
+      id: this.id,
+      ownerId: this.ownerId,
+      name: this.name,
+      maxUserNum: this.maxUserNum,
+      state: this.state,
+      users: this.users.map((user) => user.getUserData()),
+    };
+  }
+  // 게임 상태 변경
+  changeState(newState) {
+    this.state = newState;
+  }
+
+  // 유저 추가
+  addUser(userData) {
+    if (this.users.length >= this.maxUserNum) {
+      throw new Error('Room is full. Cannot add more users.');
     }
-    return false;
+    this.users.push(new User(userData));
   }
 }
 
