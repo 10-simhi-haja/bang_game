@@ -26,9 +26,11 @@ export const getGameSessionBySocket = (socket) => {
 
 // 유저가 속한 게임찾기
 export const getGameSessionByUser = (user) => {
-  return gameSessions.find((session) =>
+  console.log('유저!!!!!!!!!!!!!!!!', user);
+  const test = gameSessions.find((session) =>
     session.users.some((sessionUser) => sessionUser.id === user.id),
   );
+  return test;
 };
 
 export const getAllGameSessions = () => {
