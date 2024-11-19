@@ -1,9 +1,9 @@
 // 핸들러 구현을 위해 임시로 작성한 로직, 돌아가는지 확인이 불가능 하기에 팀원들 코드로 대체 예정
 class User {
   // 다수의 유저 데이터를 담아야하기 때문에 배열로 저장
-  constructor(socket, id, nickname, character) {
+  constructor(socket, userId, nickname, character) {
     this.socket = socket;
-    this.id = id;
+    this.userId = userId;
     this.nickname = nickname;
     this.character = character;
   }

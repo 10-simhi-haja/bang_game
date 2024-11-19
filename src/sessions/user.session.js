@@ -2,7 +2,7 @@ import User from '../classes/models/user.class.js';
 import { v4 as uuidv4 } from 'uuid';
 import { userSessions } from './sessions.js';
 
-export const addUser = async (socket) => {
+export const addUser = (socket) => {
   const user = new User(uuidv4(), socket);
   userSessions.push(user);
   return user;
