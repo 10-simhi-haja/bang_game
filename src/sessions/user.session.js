@@ -1,7 +1,6 @@
 import User from '../classes/models/user.class.js';
 import { v4 as uuidv4 } from 'uuid';
-
-export const userSessions = [];
+import { userSessions } from './sessions.js';
 
 export const addUser = async (socket) => {
   const user = new User(uuidv4(), socket);
@@ -26,5 +25,13 @@ export const getUserByDeviceId = (deviceId) => {
 };
 
 export const getUserBySocket = (socket) => {
-  return userSessions.find((user) => user.socket === socket);
+  const user = userSessions.find((user) => user.socket === socket);
+  if (!user) {
+    console.error('User not found: getUserBySocket');
+  }
+  return user;
+};
+
+export const getUserSessions = () => {
+  return userSessions;
 };
