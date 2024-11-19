@@ -144,3 +144,9 @@ export const CHARACTER_STATE_TYPE = {
   HALLUCINATION_TARGET: 14, // 신기루 대상
   CONTAINED: 15, // 감금 중
 };
+
+export const ROOM_STATA_TYPE = {
+  WAIT: 0,
+  PREPARE: 1,
+  INGAME: 2,
+};

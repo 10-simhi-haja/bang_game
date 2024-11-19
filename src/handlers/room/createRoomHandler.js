@@ -12,7 +12,7 @@ const createRoomHnadler = async ({ socket, payload }) => {
       ownerId: socket.account_id,
       name: name,
       maxUserNum: maxUserNum,
-      state: 0, // WAIT 0, PREPARE 1, INAGAME 2
+      state: config.roomStateType.wait,
       users: [],
     };
 
@@ -22,8 +22,6 @@ const createRoomHnadler = async ({ socket, payload }) => {
       failcode: 0,
     };
 
-    console.log(typeof roomData.state);
-    console.log(roomData.state);
     addGameSession(roomData);
 
     const createRoomResponse = createResponse(
@@ -39,9 +37,3 @@ const createRoomHnadler = async ({ socket, payload }) => {
 };
 
 export default createRoomHnadler;
-
-// 요청
-// {
-//     string name = 1;
-//     int32 maxUserNum = 2;
-// }
