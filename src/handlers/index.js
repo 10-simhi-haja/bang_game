@@ -3,7 +3,7 @@ import ErrorCodes from './../utils/errors/errorCodes.js';
 import config from '../config/config.js';
 import handlePositionUpdate from './syncCharacter/position.handler.js';
 import registerHandler from './user/registerHandler.js';
-import handleUserUpdate from './syncCharacter/syncCharacter.handler.js';
+import handleUserUpdate from './syncCharacter/userUpdate.handler.js';
 import loginHandler from './user/loginHandler.js';
 
 const { packetType } = config.packet;
