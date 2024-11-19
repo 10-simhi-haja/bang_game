@@ -18,9 +18,9 @@ const sendUserUpdateNotification = (gameSession, payload) => {
 };
 
 // 유저 업데이트 요청 핸들러
-const handleUserUpdate = async (payload) => {
+const handleUserUpdate = async (socket, payload) => {
     try {
-        const {socket, users} = payload;
+        const {users} = payload;
 
         const gameSession = getGameSessionBySocket(socket);
         if (!gameSession) {
