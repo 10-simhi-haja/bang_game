@@ -4,9 +4,6 @@ import { userSessions } from './sessions.js';
 
 export const addUser = async (socket, accountId, nickname) => {
   const user = new User(socket, accountId, nickname);
-  console.log(user);
-  //token은 User Class에 의해 userId가 될 겁니다.
-  //그래서 토큰을 비교해야한다면 userId로 비교하세요
   userSessions.push(user);
   return user;
 };
