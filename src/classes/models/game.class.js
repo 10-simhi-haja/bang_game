@@ -82,8 +82,32 @@ class Game {
     }
 
     Object.values(this.users).forEach((userEntry, index) => {
-      userEntry.characterData.characterType = preparedCharacter[index];
-      userEntry.characterData.roleType = preparedRole[index];
+      const characterType = preparedCharacter[index];
+      const roleType = preparedRole[index];
+
+      userEntry.characterData.characterType = characterType;
+      userEntry.characterData.roleType = roleType;
+
+      if (
+        characterType === CHARACTER_TYPE.DINOSAUR ||
+        characterType === CHARACTER_TYPE.PINK_SLIME
+      ) {
+        userEntry.characterData.hp = 3;
+      } else {
+        userEntry.characterData.hp = 4;
+      }
+
+      if (roleType === ROLE_TYPE.TARGET) {
+        userEntry.characterData.hp++;
+      }
+
+      userEntry.characterData.weapon = 0;
+      userEntry.characterData.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
+      userEntry.characterData.equips = 0;
+      userEntry.characterData.debuffs = 0;
+      userEntry.characterData.handCards = 0;
+      userEntry.characterData.bbangCount = 0;
+      userEntry.characterData.handCardsCount = 0;
     });
   }
 
@@ -114,6 +138,10 @@ class Game {
   }
 
   setCharacterDataByUserId(userId, characterData) {
+    if (!this.users[userId]) {
+      throw new Error(`${userId}를 가지는 유저가 없습니다.`);
+    }
+
     this.users[userId].characterData = characterData;
   }
 
@@ -122,7 +150,7 @@ class Game {
   prepareNotification() {
     const roomData = this.getRoomData();
 
-    this.users.forEach((user) => {
+    Object.values(this.users).forEach((user) => {
       user.socket.write(roomData);
     });
   }
