@@ -3,6 +3,7 @@ import ErrorCodes from './../utils/errors/errorCodes.js';
 import config from '../config/config.js';
 import handlePositionUpdate from './syncCharacter/position.handler.js';
 import registerHandler from './user/registerHandler.js';
+import handleUserUpdate from './syncCharacter/syncCharacter.handler.js';
 
 const { packetType } = config.packet;
 
@@ -136,7 +137,7 @@ const handlers = {
     protoType: 'game.S2CFleaMarketPickResponse',
   },
   [packetType.USER_UPDATE_NOTIFICATION]: {
-    handler: undefined,
+    handler: handleUserUpdate,
     protoType: 'game.S2CUserUpdateNotification',
   },
   [packetType.PHASE_UPDATE_NOTIFICATION]: {
