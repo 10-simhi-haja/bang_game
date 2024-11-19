@@ -41,9 +41,9 @@ const startPeriodicPositionUpdates = (gameSession) => {
 };
 
 // 위치 업데이트 요청 핸들러
-const handlePositionUpdate = async (payload) => {
+const handlePositionUpdate = async (socket, payload) => {
   try {
-    const { socket, x, y } = payload;
+    const { x, y } = payload;
     const gameSession = getGameSessionBySocket(socket);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
