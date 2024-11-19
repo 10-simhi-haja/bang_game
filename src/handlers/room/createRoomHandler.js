@@ -24,12 +24,10 @@ const createRoomHnadler = async ({ socket, payload }) => {
     };
 
     // 게임 세션 생성
-    const gameSession = addGameSession(roomData);
+    const gameSession = await addGameSession(roomData);
 
     // 방을 생성한 유저를 찾는다
     const user = getUserBySocket(socket);
-
-    // 생성한 유저를 집어 넣기
     gameSession.addUser(user);
 
     // 응답
