@@ -32,6 +32,8 @@ const loginHandler = async ({ socket, payload }) => {
 
     // 동일한 유저가 접속 중인지 확인
 
+    // 유저 세션에 추가
+
     // JWT 토큰 생성
     const userJWT = jwt.sign(user, config.jwt.key);
     socket.token = userJWT;
@@ -61,11 +63,3 @@ const loginHandler = async ({ socket, payload }) => {
 };
 
 export default loginHandler;
-
-// {
-//     bool success = 1;
-//     string message = 2;
-//     string token = 3;
-//     UserData myInfo = 4;
-//     GlobalFailCode failCode = 5;
-// }
