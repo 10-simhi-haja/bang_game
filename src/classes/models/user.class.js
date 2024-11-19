@@ -3,28 +3,8 @@ class User {
   // 다수의 유저 데이터를 담아야하기 때문에 배열로 저장
   constructor(socket, userId, nickname) {
     this.socket = socket;
-    this.userId = userId;
+    this.id = userId;
     this.nickname = nickname;
-  }
-
-  addUser(user) {
-    this.users.push(user);
-  }
-
-  removeUser(socket) {
-    this.users = this.users.filter((user) => user.socket !== socket);
-  }
-
-  getUserById(userId) {
-    return this.users.find((user) => user.id === userId);
-  }
-
-  getUserBySocket(socket) {
-    return this.users.find((user) => user.socket === socket);
-  }
-
-  getUsers() {
-    return this.users;
   }
 }
 
