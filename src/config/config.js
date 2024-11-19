@@ -29,6 +29,8 @@ import {
   CHARACTER_TYPE,
   ROLE_TYPE,
   ROLES_DISTRIBUTION,
+  CHARACTER_STATE_TYPE,
+  ROOM_STATE_TYPE,
 } from '../constants/header.js';
 
 const config = {
@@ -49,10 +51,16 @@ const config = {
   },
   character: {
     characterType: CHARACTER_TYPE,
+    characterStateType: CHARACTER_STATE_TYPE,
   },
   role: {
     roleType: ROLE_TYPE,
     rolesDistribution: ROLES_DISTRIBUTION,
+  },
+  roomStateType: {
+    wait: ROOM_STATE_TYPE.WAIT,
+    propare: ROOM_STATE_TYPE.PREPARE,
+    inGame: ROOM_STATE_TYPE.INGAME,
   },
   databases: {
     USER_DB: {

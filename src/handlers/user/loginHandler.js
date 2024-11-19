@@ -41,7 +41,6 @@ const loginHandler = async ({ socket, payload }) => {
         socket.sequence,
       );
     }
-
     // JWT 토큰 생성
     // const token = jwt.sign(user, config.jwt.key);
     const token = createJWT(email);
