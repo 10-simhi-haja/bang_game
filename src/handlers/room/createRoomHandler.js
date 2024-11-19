@@ -4,13 +4,14 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import config from '../../config/config.js';
 import { addGameSession } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import { joinRoomNotification } from '../../utils/notification/prepare.notification.js';
 
 const createRoomHnadler = async ({ socket, payload }) => {
   try {
     const { name, maxUserNum } = payload;
     let roomData = {
       id: uuidv4(),
-      ownerId: getUserBySocket(socket).userId,
+      ownerId: getUserBySocket(socket).id,
       name: name,
       maxUserNum: maxUserNum,
       state: config.roomStateType.wait,
@@ -36,6 +37,17 @@ const createRoomHnadler = async ({ socket, payload }) => {
       socket.sequence,
       responseData,
     );
+
+    const userData = {
+      id: user.id,
+      nickname: user.nickname,
+      characterData: gameSession.users[user.id].characterData,
+    };
+
+    console.log(user);
+
+    const noti = joinRoomNotification(userData, user);
+    socket.write(noti);
 
     socket.write(createRoomResponse);
   } catch (error) {

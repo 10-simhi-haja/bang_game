@@ -1,6 +1,7 @@
 import config from '../../config/config.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import { prepareNotification } from '../../utils/notification/prepare.notification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
@@ -146,9 +147,9 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     // 성공 실패 응답 해당유저에게 보내고,
 
     // 노티 해당 게임내 플레이어들에게 전부 보내고.
-    users = game.getUsers();
+    users = game.getAllUser();
 
-    game.prepareNotification();
+    prepareNotification();
 
     // 응답 패킷 생성
     const prepareResponse = createResponse(

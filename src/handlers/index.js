@@ -206,3 +206,33 @@ export const getProtoTypeNameByPacketType = (PacketType) => {
   }
   return handlers[PacketType].protoType;
 };
+
+export const getHandlerById = (handlerId) => {
+  if (!handlers[handlerId]) {
+    throw new CustomError(
+      ErrorCodes.UNKNOWN_HANDLER_ID,
+      `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+    );
+  }
+  return handlers[handlerId].handler;
+};
+
+export const getProtoTypeNameByHandlerId = (handlerId) => {
+  if (!handlers[handlerId]) {
+    throw new CustomError(
+      ErrorCodes.UNKNOWN_HANDLER_ID,
+      `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+    );
+  }
+  return handlers[handlerId].protoType;
+};
+
+export const getFieldNameByHandlerId = (handlerId) => {
+  if (!handlers[handlerId]) {
+    throw new CustomError(
+      ErrorCodes.UNKNOWN_HANDLER_ID,
+      `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+    );
+  }
+  return handlers[handlerId].fieldName;
+};

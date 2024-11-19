@@ -137,6 +137,10 @@ class Game {
       .map((key) => this.users[key]); // 상대방 유저 데이터 배열로 반환
   }
 
+  getAllUsers() {
+    return Object.values(this.users).map((entry) => entry.user);
+  }
+
   setCharacterDataByUserId(userId, characterData) {
     if (!this.users[userId]) {
       throw new Error(`${userId}를 가지는 유저가 없습니다.`);
