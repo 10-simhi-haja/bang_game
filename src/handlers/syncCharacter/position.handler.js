@@ -41,8 +41,9 @@ const startPeriodicPositionUpdates = (gameSession) => {
 };
 
 // 위치 업데이트 요청 핸들러
-const handlePositionUpdate = async ({ socket, payload }) => {
+const handlePositionUpdate = async (payload) => {
   try {
+    const { socket, x, y } = payload;
     const gameSession = getGameSessionBySocket(socket);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
@@ -54,17 +55,17 @@ const handlePositionUpdate = async ({ socket, payload }) => {
     }
 
     // 위치 업데이트 호출
-    const success = updateCharacterPosition(gameSession, currentUser.id, payload.x, payload.y);
+    const success = updateCharacterPosition(gameSession, currentUser.id, x, y);
 
     if (success) {
       const positionResponse = createResponse(packetType.POSITION_UPDATE_RESPONSE, 0, {
-        x: payload.x,
-        y: payload.y,
+        x,
+        y,
       });
       socket.write(positionResponse);
 
       // 위치를 업데이트 시 바로 상대에게 전송
-      sendPositionUpdateToOpponents(gameSession, currentUser.id, { x: payload.x, y: payload.y });
+      sendPositionUpdateToOpponents(gameSession, currentUser.id, { x, y });
     } else {
       throw new Error('캐릭터 위치 업데이트에 실패하였습니다.');
     }
