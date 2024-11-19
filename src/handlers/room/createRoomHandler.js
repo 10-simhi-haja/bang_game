@@ -1,16 +1,16 @@
 import handleError from '../../utils/errors/errorHandler.js';
-import { v4 as uuidv4 } from 'uuid';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import config from '../../config/config.js';
 import { addGameSession } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 
-const createRoomHnadler = async ({ socket, payload }) => {
+let count = 0;
+const createRoomHandler = async ({ socket, payload }) => {
   try {
     const { name, maxUserNum } = payload;
     let roomData = {
-      id: uuidv4(),
-      ownerId: getUserBySocket(socket).userId,
+      id: ++count,
+      ownerId: getUserBySocket(socket).id,
       name: name,
       maxUserNum: maxUserNum,
       state: config.roomStateType.wait,
@@ -43,4 +43,4 @@ const createRoomHnadler = async ({ socket, payload }) => {
   }
 };
 
-export default createRoomHnadler;
+export default createRoomHandler;
