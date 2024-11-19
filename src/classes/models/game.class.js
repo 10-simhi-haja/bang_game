@@ -14,9 +14,7 @@ class Game {
     this.name = roomData.name;
     this.maxUserNum = roomData.maxUserNum;
     this.state = roomData.state; // WAIT, PREPARE, INGAME
-    this.users = {
-      length: 0,
-    };
+    this.users = {};
     // 인터버 매니저 추가되면.
     // this.intervalManager = new IntervalManager();
   }
@@ -28,14 +26,17 @@ class Game {
       name: this.name,
       maxUserNum: this.maxUserNum,
       state: this.state,
-      users: Object.values(this.users)
-        .filter((entry) => typeof entry === 'object') // 유저 데이터를 필터링 length를 제외하는 과정
-        .map((entry) => ({
-          id: entry.user.id,
-          nickname: entry.user.nickname,
-          characterData: entry.characterData,
-        })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
+      users: Object.values(this.users).map((entry) => ({
+        id: entry.user.id,
+        nickname: entry.user.nickname,
+        characterData: entry.characterData,
+      })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
     };
+  }
+
+  getUserLength() {
+    const userLength = Object.keys(this.users).length;
+    return userLength;
   }
 
   // 게임 상태 변경
@@ -45,45 +46,53 @@ class Game {
 
   // 유저 추가
   addUser(user) {
-    if (this.users.length >= this.maxUserNum) {
+    if (this.getUserLength() >= this.maxUserNum) {
       throw new Error(
-        `방이 가득 찼습니다. 현재인원 : ${this.users.length}, 최대 인원 : ${this.maxUserNum}`,
+        `방이 가득 찼습니다. 현재인원 : ${this.getUserLength()}, 최대 인원 : ${this.maxUserNum}`,
       );
     }
 
-    this.users.length++;
+    // 캐릭터 데이터
+    const defaultCharacterData = {
+      characterType: CHARACTER_TYPE.NONE_CHARACTER, // 캐릭터 종류
+      roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
+      hp: 0,
+      weapon: 0,
+      stateInfo: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE, // 캐릭터 스테이트 타입
+      equips: 0,
+      debuffs: 0,
+      handCards: 0,
+      bbangCount: 0,
+      handCardsCount: 0,
+    };
+
     this.users[user.id] = {
       user, // 유저
-      characterData: {
-        characterType: CHARACTER_TYPE.NONE_CHARACTER, // 캐릭터 종류
-        roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
-        hp: 0,
-        weapon: 0,
-        stateInfo: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE, // 캐릭터 스테이트 타입
-        equips: 0,
-        debuffs: 0,
-        handCards: 0,
-        bbangCount: 0,
-        handCardsCount: 0,
-      },
+      characterData: { ...defaultCharacterData },
     };
   }
 
-  // 캐릭터, 역할분배 셋팅
+  // 캐릭터, 역할 분배 설정
   setPrepare(preparedCharacter, preparedRole) {
-    this.users.forEach((userId, index) => {
-      this.users[userId].characterData.characterType = preparedCharacter[index];
-      this.users[userId].characterData.roleType = preparedRole[index];
+    if (
+      this.getUserLength() !== preparedCharacter.length ||
+      this.getUserLength() !== preparedRole.length
+    ) {
+      throw new Error('캐릭터 및 역할 배열의 길이가 유저 수와 일치하지 않습니다.');
+    }
+
+    Object.values(this.users).forEach((userEntry, index) => {
+      userEntry.characterData.characterType = preparedCharacter[index];
+      userEntry.characterData.roleType = preparedRole[index];
     });
   }
 
   removeUser(userId) {
-    if (this.users.length == 0) {
+    if (this.getUserLength() == 0) {
       return;
     }
-    delete this.users[userId];
-    this.users.length--;
 
+    delete this.users[userId];
     // 인터버 매니져 추가되면.
     // this.intervalManager.removePlayer(userId);
   }
@@ -96,18 +105,26 @@ class Game {
   // 자신을 제외한 유저들 배열
   getOpponents(userId) {
     if (!this.users[userId]) {
-      return null; // 해당 유저가 없으면 null 반환
+      return []; // 유저가 없으면 빈 배열 반환
     }
 
-    const opponents = Object.keys(this.users) // 모든 유저 ID 가져오기
+    return Object.keys(this.users) // 모든 유저 ID 가져오기
       .filter((key) => key !== userId) // userId와 다른 유저 필터링
-      .map((key) => this.users[key]); // 상대방 유저 데이터 가져오기
-
-    return opponents.length > 0 ? opponents : null; // 상대방이 없으면 null 반환
+      .map((key) => this.users[key]); // 상대방 유저 데이터 배열로 반환
   }
 
   setCharacterDataByUserId(userId, characterData) {
     this.users[userId].characterData = characterData;
+  }
+
+  /////////////////// notification
+
+  prepareNotification() {
+    const roomData = this.getRoomData();
+
+    this.users.forEach((user) => {
+      user.socket.write(roomData);
+    });
   }
 }
 
