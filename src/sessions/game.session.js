@@ -3,8 +3,8 @@ import Game from '../classes/models/game.class.js';
 import { gameSessions } from './sessions.js';
 import { v4 as uuidv4 } from 'uuid';
 
-export const addGameSession = async () => {
-  const session = new Game(uuidv4());
+export const addGameSession = async (data) => {
+  const session = new Game(data);
   gameSessions.push(session);
   return session;
 };
