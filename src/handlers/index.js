@@ -5,9 +5,10 @@ import handlePositionUpdate from './syncCharacter/position.handler.js';
 import registerHandler from './user/registerHandler.js';
 import handleUserUpdate from './syncCharacter/userUpdate.handler.js';
 import loginHandler from './user/loginHandler.js';
-import roomListHnadler from './room/roomListHandler.js';
-import createRoomHnadler from './room/createRoomHandler.js';
-import handleDestroyCardRequest from './card/destroyCard.handler.js';
+
+import roomListHandler from './room/roomListHandler.js';
+import createRoomHandler from './room/createRoomHandler.js';
+import joinRoomHandler from './room/joinRoomHandler.js';
 
 const { packetType } = config.packet;
 
@@ -29,7 +30,7 @@ const handlers = {
     protoType: 'auth.S2CLoginResponse', ///
   },
   [packetType.CREATE_ROOM_REQUEST]: {
-    handler: createRoomHnadler,
+    handler: createRoomHandler,
     protoType: 'room.C2SCreateRoomRequest',
   },
   [packetType.CREATE_ROOM_RESPONSE]: {
@@ -37,7 +38,7 @@ const handlers = {
     protoType: 'room.S2CCreateRoomResponse',
   },
   [packetType.GET_ROOM_LIST_REQUEST]: {
-    handler: roomListHnadler,
+    handler: roomListHandler,
     protoType: 'room.C2SGetRoomListRequest',
   },
   [packetType.GET_ROOM_LIST_RESPONSE]: {
@@ -45,7 +46,7 @@ const handlers = {
     protoType: 'room.S2CGetRoomListResponse',
   },
   [packetType.JOIN_ROOM_REQUEST]: {
-    handler: undefined,
+    handler: joinRoomHandler,
     protoType: 'room.C2SJoinRoomRequest',
   },
   [packetType.JOIN_ROOM_RESPONSE]: {
@@ -65,7 +66,7 @@ const handlers = {
     protoType: 'room.S2CJoinRoomNotification',
   },
   [packetType.LEAVE_ROOM_REQUEST]: {
-    handler: undefined,
+    handler: leaveRoomHandler,
     protoType: 'room.C2SLeaveRoomRequest',
   },
   [packetType.LEAVE_ROOM_RESPONSE]: {
@@ -90,7 +91,7 @@ const handlers = {
   },
   [packetType.GAME_START_REQUEST]: {
     handler: undefined,
-    protoType: 'gameState.C2SGameStartRequest ',
+    protoType: 'gameState.C2SGameStartRequest',
   },
   [packetType.GAME_START_RESPONSE]: {
     handler: undefined,
