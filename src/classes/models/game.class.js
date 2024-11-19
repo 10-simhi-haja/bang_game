@@ -43,6 +43,18 @@ class Game {
     this.users.length++;
     this.users[user.id] = {
       user,
+      characterData: {
+        characterType: 0,
+        roleType: 0,
+        hp: 0,
+        weapon: 0,
+        stateInfo: 0, // 캐릭터 스테이트
+        equips: 0,
+        debuffs: 0,
+        handCards: 0,
+        bbangCount: 0,
+        handCardsCount: 0,
+      },
     };
   }
 
@@ -55,6 +67,24 @@ class Game {
 
     // 인터버 매니져 추가되면.
     // this.intervalManager.removePlayer(userId);
+  }
+
+  // userId로 user찾기
+  getUser(userId) {
+    return this.users[userId].user;
+  }
+
+  // 자신을 제외한 유저들 배열
+  getOpponents(userId) {
+    if (!this.users[userId]) {
+      return null; // 해당 유저가 없으면 null 반환
+    }
+
+    const opponents = Object.keys(this.users) // 모든 유저 ID 가져오기
+      .filter((key) => key !== userId) // userId와 다른 유저 필터링
+      .map((key) => this.users[key]); // 상대방 유저 데이터 가져오기
+
+    return opponents.length > 0 ? opponents : null; // 상대방이 없으면 null 반환
   }
 }
 
