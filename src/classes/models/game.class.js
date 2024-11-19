@@ -28,7 +28,13 @@ class Game {
       name: this.name,
       maxUserNum: this.maxUserNum,
       state: this.state,
-      users: this.users.map((user) => user.getUserData()),
+      users: Object.values(this.users)
+        .filter((entry) => typeof entry === 'object') // 유저 데이터를 필터링 length를 제외하는 과정
+        .map((entry) => ({
+          id: entry.user.id,
+          nickname: entry.user.nickname,
+          characterData: entry.characterData,
+        })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
     };
   }
 
@@ -47,7 +53,7 @@ class Game {
 
     this.users.length++;
     this.users[user.id] = {
-      user,
+      user, // 유저
       characterData: {
         characterType: CHARACTER_TYPE.NONE_CHARACTER, // 캐릭터 종류
         roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
@@ -61,6 +67,14 @@ class Game {
         handCardsCount: 0,
       },
     };
+  }
+
+  // 캐릭터, 역할분배 셋팅
+  setPrepare(preparedCharacter, preparedRole) {
+    this.users.forEach((userId, index) => {
+      this.users[userId].characterData.characterType = preparedCharacter[index];
+      this.users[userId].characterData.roleType = preparedRole[index];
+    });
   }
 
   removeUser(userId) {
@@ -90,6 +104,10 @@ class Game {
       .map((key) => this.users[key]); // 상대방 유저 데이터 가져오기
 
     return opponents.length > 0 ? opponents : null; // 상대방이 없으면 null 반환
+  }
+
+  setCharacterDataByUserId(userId, characterData) {
+    this.users[userId].characterData = characterData;
   }
 }
 
