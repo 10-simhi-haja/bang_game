@@ -2,8 +2,8 @@ import User from '../classes/models/user.class.js';
 import { v4 as uuidv4 } from 'uuid';
 import { userSessions } from './sessions.js';
 
-export const addUser = async (socket, token, nickname, character) => {
-  const user = new User(socket, token, nickname, character);
+export const addUser = async (socket, accountId, nickname) => {
+  const user = new User(socket, accountId, nickname);
   console.log(user);
   //token은 User Class에 의해 userId가 될 겁니다.
   //그래서 토큰을 비교해야한다면 userId로 비교하세요

@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { findUserEmail, updateUserLogin } from '../../database/user/user.db.js';
 import CustomError from '../../utils/errors/customError.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
@@ -11,12 +10,9 @@ import { createJWT } from '../../utils/jwt/createToken.js';
 
 const loginHandler = async ({ socket, payload }) => {
   try {
-    console.log('처음 소켓의 토큰', socket.token);
-    console.log('로그인 핸들러 payload: ', payload);
     const { email, password } = payload;
 
     const user = await findUserEmail(email);
-    console.log('로그인 핸들러 user: ', user);
 
     // DB 유저 확인
     if (!user) {
@@ -37,7 +33,7 @@ const loginHandler = async ({ socket, payload }) => {
     }
 
     // 동일한 유저가 접속 중인지 확인
-    let isUserSession = getUserById(user.account_id);
+    let isUserSession = getUserById(user.accountId);
     if (isUserSession) {
       throw new CustomError(
         ErrorCodes.DUPLICATED_USER_CONNECT,
@@ -50,11 +46,7 @@ const loginHandler = async ({ socket, payload }) => {
     // const token = jwt.sign(user, config.jwt.key);
     const token = createJWT(email);
 
-    // socket.token = token;
-    console.log('바꾸고 소켓의 토큰', socket.token);
-    // 임시 더미 캐릭터
-    const character = 'dummyCharacter';
-    await addUser(socket, token, user.nickname, character);
+    await addUser(socket, token, user.nickname);
 
     // 마지막 접속 기록 업데이트
     updateUserLogin(email);
@@ -64,7 +56,7 @@ const loginHandler = async ({ socket, payload }) => {
       success: true,
       message: '로그인 성공',
       token,
-      myInfo: { id: user.account_id, nickname: user.nickname, character: {} },
+      myInfo: { id: token, nickname: user.nickname, character: {} },
       failCode: 0,
     };
 
