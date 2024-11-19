@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { findUserEmail } from '../../database/user/user.db.js';
+import { findUserEmail, updateUserLogin } from '../../database/user/user.db.js';
 import CustomError from '../../utils/errors/customError.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
 import handleError from './../../utils/errors/errorHandler.js';
 import config from '../../config/config.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const loginHandler = async ({ socket, payload }) => {
   try {
@@ -34,11 +35,26 @@ const loginHandler = async ({ socket, payload }) => {
     // JWT 토큰 생성
     const userJWT = jwt.sign(user, config.jwt.key);
     socket.token = userJWT;
-    console.log('userJWT: ', userJWT);
-    console.log('socket: ', socket);
-    console.log('socket.token: ', socket.token);
 
-    console.log(user);
+    // 마지막 접속 기록 업데이트
+    updateUserLogin(email);
+
+    // 응답 패킷 생성
+    const responseData = {
+      success: true,
+      message: '로그인 성공',
+      token: userJWT,
+      myInfo: { id: user.account_id, nicname: user.nicname, character: {} },
+      failCode: 0,
+    };
+
+    const loginResponsePacket = createResponse(
+      config.packet.packetType.LOGIN_RESPONSE,
+      socket.sequence,
+      responseData,
+    );
+
+    socket.write(loginResponsePacket);
   } catch (error) {
     handleError(socket, error);
   }
