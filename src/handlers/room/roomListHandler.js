@@ -2,7 +2,7 @@ import config from '../../config/config.js';
 import { getAllGameSessions } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
-const roomListHnadler = async ({ socket, payload }) => {
+const roomListHandler = async ({ socket, payload }) => {
   try {
     const roomData = getAllGameSessions();
     const responseRoomData = {
@@ -21,4 +21,4 @@ const roomListHnadler = async ({ socket, payload }) => {
   }
 };
 
-export default roomListHnadler;
+export default roomListHandler;
