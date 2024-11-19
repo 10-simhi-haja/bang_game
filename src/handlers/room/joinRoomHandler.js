@@ -7,7 +7,7 @@ import { getUserBySocket } from '../../sessions/user.session.js';
 
 const joinRoomHandler = async ({ socket, payload }) => {
   try {
-   
+   const roomId = 
   } catch (error) {
     handleError(socket, error);
   }

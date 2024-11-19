@@ -145,7 +145,7 @@ export const CHARACTER_STATE_TYPE = {
   CONTAINED: 15, // 감금 중
 };
 
-export const ROOM_STATA_TYPE = {
+export const ROOM_STATE_TYPE = {
   WAIT: 0,
   PREPARE: 1,
   INGAME: 2,

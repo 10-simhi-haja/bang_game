@@ -2,8 +2,8 @@ import User from '../classes/models/user.class.js';
 import { v4 as uuidv4 } from 'uuid';
 import { userSessions } from './sessions.js';
 
-export const addUser = async (socket) => {
-  const user = new User(uuidv4(), socket);
+export const addUser = async (socket, accountId, nickname) => {
+  const user = new User(socket, accountId, nickname);
   userSessions.push(user);
   return user;
 };
@@ -29,6 +29,7 @@ export const getUserBySocket = (socket) => {
   if (!user) {
     console.error('User not found: getUserBySocket');
   }
+  console.log(`소켓으로 유저 찾기 : ${user}`);
   return user;
 };
 
