@@ -1,5 +1,10 @@
-// 핸들러 구현을 위해 임시로 작성한 로직, 돌아가는지 확인이 불가능 하기에 함수를 제외한 팀원들 코드로 대체 예정
-import User from './user.class.js';
+import config from '../../config/config.js';
+
+const {
+  packet: { packetType: PACKET_TYPE },
+  character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
+  role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
+} = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
 class Game {
@@ -44,11 +49,11 @@ class Game {
     this.users[user.id] = {
       user,
       characterData: {
-        characterType: 0,
-        roleType: 0,
+        characterType: CHARACTER_TYPE.NONE_CHARACTER, // 캐릭터 종류
+        roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
         hp: 0,
         weapon: 0,
-        stateInfo: 0, // 캐릭터 스테이트
+        stateInfo: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE, // 캐릭터 스테이트 타입
         equips: 0,
         debuffs: 0,
         handCards: 0,
