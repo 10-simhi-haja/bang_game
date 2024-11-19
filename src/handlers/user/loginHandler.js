@@ -43,6 +43,7 @@ const loginHandler = async ({ socket, payload }) => {
 
     // 유저 세션에 추가
     addUser(socket);
+    socket.account_id = user.account_id;
 
     // JWT 토큰 생성
     const userJWT = jwt.sign(user, config.jwt.key);
