@@ -5,7 +5,6 @@ import { PACKET_TYPE } from '../../constants/header.js';
 const packetType = PACKET_TYPE;
 
 const handlePositionUpdate = async ({ socket, payload }) => {
-  // 검증 과정
   try {
     const gameSession = getGameSession(socket);
     if (!gameSession) {
@@ -22,35 +21,31 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       throw new Error('상대 유저가 존재하지 않습니다.');
     }
 
-    // 캐릭터 위치 업데이트 수행
     const success = gameSession.updateCharacterPosition(user.id, payload.x, payload.y);
 
     if (success) {
-      // 위치 업데이트 성공 응답 생성
-      // 시퀀스 내용 추가
-      const positionResponse = createResponse({
-        success: true,
-        type: packetType.POSITION_UPDATE_RESPONSE,
-        data: { x: payload.x, y: payload.y },
+      const positionResponse = createResponse(packetType.POSITION_UPDATE_RESPONSE, 0, {
+        x: payload.x,
+        y: payload.y,
       });
       socket.write(positionResponse);
 
-      // 상대 플레이어에게 위치 업데이트 알림 전송
-      // const positionNotification = createNotificationPacket({
-      //   characterPositions: [{ userId: user.id, x: payload.x, y: payload.y }],
-      //   type: packetType.POSITION_UPDATE_NOTIFICATION,
-      //   success: true,
-      // });
+      // 수정 필요
+      // 알림 로직은 리스폰스로 보내면 요청이 올때 응답을 해서 주기적으로 보내야하는 알림 로직과는 맞지 않음
+      const positionNotification = createResponse(packetType.POSITION_UPDATE_NOTIFICATION, 0, {
+        characterPositions: [{ userId: user.id, x: payload.x, y: payload.y }],
+        type: packetType.POSITION_UPDATE_NOTIFICATION,
+        success: true,
+      });
       opponent.socket.write(positionNotification);
     } else {
       throw new Error('캐릭터 위치 업데이트에 실패하였습니다.');
     }
   } catch (error) {
-    console.error('위치 업데이트 중 에러 발생:', error);
+    console.error('위치 업데이트 중 에러 발생:', error.message);
 
-    const errorResponse = createResponse({
+    const errorResponse = createResponse(packetType.POSITION_UPDATE_RESPONSE, 0, {
       success: false,
-      type: packetType.POSITION_UPDATE_RESPONSE,
       data: { message: error.message || 'Error updating position', failCode: 1 },
     });
     socket.write(errorResponse);
