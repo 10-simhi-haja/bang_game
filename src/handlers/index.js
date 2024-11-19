@@ -6,6 +6,7 @@ import registerHandler from './user/registerHandler.js';
 import loginHandler from './user/loginHandler.js';
 import roomListHnadler from './room/roomListHandler.js';
 import createRoomHnadler from './room/createRoomHandler.js';
+import reaveRoomHandler from './room/reaveRoomHandler.js';
 
 const { packetType } = config.packet;
 
@@ -63,7 +64,7 @@ const handlers = {
     protoType: 'room.S2CJoinRoomNotification',
   },
   [packetType.LEAVE_ROOM_REQUEST]: {
-    handler: undefined,
+    handler: reaveRoomHandler,
     protoType: 'room.C2SLeaveRoomRequest',
   },
   [packetType.LEAVE_ROOM_RESPONSE]: {
