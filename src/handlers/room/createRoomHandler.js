@@ -1,5 +1,8 @@
 import handleError from '../../utils/errors/errorHandler.js';
 import { v4 as uuidv4 } from 'uuid';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
+import config from '../../config/config.js';
+import { addGameSession } from '../../sessions/game.session.js';
 
 const createRoomHnadler = async ({ socket, payload }) => {
   try {
@@ -13,18 +16,23 @@ const createRoomHnadler = async ({ socket, payload }) => {
       users: [],
     };
 
-    console.log('방을 만들거야: ', payload);
-
     const responseData = {
-
+      success: true,
+      room: roomData,
+      failcode: 0,
     };
 
-    // 응답
-    // {
-    //     bool success = 1;
-    //     RoomData room = 2;
-    //     GlobalFailCode failCode = 3;
-    // }
+    console.log(typeof roomData.state);
+    console.log(roomData.state);
+    addGameSession(roomData);
+
+    const createRoomResponse = createResponse(
+      config.packet.packetType.CREATE_ROOM_RESPONSE,
+      socket.sequence,
+      responseData,
+    );
+
+    socket.write(createRoomResponse);
   } catch (error) {
     handleError(socket, error);
   }
