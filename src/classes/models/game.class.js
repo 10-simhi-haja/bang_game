@@ -35,7 +35,7 @@ class Game {
       users: this.userOrder.map((id) => ({
         id: this.users[id].user.id,
         nickname: this.users[id].user.nickname,
-        characterData: { ...this.users[id].characterData },
+        character: { ...this.users[id].character },
       })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
     };
   }
@@ -58,7 +58,7 @@ class Game {
     }
 
     // 캐릭터 데이터
-    const defaultCharacterData = {
+    const defaultCharacter = {
       characterType: CHARACTER_TYPE.NONE_CHARACTER, // 캐릭터 종류
       roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
       hp: 0,
@@ -73,7 +73,7 @@ class Game {
 
     this.users[user.id] = {
       user, // 유저
-      characterData: { ...defaultCharacterData },
+      character: { ...defaultCharacter },
     };
     this.userOrder.push(user.id);
   }
@@ -91,30 +91,30 @@ class Game {
       const characterType = preparedCharacter[index];
       const roleType = preparedRole[index];
 
-      userEntry.characterData.characterType = characterType;
-      userEntry.characterData.roleType = roleType;
+      userEntry.character.characterType = characterType;
+      userEntry.character.roleType = roleType;
 
       if (
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.characterData.hp = 3;
+        userEntry.character.hp = 3;
       } else {
-        userEntry.characterData.hp = 4;
+        userEntry.character.hp = 4;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
-        userEntry.characterData.hp++;
+        userEntry.character.hp++;
       }
 
-      userEntry.characterData.weapon = 0;
-      userEntry.characterData.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
-      userEntry.characterData.equips = 0;
-      userEntry.characterData.debuffs = 0;
-      userEntry.characterData.handCards = 0;
-      userEntry.characterData.bbangCount = 0;
-      userEntry.characterData.handCardsCount = 0;
-      console.log(`캐릭터 데이터 : ${userEntry.characterData.characterType}`);
+      userEntry.character.weapon = 0;
+      userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
+      userEntry.character.equips = 0;
+      userEntry.character.debuffs = 0;
+      userEntry.character.handCards = 0;
+      userEntry.character.bbangCount = 0;
+      userEntry.character.handCardsCount = 0;
+      console.log(`캐릭터 데이터 : ${userEntry.character.characterType}`);
     });
   }
 
@@ -156,12 +156,12 @@ class Game {
     return Object.values(this.users).map((entry) => entry.user);
   }
 
-  setCharacterDataByUserId(userId, characterData) {
+  setCharacterDataByUserId(userId, character) {
     if (!this.users[userId]) {
       throw new Error(`${userId}를 가지는 유저가 없습니다.`);
     }
 
-    this.users[userId].characterData = characterData;
+    this.users[userId].character = character;
   }
 
   /////////////////// notification

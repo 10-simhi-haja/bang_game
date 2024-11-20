@@ -144,7 +144,7 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     game.setPrepare(preparedCharacter, preparedRole);
 
     const roomData = game.getRoomData();
-    console.log(`룸데이터 : ${roomData.ownerId}`);
+    console.log(`룸오너아이디 : ${roomData.ownerId}`);
 
     // 성공 실패 응답 해당유저에게 보내고,
     console.log(`xxxxx`);
@@ -248,8 +248,8 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
 
     /////////////////////////////
 
-    console.log(`캐릭터 타입: ${roomData.users[0].characterData.characterType}`);
-
+    console.log(`캐릭터 타입: ${roomData.users[0].character.characterType}`);
+    console.dir(roomData, { depth: null });
     const noti = createResponse(
       PACKET_TYPE.GAME_PREPARE_NOTIFICATION,
       socket.sequence,
