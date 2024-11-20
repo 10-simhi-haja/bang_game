@@ -13,7 +13,7 @@ const leaveRoomNotification = (socket, userId, room, ownerOut) => {
     // 방 주인이 나갔을 경우
     const responseData = {
       success: true,
-      failcode: 0,
+      failCode: 0,
     };
     leaveRoomNotification = createResponse(
       config.packet.packetType.LEAVE_ROOM_RESPONSE,

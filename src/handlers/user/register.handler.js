@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { createUser, findUser } from '../../database/user/user.db.js';
-import { createResponse } from './../../utils/packet/response/createResponse.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
 import config from '../../config/config.js';
 
 const registerHandler = async ({ socket, payload }) => {
