@@ -15,12 +15,14 @@ class Game {
     this.maxUserNum = roomData.maxUserNum;
     this.state = roomData.state; // WAIT, PREPARE, INGAME
     this.users = {};
+    this.userOrder = [];
     // 인터버 매니저 추가되면.
     // this.intervalManager = new IntervalManager();
   }
 
+  // 들어온 순서대로 반영.
   getAllUsers() {
-    return Object.values(this.users).map((entry) => entry.user);
+    return this.userOrder.map((id) => this.users[id].user);
   }
 
   getRoomData() {
@@ -30,17 +32,16 @@ class Game {
       name: this.name,
       maxUserNum: this.maxUserNum,
       state: this.state,
-      users: Object.values(this.users).map((entry) => ({
-        id: entry.user.id,
-        nickname: entry.user.nickname,
-        characterData: { ...entry.characterData },
+      users: this.userOrder.map((id) => ({
+        id: this.users[id].user.id,
+        nickname: this.users[id].user.nickname,
+        characterData: { ...this.users[id].characterData },
       })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
     };
   }
 
   getUserLength() {
-    const userLength = Object.keys(this.users).length;
-    return userLength;
+    return this.userOrder.length;
   }
 
   // 게임 상태 변경
@@ -74,6 +75,7 @@ class Game {
       user, // 유저
       characterData: { ...defaultCharacterData },
     };
+    this.userOrder.push(user.id);
   }
 
   // 캐릭터, 역할 분배 설정
@@ -116,12 +118,14 @@ class Game {
     });
   }
 
+  // 유저 제거
   removeUser(userId) {
-    if (this.getUserLength() == 0) {
+    if (!this.users[userId]) {
       return;
     }
 
     delete this.users[userId];
+    this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
     // 인터버 매니져 추가되면.
     // this.intervalManager.removePlayer(userId);
   }
