@@ -7,6 +7,7 @@ import { getUserBySocket } from '../../sessions/user.session.js';
 let count = 0;
 const createRoomHandler = async ({ socket, payload }) => {
   try {
+    console.log('createRoom payload: ', payload);
     const { name, maxUserNum } = payload;
     let roomData = {
       id: ++count,
