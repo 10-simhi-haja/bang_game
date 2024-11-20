@@ -1,9 +1,9 @@
 import config from '../../config/config.js';
-import { getGameSessionById } from '../../sessions/game.session.js';
+import { getAllGameSessions, getGameSessionById } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import handleError from '../../utils/errors/errorHandler.js';
 import joinRoomNotification from '../../utils/notification/joinRoomNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import handleError from './../../utils/errors/errorHandler.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -11,15 +11,13 @@ const {
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
 } = config;
 
-const joinRoomHandler = async ({ socket, payload }) => {
+const joinRandomRoomHandler = async ({ socket }) => {
   try {
-    console.log('joinRoom payload: ', payload);
-    const roomId = payload.roomId;
+    const allRoom = getAllGameSessions();
+    const randomRoomId = allRoom[Math.floor(Math.random() * allRoom.length)];
+    const roomId = randomRoomId.id;
     const room = getGameSessionById(roomId);
-    console.log('joinRoom: ', room);
-
     const user = getUserBySocket(socket);
-    console.log('joinUser: ', user);
 
     room.addUser(user);
 
@@ -48,18 +46,17 @@ const joinRoomHandler = async ({ socket, payload }) => {
       failCode: 0,
     };
 
-    const joinRoomResponse = createResponse(
-      config.packet.packetType.JOIN_ROOM_RESPONSE,
+    const joinRandomRoomResponse = createResponse(
+      config.packet.packetType.JOIN_RANDOM_ROOM_RESPONSE,
       socket.sequence,
       responseData,
     );
 
-    socket.write(joinRoomResponse);
+    socket.write(joinRandomRoomResponse);
     joinRoomNotification(socket, user.id, userData, room);
-    console.log(userData);
   } catch (error) {
     handleError(socket, error);
   }
 };
 
-export default joinRoomHandler;
+export default joinRandomRoomHandler;
