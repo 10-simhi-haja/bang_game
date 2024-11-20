@@ -29,14 +29,14 @@ const handlePassDebuffRequest = async (socket, payload) => {
       (card) => card.type === debuffCardType,
     );
     if (debuffCardIndex === -1) {
-      throw new Error(`유저의 핸드에 해당 디버프 카드가 존재하지 않습니다.`);
+      throw new Error('유저의 핸드에 해당 디버프 카드가 존재하지 않습니다.');
     }
 
     const [debuffCard] = currentUser.character.handCards.splice(debuffCardIndex, 1);
     targetUser.character.debuffs.push(debuffCard.type);
 
     // 요청을 보낸 소켓에 성공 여부 보내기
-    const passDebuffResponse = createResponse(packetType.PASS_DEBUFF_RESPONSE, 0, {
+    const passDebuffResponse = createResponse(packetType.PASS_DEBUFF_RESPONSE, socket.sequence, {
       success: true,
       failCode: 0,
     });
@@ -45,7 +45,7 @@ const handlePassDebuffRequest = async (socket, payload) => {
     console.error('디버프 전달 중 에러 발생:', error.message);
 
     // 요청을 보낸 소켓에 실패 여부 보내기
-    const errorResponse = createResponse(packetType.PASS_DEBUFF_RESPONSE, 0, {
+    const errorResponse = createResponse(packetType.PASS_DEBUFF_RESPONSE, socket.sequence, {
       success: false,
       failCode: 1,
       message: error.message || 'Debuff pass failed',

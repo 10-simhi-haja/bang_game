@@ -29,7 +29,7 @@ const sendUserUpdateNotification = (gameSession, payload) => {
   gameSession.users.forEach((user) => {
     const userUpdateNotification = createResponse(
       packetType.USER_UPDATE_NOTIFICATION,
-      0,
+      user.socket.sequence,
       userUpdatePayload,
     );
     user.socket.write(userUpdateNotification);
