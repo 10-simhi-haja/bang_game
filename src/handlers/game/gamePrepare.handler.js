@@ -1,6 +1,7 @@
 import config from '../../config/config.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -127,7 +128,7 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
   try {
     // 1. 방장의 소켓으로 prepare 요청이 들어온다.
     // 1-1. ownerId로 game세션을 찾을수 있어야함.
-    const owner = getUserByScoket(socket);
+    const owner = getUserBySocket(socket);
     const game = getGameSessionByUser(owner);
 
     // 방 인원수
@@ -145,13 +146,16 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     // 성공 실패 응답 해당유저에게 보내고,
 
     // 노티 해당 게임내 플레이어들에게 전부 보내고.
-    users = game.getUsers();
+    users = game.getAllUser();
 
-    users.forEach((user) => {
-      const noti = gamePreapareNotification(roomData, user);
-      const roomUserSocket = user.socket;
-      roomUserSocket.write(noti);
-    });
+    // 응답 패킷 생성
+    const prepareResponse = createResponse(
+      PACKET_TYPE.GAME_PREPARE_RESPONSE,
+      socket.sequence,
+      roomData,
+    );
+
+    socket.write(prepareResponse);
 
     // 크리에이트 리스폰스(성공여부, 실패코드)
   } catch (error) {}

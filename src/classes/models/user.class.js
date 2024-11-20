@@ -5,6 +5,11 @@ class User {
     this.socket = socket;
     this.id = userId;
     this.nickname = nickname;
+    this.sequence = 0;
+  }
+
+  getNextSequence() {
+    return ++this.sequence;
   }
 }
 
