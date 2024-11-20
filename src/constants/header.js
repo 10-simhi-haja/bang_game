@@ -151,7 +151,7 @@ export const ROOM_STATE_TYPE = {
   INGAME: 2,
 };
 
-export const GlobalFailCode = {
+export const GLOBAL_FAIL_CODE = {
   NONE_FAILCODE: 0,
   UNKNOWN_ERROR: 1,
   INVALID_REQUEST: 2,
@@ -169,4 +169,9 @@ export const GlobalFailCode = {
   ALREADY_USED_BBANG: 14,
   INVALID_PHASE: 15,
   CHARACTER_CONTAINED: 16,
+};
+
+export const WARNING_TYPE = {
+  NO_WARNING: 0,
+  BOMB_WARNING: 1,
 };

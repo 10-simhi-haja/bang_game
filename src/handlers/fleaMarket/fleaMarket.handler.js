@@ -1,6 +1,6 @@
 import { getGameSessionBySocket } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { GlobalFailCode, PACKET_TYPE } from '../../constants/header.js';
+import { GLOBAL_FAIL_CODE, PACKET_TYPE } from '../../constants/header.js';
 
 const packetType = PACKET_TYPE;
 
@@ -22,6 +22,7 @@ const handleFleaMarketPick = async (socket, payload) => {
     const isValidPickIndex = (index) => {
       // 플리마켓에서 유효한 인덱스인지 확인하는 로직을 구현
       // 일단 다른거부터
+      // 플리마켓 카드 사용시 패킷 전송
       return true;
     };
 
@@ -53,7 +54,7 @@ const handleFleaMarketPick = async (socket, payload) => {
     const errorResponse = await createResponse(packetType.FLEA_MARKET_PICK_RESPONSE, null, {
       success: false,
       message: 'Error processing flea market pick',
-      failCode: GlobalFailCode.UNKNOWN_ERROR,
+      failCode: GLOBAL_FAIL_CODE.UNKNOWN_ERROR,
     });
     socket.write(errorResponse);
   }

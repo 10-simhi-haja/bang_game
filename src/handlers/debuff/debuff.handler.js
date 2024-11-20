@@ -1,6 +1,6 @@
 import { getGameSessionBySocket } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { PACKET_TYPE } from '../../constants/header.js';
+import { PACKET_TYPE, WARNING_TYPE } from '../../constants/header.js';
 
 const packetType = PACKET_TYPE;
 
@@ -41,6 +41,19 @@ const handlePassDebuffRequest = async (socket, payload) => {
       failCode: 0,
     });
     socket.write(passDebuffResponse);
+
+    // 노티피케이션 생성 및 전송
+    const notificationData = {
+      warningType: WARNING_TYPE,
+      expectedAt: Date.now(),
+    };
+
+    const notificationResponse = createResponse(
+      packetType.WARNING_NOTIFICATION,
+      targetUser.socket.sequence,
+      notificationData,
+    );
+    targetUser.socket.write(notificationResponse);
   } catch (error) {
     console.error('디버프 전달 중 에러 발생:', error.message);
 
