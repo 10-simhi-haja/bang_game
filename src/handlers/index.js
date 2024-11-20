@@ -9,6 +9,7 @@ import createRoomHandler from './room/createRoomHandler.js';
 import joinRoomHandler from './room/joinRoomHandler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
 import leaveRoomHandler from './room/leaveRoomHandler.js';
+import joinRandomRoomHandler from './room/joinRandomRoomHandler.js';
 
 const { packetType } = config.packet;
 
@@ -54,7 +55,7 @@ const handlers = {
     protoType: 'room.S2CJoinRoomResponse',
   },
   [packetType.JOIN_RANDOM_ROOM_REQUEST]: {
-    handler: undefined,
+    handler: joinRandomRoomHandler,
     protoType: 'room.C2SJoinRandomRoomRequest',
   },
   [packetType.JOIN_RANDOM_ROOM_RESPONSE]: {
