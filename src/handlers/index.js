@@ -5,12 +5,13 @@ import handlePositionUpdate from './syncCharacter/position.handler.js';
 import registerHandler from './user/registerHandler.js';
 import handleUserUpdate from './syncCharacter/userUpdate.handler.js';
 import loginHandler from './user/loginHandler.js';
-
 import roomListHandler from './room/roomListHandler.js';
 import createRoomHandler from './room/createRoomHandler.js';
 import joinRoomHandler from './room/joinRoomHandler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
 import leaveRoomHandler from './room/leaveRoomHandler.js';
+import handleDestroyCardRequest from './card/destroyCard.handler.js';
+import handleFleaMarketPick from './fleaMarket/fleaMarket.handler.js';
 
 const { packetType } = config.packet;
 
@@ -136,7 +137,7 @@ const handlers = {
     protoType: 'game.S2CFleaMarketNotification',
   },
   [packetType.FLEA_MARKET_PICK_REQUEST]: {
-    handler: undefined,
+    handler: handleFleaMarketPick,
     protoType: 'game.C2SFleaMarketPickRequest',
   },
   [packetType.FLEA_MARKET_PICK_RESPONSE]: {
