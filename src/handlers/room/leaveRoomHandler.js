@@ -15,7 +15,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     room.removeUser(user.id);
 
     // // 방에 남아 있는 사람이 0 이하면 방은 삭제 된다.
-    let usersLength = Object.keys(room.users).length;
+    let usersLength = room.getUserLength();
     if (usersLength <= 0) {
       removeGameSessionById(room.id);
     }
