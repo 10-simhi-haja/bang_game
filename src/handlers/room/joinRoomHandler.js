@@ -1,7 +1,6 @@
 import config from '../../config/config.js';
 import { getGameSessionById } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
-import { createJoinRoomNotification } from '../../utils/notification/joinRoom.notification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import handleError from './../../utils/errors/errorHandler.js';
 
