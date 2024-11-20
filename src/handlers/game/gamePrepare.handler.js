@@ -2,6 +2,7 @@ import config from '../../config/config.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import ErrorCodes from '../../utils/errors/errorCodes.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -146,9 +147,119 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     console.log(`룸데이터 : ${roomData.ownerId}`);
 
     // 성공 실패 응답 해당유저에게 보내고,
+    console.log(`xxxxx`);
 
     // 노티 해당 게임내 플레이어들에게 전부 보내고.
-    users = game.getAllUsers();
+    const users = game.getAllUsers();
+    console.log(`xxxxx`);
+
+    const prepareNotiData = {
+      room: roomData,
+    };
+
+    //////////////////
+
+    // const test1CharacterData = {
+    //   characterType: 1, // 캐릭터 종류
+    //   roleType: 1, // 역할 종류
+    //   hp: 0,
+    //   weapon: 0,
+    //   stateInfo: 0, // 캐릭터 스테이트 타입
+    //   equips: 0,
+    //   debuffs: 0,
+    //   handCards: 0,
+    //   bbangCount: 0,
+    //   handCardsCount: 0,
+    // };
+
+    // const test2CharacterData = {
+    //   characterType: 3, // 캐릭터 종류
+    //   roleType: 3, // 역할 종류
+    //   hp: 0,
+    //   weapon: 0,
+    //   stateInfo: 0, // 캐릭터 스테이트 타입
+    //   equips: 0,
+    //   debuffs: 0,
+    //   handCards: 0,
+    //   bbangCount: 0,
+    //   handCardsCount: 0,
+    // };
+
+    // const test3CharacterData = {
+    //   characterType: 5, // 캐릭터 종류
+    //   roleType: 3, // 역할 종류
+    //   hp: 0,
+    //   weapon: 0,
+    //   stateInfo: 0, // 캐릭터 스테이트 타입
+    //   equips: 0,
+    //   debuffs: 0,
+    //   handCards: 0,
+    //   bbangCount: 0,
+    //   handCardsCount: 0,
+    // };
+
+    // const test4CharacterData = {
+    //   characterType: 7, // 캐릭터 종류
+    //   roleType: 4, // 역할 종류
+    //   hp: 0,
+    //   weapon: 0,
+    //   stateInfo: 0, // 캐릭터 스테이트 타입
+    //   equips: 0,
+    //   debuffs: 0,
+    //   handCards: 0,
+    //   bbangCount: 0,
+    //   handCardsCount: 0,
+    // };
+
+    // const testUsers = [
+    //   { id: 8, nickname: 4, characterData: test1CharacterData },
+    //   { id: 7, nickname: 3, characterData: test2CharacterData },
+    //   { id: 6, nickname: 2, characterData: test3CharacterData },
+    //   { id: 5, nickname: 1, characterData: test4CharacterData },
+    // ];
+
+    // const testRoomData = {
+    //   id: 1,
+    //   ownerId: 8,
+    //   name: roomData.name,
+    //   maxUserNum: roomData.maxUserNum,
+    //   state: this.state,
+    //   users: testUsers,
+    // };
+
+    // const testNotiData = {
+    //   room: testRoomData,
+    // };
+
+    // console.log(`xxxxx`);
+
+    // const testNoti = createResponse(
+    //   PACKET_TYPE.GAME_PREPARE_NOTIFICATION,
+    //   socket.sequence,
+    //   testNotiData,
+    // );
+
+    // users.forEach((notiUser) => {
+    //   console.log(`테스트`);
+
+    //   notiUser.socket.write(testNoti);
+    //   console.log(`테스트2`);
+    // });
+
+    /////////////////////////////
+
+    console.log(`캐릭터 타입: ${roomData.users[0].characterData.characterType}`);
+
+    const noti = createResponse(
+      PACKET_TYPE.GAME_PREPARE_NOTIFICATION,
+      socket.sequence,
+      prepareNotiData,
+    );
+
+    users.forEach((notiUser) => {
+      console.log(`전`);
+      notiUser.socket.write(noti);
+    });
 
     const prepareResponseData = {
       success: true,
@@ -161,15 +272,11 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
       socket.sequence,
       prepareResponseData,
     );
-    console.log(users);
-
-    users.forEach((user) => {
-      noti = createResponse(PACKET_TYPE.GAME_PREPARE_NOTIFICATION, user.socket.sequence, roomData);
-      console.log(`${user.nickname}에게 noti`);
-      user.socket.write(noti);
-    });
+    console.log(`응답 보냄`);
 
     socket.write(prepareResponse);
+
+    console.log(`응답 완료`);
 
     // 크리에이트 리스폰스(성공여부, 실패코드)
   } catch (error) {}

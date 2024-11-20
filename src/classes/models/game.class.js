@@ -33,7 +33,7 @@ class Game {
       users: Object.values(this.users).map((entry) => ({
         id: entry.user.id,
         nickname: entry.user.nickname,
-        characterData: entry.characterData,
+        characterData: { ...entry.characterData },
       })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
     };
   }
@@ -84,7 +84,7 @@ class Game {
     ) {
       throw new Error('캐릭터 및 역할 배열의 길이가 유저 수와 일치하지 않습니다.');
     }
-
+    this.state = 1;
     Object.values(this.users).forEach((userEntry, index) => {
       const characterType = preparedCharacter[index];
       const roleType = preparedRole[index];
@@ -112,7 +112,7 @@ class Game {
       userEntry.characterData.handCards = 0;
       userEntry.characterData.bbangCount = 0;
       userEntry.characterData.handCardsCount = 0;
-      console.log(`캐릭터 데이터 : ${userEntry.characterData.roleType}`);
+      console.log(`캐릭터 데이터 : ${userEntry.characterData.characterType}`);
     });
   }
 
