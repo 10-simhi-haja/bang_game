@@ -2,6 +2,7 @@ import config from '../../config/config.js';
 import { getGameSessionByUser, removeGameSessionById } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import leaveRoomNotification from '../../utils/notification/leaveRoomNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 const leaveRoomHandler = async ({ socket, payload }) => {
   try {
@@ -15,7 +16,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     room.removeUser(user.id);
 
     // // 방에 남아 있는 사람이 0 이하면 방은 삭제 된다.
-    let usersLength = Object.keys(room.users).length;
+    let usersLength = room.getUserLength();
     if (usersLength <= 0) {
       removeGameSessionById(room.id);
     }
@@ -33,6 +34,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     );
 
     socket.write(leaveRoomResponse);
+    leaveRoomNotification(socket, user.id, room);
   } catch (error) {
     handleError(socket, error);
   }

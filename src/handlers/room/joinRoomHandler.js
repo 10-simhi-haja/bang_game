@@ -1,6 +1,7 @@
 import config from '../../config/config.js';
 import { getGameSessionById } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import joinRoomNotification from '../../utils/notification/joinRoomNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import handleError from './../../utils/errors/errorHandler.js';
 
@@ -52,6 +53,8 @@ const joinRoomHandler = async ({ socket, payload }) => {
     );
 
     socket.write(joinRoomResponse);
+    joinRoomNotification(socket, user.id, userData, room);
+    console.log(userData);
   } catch (error) {
     handleError(socket, error);
   }
