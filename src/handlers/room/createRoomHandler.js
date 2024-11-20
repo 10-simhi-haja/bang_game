@@ -17,18 +17,18 @@ const createRoomHandler = async ({ socket, payload }) => {
       users: [],
     };
 
-    const responseData = {
-      success: true,
-      room: roomData,
-      failcode: 0,
-    };
-
     // 게임 세션 생성
     const gameSession = await addGameSession(roomData);
 
     // 방을 생성한 유저를 찾는다
     const user = getUserBySocket(socket);
     gameSession.addUser(user);
+
+    const responseData = {
+      success: true,
+      room: gameSession.getRoomData(),
+      failcode: 0,
+    };
 
     // 응답
     const createRoomResponse = createResponse(

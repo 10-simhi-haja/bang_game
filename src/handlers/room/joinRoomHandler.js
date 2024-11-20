@@ -16,20 +16,8 @@ const joinRoomHandler = async ({ socket, payload }) => {
     const roomId = payload.roomId;
     const room = getGameSessionById(roomId);
 
-    const responseData = {
-      success: true,
-      room: room.getRoomData(),
-      failcode: 0,
-    };
-
-    const joinRoomResponse = createResponse(
-      config.packet.packetType.JOIN_ROOM_RESPONSE,
-      socket.sequence,
-      responseData,
-    );
-
     const user = getUserBySocket(socket);
-    console.log(`user : ${user.nickname}`);
+
     room.addUser(user);
 
     const defaultCharacterData = {
@@ -51,28 +39,17 @@ const joinRoomHandler = async ({ socket, payload }) => {
       characterData: defaultCharacterData,
     };
 
-    const opponentUsers = room.getOpponents(user.id);
-    console.log(`조인노티 실행전`);
+    const responseData = {
+      success: true,
+      room: room.getRoomData(),
+      failcode: 0,
+    };
 
-    const allUsers = room.getAllUsers();
-
-    allUsers.forEach((selectUser) => {
-      if (selectUser.id === user.id) {
-        return;
-      }
-
-      const noti = createJoinRoomNotification(userData, selectUser);
-      selectUser.socket.write(noti);
-    });
-
-    // if (opponentUsers !== null) {
-    //   console.log(`조인노티 실행`);
-    //   opponentUsers.forEach((user) => {
-    //     const noti = createJoinRoomNotification(userData, user);
-    //     user.socket.write(noti);
-    //   });
-    // }
-    console.log(`조인노티 실행후`);
+    const joinRoomResponse = createResponse(
+      config.packet.packetType.JOIN_ROOM_RESPONSE,
+      socket.sequence,
+      responseData,
+    );
 
     socket.write(joinRoomResponse);
   } catch (error) {
