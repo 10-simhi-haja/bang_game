@@ -34,7 +34,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     // 방 나가기 응답
     const responseData = {
       success: true,
-      failcode: 0,
+      failCode: 0,
     };
 
     const leaveRoomResponse = createResponse(

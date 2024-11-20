@@ -2,14 +2,14 @@ import CustomError from '../utils/errors/customError.js';
 import ErrorCodes from './../utils/errors/errorCodes.js';
 import config from '../config/config.js';
 import handlePositionUpdate from './syncCharacter/position.handler.js';
-import registerHandler from './user/registerHandler.js';
-import loginHandler from './user/loginHandler.js';
-import roomListHandler from './room/roomListHandler.js';
-import createRoomHandler from './room/createRoomHandler.js';
-import joinRoomHandler from './room/joinRoomHandler.js';
+import registerHandler from './user/register.handler.js';
+import loginHandler from './user/login.handler.js';
+import roomListHandler from './room/roomList.handler.js';
+import createRoomHandler from './room/createRoom.handler.js';
+import joinRoomHandler from './room/joinRoom.handler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
-import leaveRoomHandler from './room/leaveRoomHandler.js';
-import joinRandomRoomHandler from './room/joinRandomRoomHandler.js';
+import leaveRoomHandler from './room/leaveRoom.handler.js';
+import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 
 const { packetType } = config.packet;
 

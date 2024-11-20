@@ -27,7 +27,7 @@ const createRoomHandler = async ({ socket, payload }) => {
     const responseData = {
       success: true,
       room: gameSession.getRoomData(),
-      failcode: 0,
+      failCode: 0,
     };
 
     // 응답

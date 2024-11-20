@@ -1,9 +1,9 @@
 import config from '../../config/config.js';
-import { getAllGameSessions, getGameSessionById } from '../../sessions/game.session.js';
+import { getGameSessionById } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
-import handleError from '../../utils/errors/errorHandler.js';
 import joinRoomNotification from '../../utils/notification/joinRoomNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import handleError from './../../utils/errors/errorHandler.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -11,17 +11,16 @@ const {
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
 } = config;
 
-const joinRandomRoomHandler = async ({ socket }) => {
+const joinRoomHandler = async ({ socket, payload }) => {
   try {
-    const allRoom = getAllGameSessions();
-    const randomRoomId = allRoom[Math.floor(Math.random() * allRoom.length)];
-    const roomId = randomRoomId.id;
+    const roomId = payload.roomId;
     const room = getGameSessionById(roomId);
+
     const user = getUserBySocket(socket);
 
     room.addUser(user);
 
-    const defaultCharacterData = {
+    const defaultCharacter = {
       characterType: CHARACTER_TYPE.NONE_CHARACTER, // 캐릭터 종류
       roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
       hp: 0,
@@ -37,26 +36,27 @@ const joinRandomRoomHandler = async ({ socket }) => {
     const userData = {
       id: user.id,
       nickname: user.nickname,
-      characterData: defaultCharacterData,
+      character: defaultCharacter,
     };
 
     const responseData = {
       success: true,
       room: room.getRoomData(),
-      failcode: 0,
+      failCode: 0,
     };
 
-    const joinRandomRoomResponse = createResponse(
-      config.packet.packetType.JOIN_RANDOM_ROOM_RESPONSE,
+    const joinRoomResponse = createResponse(
+      config.packet.packetType.JOIN_ROOM_RESPONSE,
       socket.sequence,
       responseData,
     );
 
-    socket.write(joinRandomRoomResponse);
+    socket.write(joinRoomResponse);
     joinRoomNotification(socket, user.id, userData, room);
+    console.log(userData);
   } catch (error) {
     handleError(socket, error);
   }
 };
 
-export default joinRandomRoomHandler;
+export default joinRoomHandler;
