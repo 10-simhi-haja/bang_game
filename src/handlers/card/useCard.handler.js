@@ -12,7 +12,7 @@ const useCardHandler = ({ socket, payload }) => {
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
 
-    // 카드 타입에 맞게
+    // 카드 타입에 맞게 함수를 만들기
 
     const userCardPayload = {
       success: true,
