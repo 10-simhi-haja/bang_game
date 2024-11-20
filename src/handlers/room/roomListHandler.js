@@ -1,12 +1,21 @@
 import config from '../../config/config.js';
 import { getAllGameSessions } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import handleError from '../../utils/errors/errorHandler.js';
 
 const roomListHandler = async ({ socket, payload }) => {
   try {
-    const roomData = getAllGameSessions();
+    const gameSessions = getAllGameSessions();
+    const roomDatas = [];
+
+    for (let i = 0; i < gameSessions.length; i++) {
+      const roomData = gameSessions[i].getRoomData();
+      roomDatas.push(roomData);
+    }
+
+    // const roomData = getAllGameSessions();
     const responseRoomData = {
-      rooms: roomData,
+      rooms: roomDatas,
     };
 
     const roomListResponse = createResponse(

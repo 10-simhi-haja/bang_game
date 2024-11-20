@@ -29,7 +29,7 @@ export const getUserBySocket = (socket) => {
   if (!user) {
     console.error('User not found: getUserBySocket');
   }
-  console.log(`소켓으로 유저 찾기 : ${user}`);
+
   return user;
 };
 

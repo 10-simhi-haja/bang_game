@@ -7,6 +7,7 @@ import loginHandler from './user/loginHandler.js';
 import roomListHandler from './room/roomListHandler.js';
 import createRoomHandler from './room/createRoomHandler.js';
 import joinRoomHandler from './room/joinRoomHandler.js';
+import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
 import leaveRoomHandler from './room/leaveRoomHandler.js';
 
 const { packetType } = config.packet;
@@ -77,7 +78,7 @@ const handlers = {
     protoType: 'room.S2CLeaveRoomNotification',
   },
   [packetType.GAME_PREPARE_REQUEST]: {
-    handler: undefined,
+    handler: gamePrepareRequestHandler,
     protoType: 'gameState.C2SGamePrepareRequest',
   },
   [packetType.GAME_PREPARE_RESPONSE]: {
@@ -206,4 +207,34 @@ export const getProtoTypeNameByPacketType = (PacketType) => {
     throw new CustomError(ErrorCodes.UNKNOWN_PROTOTYPE_NAME, '프로토타입 이름을 찾을 수 없습니다.');
   }
   return handlers[PacketType].protoType;
+};
+
+export const getHandlerById = (handlerId) => {
+  if (!handlers[handlerId]) {
+    throw new CustomError(
+      ErrorCodes.UNKNOWN_HANDLER_ID,
+      `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+    );
+  }
+  return handlers[handlerId].handler;
+};
+
+export const getProtoTypeNameByHandlerId = (handlerId) => {
+  if (!handlers[handlerId]) {
+    throw new CustomError(
+      ErrorCodes.UNKNOWN_HANDLER_ID,
+      `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+    );
+  }
+  return handlers[handlerId].protoType;
+};
+
+export const getFieldNameByHandlerId = (handlerId) => {
+  if (!handlers[handlerId]) {
+    throw new CustomError(
+      ErrorCodes.UNKNOWN_HANDLER_ID,
+      `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+    );
+  }
+  return handlers[handlerId].fieldName;
 };
