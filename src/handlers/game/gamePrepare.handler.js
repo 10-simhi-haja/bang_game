@@ -127,139 +127,23 @@ const prepare = (num) => {};
 // 요청을 보내고 다른 모든이들에게 알림을 보낸다.
 export const gamePrepareRequestHandler = ({ socket, payload }) => {
   try {
-    console.log(`역할분배`);
     // 1. 방장의 소켓으로 prepare 요청이 들어온다.
     // 1-1. ownerId로 game세션을 찾을수 있어야함.
     const owner = getUserBySocket(socket);
-    console.log(`오너: ${owner.nickname}`);
+
     const game = getGameSessionByUser(owner);
-    console.log(`게임 주인 : ${game.ownerId}`);
 
     // 방 인원수
     const playerCount = Object.keys(game.users).length;
-    console.log(`플레이어 인원 : ${playerCount}`);
+
     const preparedCharacter = prepareCharacter(playerCount); // 배열
     const preparedRole = prepareRole(playerCount); // 배열
 
     game.setPrepare(preparedCharacter, preparedRole);
 
     const roomData = game.getRoomData();
-    console.log(`룸오너아이디 : ${roomData.ownerId}`);
 
-    // 성공 실패 응답 해당유저에게 보내고,
-    console.log(`xxxxx`);
-
-    // 노티 해당 게임내 플레이어들에게 전부 보내고.
     const users = game.getAllUsers();
-    console.log(`xxxxx`);
-
-    const prepareNotiData = {
-      room: roomData,
-    };
-
-    //////////////////
-
-    // const test1CharacterData = {
-    //   characterType: 1, // 캐릭터 종류
-    //   roleType: 1, // 역할 종류
-    //   hp: 0,
-    //   weapon: 0,
-    //   stateInfo: 0, // 캐릭터 스테이트 타입
-    //   equips: 0,
-    //   debuffs: 0,
-    //   handCards: 0,
-    //   bbangCount: 0,
-    //   handCardsCount: 0,
-    // };
-
-    // const test2CharacterData = {
-    //   characterType: 3, // 캐릭터 종류
-    //   roleType: 3, // 역할 종류
-    //   hp: 0,
-    //   weapon: 0,
-    //   stateInfo: 0, // 캐릭터 스테이트 타입
-    //   equips: 0,
-    //   debuffs: 0,
-    //   handCards: 0,
-    //   bbangCount: 0,
-    //   handCardsCount: 0,
-    // };
-
-    // const test3CharacterData = {
-    //   characterType: 5, // 캐릭터 종류
-    //   roleType: 3, // 역할 종류
-    //   hp: 0,
-    //   weapon: 0,
-    //   stateInfo: 0, // 캐릭터 스테이트 타입
-    //   equips: 0,
-    //   debuffs: 0,
-    //   handCards: 0,
-    //   bbangCount: 0,
-    //   handCardsCount: 0,
-    // };
-
-    // const test4CharacterData = {
-    //   characterType: 7, // 캐릭터 종류
-    //   roleType: 4, // 역할 종류
-    //   hp: 0,
-    //   weapon: 0,
-    //   stateInfo: 0, // 캐릭터 스테이트 타입
-    //   equips: 0,
-    //   debuffs: 0,
-    //   handCards: 0,
-    //   bbangCount: 0,
-    //   handCardsCount: 0,
-    // };
-
-    // const testUsers = [
-    //   { id: 8, nickname: 4, characterData: test1CharacterData },
-    //   { id: 7, nickname: 3, characterData: test2CharacterData },
-    //   { id: 6, nickname: 2, characterData: test3CharacterData },
-    //   { id: 5, nickname: 1, characterData: test4CharacterData },
-    // ];
-
-    // const testRoomData = {
-    //   id: 1,
-    //   ownerId: 8,
-    //   name: roomData.name,
-    //   maxUserNum: roomData.maxUserNum,
-    //   state: this.state,
-    //   users: testUsers,
-    // };
-
-    // const testNotiData = {
-    //   room: testRoomData,
-    // };
-
-    // console.log(`xxxxx`);
-
-    // const testNoti = createResponse(
-    //   PACKET_TYPE.GAME_PREPARE_NOTIFICATION,
-    //   socket.sequence,
-    //   testNotiData,
-    // );
-
-    // users.forEach((notiUser) => {
-    //   console.log(`테스트`);
-
-    //   notiUser.socket.write(testNoti);
-    //   console.log(`테스트2`);
-    // });
-
-    /////////////////////////////
-
-    console.log(`캐릭터 타입: ${roomData.users[0].character.characterType}`);
-    console.dir(roomData, { depth: null });
-    const noti = createResponse(
-      PACKET_TYPE.GAME_PREPARE_NOTIFICATION,
-      socket.sequence,
-      prepareNotiData,
-    );
-
-    users.forEach((notiUser) => {
-      console.log(`전`);
-      notiUser.socket.write(noti);
-    });
 
     const prepareResponseData = {
       success: true,
@@ -272,11 +156,24 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
       socket.sequence,
       prepareResponseData,
     );
-    console.log(`응답 보냄`);
 
     socket.write(prepareResponse);
 
-    console.log(`응답 완료`);
+    // 응답 먼저 보내고 노티.
+
+    const prepareNotiData = {
+      room: roomData,
+    };
+
+    const noti = createResponse(
+      PACKET_TYPE.GAME_PREPARE_NOTIFICATION,
+      socket.sequence,
+      prepareNotiData,
+    );
+
+    users.forEach((notiUser) => {
+      notiUser.socket.write(noti);
+    });
 
     // 크리에이트 리스폰스(성공여부, 실패코드)
   } catch (error) {}

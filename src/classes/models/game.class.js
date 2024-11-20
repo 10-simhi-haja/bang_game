@@ -35,7 +35,7 @@ class Game {
       users: this.userOrder.map((id) => ({
         id: this.users[id].user.id,
         nickname: this.users[id].user.nickname,
-        character: { ...this.users[id].character },
+        characterData: { ...this.users[id].character },
       })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
     };
   }
