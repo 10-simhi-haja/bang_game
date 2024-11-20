@@ -130,11 +130,10 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     // 1. 방장의 소켓으로 prepare 요청이 들어온다.
     // 1-1. ownerId로 game세션을 찾을수 있어야함.
     const owner = getUserBySocket(socket);
-
     const game = getGameSessionByUser(owner);
 
     // 방 인원수
-    const playerCount = Object.keys(game.users).length;
+    const playerCount = game.getUserLength();
 
     const preparedCharacter = prepareCharacter(playerCount); // 배열
     const preparedRole = prepareRole(playerCount); // 배열
@@ -176,5 +175,7 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     });
 
     // 크리에이트 리스폰스(성공여부, 실패코드)
-  } catch (error) {}
+  } catch (error) {
+    throw new Error(error);
+  }
 };
