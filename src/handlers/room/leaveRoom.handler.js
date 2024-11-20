@@ -6,14 +6,10 @@ import leaveRoomNotification from '../../utils/notification/leaveRoomNotificatio
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 const leaveRoomHandler = async ({ socket, payload }) => {
   try {
-    console.log('leaveRoom payload: ', payload);
     // 방에서 나가려는 유저와 해당 방 찾기
     const user = getUserBySocket(socket);
-    console.log('user: ', user);
     const room = getGameSessionByUser(user);
-    console.log('room: ', room);
 
-    console.log('나가기 전: ', room);
     // 나간 유저를 게임 세션에서 없앤다.
     room.removeUser(user.id);
     console.log('나간 후: ', room);
