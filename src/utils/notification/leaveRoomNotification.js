@@ -4,6 +4,9 @@ import { createResponse } from '../packet/response/createResponse.js';
 // 방에 남은 유저들에게 전달
 const leaveRoomNotification = (socket, userId, room, ownerOut) => {
   // 응답 패킷 생성
+  const responseData = {
+    userId: userId,
+  };
 
   let leaveRoomNotification;
   if (ownerOut === true) {
@@ -21,7 +24,7 @@ const leaveRoomNotification = (socket, userId, room, ownerOut) => {
     leaveRoomNotification = createResponse(
       config.packet.packetType.LEAVE_ROOM_NOTIFICATION,
       socket.sequence,
-      userId,
+      responseData,
     );
   }
 
