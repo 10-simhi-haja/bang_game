@@ -112,6 +112,7 @@ class Game {
       userEntry.characterData.handCards = 0;
       userEntry.characterData.bbangCount = 0;
       userEntry.characterData.handCardsCount = 0;
+      console.log(`캐릭터 데이터 : ${userEntry.characterData.roleType}`);
     });
   }
 

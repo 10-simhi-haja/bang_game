@@ -27,6 +27,16 @@ export const createResponse = (packetType, sequence, payloadData = {}) => {
   const payloadLengthBuffer = Buffer.alloc(config.packet.payloadLength);
   payloadLengthBuffer.writeUInt32BE(payloadBuffer.length);
 
+  console.log(`응답 ${packetType}`);
+
+  if (packetType === 18) {
+    console.log(`캐릭터 셔플 응답`);
+  }
+
+  if (packetType === 19) {
+    console.log(`캐릭터 셔플 노티`);
+  }
+
   return Buffer.concat([
     typeBuffer,
     versionLengthBuffer,

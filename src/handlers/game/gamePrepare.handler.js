@@ -79,8 +79,8 @@ export const prepareCharacter = (playersCount) => {
   // index 크기만큼 random수를 뽑고
   // 뽑힌 random수와 index맨끝수를 교환 하고
   // index를 감소시키면서 반복하여 랜덤 배분.
-  for (let i = characterArray.length - 1; i > 0; i--) {
-    const randomIndex = Math.floor(Math.random() * (i + 1));
+  for (let i = characterArray.length - 1; i > 1; i--) {
+    const randomIndex = Math.floor(Math.random() * i) + 1;
     [characterArray[i], characterArray[randomIndex]] = [
       characterArray[randomIndex],
       characterArray[i],
@@ -88,7 +88,7 @@ export const prepareCharacter = (playersCount) => {
   }
 
   // 플레이어에게 랜덤 배정
-  const prepareCharacters = characterArray.slice(0, playersCount);
+  const prepareCharacters = characterArray.slice(1, playersCount + 1);
   console.log(prepareCharacters);
   return prepareCharacters;
 };
@@ -105,9 +105,9 @@ export const prepareRole = (playersCount) => {
   Object.entries(currentRoles).forEach(([role, count]) => {
     for (let i = 0; i < count; i++) {
       // test중에는 이름으로 표시되도록
-      roles.push(role);
+      //roles.push(role);
       // 넘겨줄땐 enum으로
-      //roles.push(ROLE_TYPE[role]);
+      roles.push(ROLE_TYPE[role]);
     }
   });
 
@@ -126,34 +126,48 @@ const prepare = (num) => {};
 // 요청을 보내고 다른 모든이들에게 알림을 보낸다.
 export const gamePrepareRequestHandler = ({ socket, payload }) => {
   try {
+    console.log(`역할분배`);
     // 1. 방장의 소켓으로 prepare 요청이 들어온다.
     // 1-1. ownerId로 game세션을 찾을수 있어야함.
     const owner = getUserBySocket(socket);
+    console.log(`오너: ${owner.nickname}`);
     const game = getGameSessionByUser(owner);
+    console.log(`게임 주인 : ${game.ownerId}`);
 
     // 방 인원수
-    // const playerCount = game.users.length;
-    // 임시
-    const playerCount = payload.length;
-
+    const playerCount = Object.keys(game.users).length;
+    console.log(`플레이어 인원 : ${playerCount}`);
     const preparedCharacter = prepareCharacter(playerCount); // 배열
     const preparedRole = prepareRole(playerCount); // 배열
 
     game.setPrepare(preparedCharacter, preparedRole);
 
     const roomData = game.getRoomData();
+    console.log(`룸데이터 : ${roomData.ownerId}`);
 
     // 성공 실패 응답 해당유저에게 보내고,
 
     // 노티 해당 게임내 플레이어들에게 전부 보내고.
-    users = game.getAllUser();
+    users = game.getAllUsers();
+
+    const prepareResponseData = {
+      success: true,
+      failCode: 0,
+    };
 
     // 응답 패킷 생성
     const prepareResponse = createResponse(
       PACKET_TYPE.GAME_PREPARE_RESPONSE,
       socket.sequence,
-      roomData,
+      prepareResponseData,
     );
+    console.log(users);
+
+    users.forEach((user) => {
+      noti = createResponse(PACKET_TYPE.GAME_PREPARE_NOTIFICATION, user.socket.sequence, roomData);
+      console.log(`${user.nickname}에게 noti`);
+      user.socket.write(noti);
+    });
 
     socket.write(prepareResponse);
 
