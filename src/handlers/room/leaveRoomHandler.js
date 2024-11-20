@@ -2,6 +2,7 @@ import config from '../../config/config.js';
 import { getGameSessionByUser, removeGameSessionById } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import leaveRoomNotification from '../../utils/notification/leaveRoomNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const leaveRoomHandler = async ({ socket, payload }) => {
@@ -32,6 +33,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     );
 
     socket.write(leaveRoomResponse);
+    leaveRoomNotification(socket, user.id, room);
   } catch (error) {
     handleError(socket, error);
   }
