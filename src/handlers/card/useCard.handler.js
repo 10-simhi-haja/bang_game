@@ -1,4 +1,6 @@
 import { PACKET_TYPE } from '../../constants/header.js';
+import { getGameSessionByUser } from '../../sessions/game.session.js';
+import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 /**
@@ -7,6 +9,10 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 const useCardHandler = ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload;
+    const user = getUserBySocket(socket);
+    const room = getGameSessionByUser(user);
+
+    // 카드 타입에 맞게
 
     const userCardPayload = {
       success: true,

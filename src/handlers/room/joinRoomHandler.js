@@ -16,8 +16,10 @@ const joinRoomHandler = async ({ socket, payload }) => {
     console.log('joinRoom payload: ', payload);
     const roomId = payload.roomId;
     const room = getGameSessionById(roomId);
+    console.log('joinRoom: ', room);
 
     const user = getUserBySocket(socket);
+    console.log('joinUser: ', user);
 
     room.addUser(user);
 
