@@ -43,7 +43,7 @@ const joinRoomHandler = async ({ socket, payload }) => {
     const responseData = {
       success: true,
       room: room.getRoomData(),
-      failcode: 0,
+      failCode: 0,
     };
 
     const joinRoomResponse = createResponse(

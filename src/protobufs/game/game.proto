@@ -38,7 +38,7 @@ message S2CUseCardNotification {
 }
 message S2CEquipCardNotification {
     CardType cardType = 1;
-     int64 userId = 2;
+    int64 userId = 2;
 }
 message S2CCardEffectNotification {
     CardType cardType = 1;

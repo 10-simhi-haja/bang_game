@@ -15,7 +15,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     // 나간 유저를 게임 세션에서 없앤다.
     room.removeUser(user.id);
 
-    // // 방에 남아 있는 사람이 0 이하면 방은 삭제 된다.
+    // 방에 남아 있는 사람이 0 이하면 방은 삭제 된다.
     let usersLength = room.getUserLength();
     if (usersLength <= 0) {
       removeGameSessionById(room.id);
@@ -24,7 +24,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     // 방 나가기 응답
     const responseData = {
       success: true,
-      failcode: 0,
+      failCode: 0,
     };
 
     const leaveRoomResponse = createResponse(
