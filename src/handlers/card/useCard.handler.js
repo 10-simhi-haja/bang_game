@@ -8,7 +8,6 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const useCardHandler = ({ socket, payload }) => {
   try {
-    console.log('userCard', payload);
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
@@ -28,7 +27,7 @@ const useCardHandler = ({ socket, payload }) => {
 
     const responsePayload = {
       success: true,
-      failCode: 0, // * GlobalFailCode 사용 예정
+      failCode: config.globalFailCode.globalFailCode.NONE_FAILCODE, // * GlobalFailCode 사용 예정
     };
 
     const userCardResponse = createResponse(
