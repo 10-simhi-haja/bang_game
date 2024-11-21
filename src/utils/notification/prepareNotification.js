@@ -5,9 +5,8 @@ const {
   packet: { packetType: PACKET_TYPE },
 } = config;
 
-// 방에 남은 유저들에게 전달
+// 역할 분배 알림
 const prepareNotification = (socket, user, payload) => {
-  // 응답 패킷 생성
   const noti = createResponse(PACKET_TYPE.GAME_PREPARE_NOTIFICATION, socket.sequence, payload);
 
   user.socket.write(noti);
