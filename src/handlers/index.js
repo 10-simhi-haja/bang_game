@@ -12,6 +12,7 @@ import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
 import leaveRoomHandler from './room/leaveRoomHandler.js';
 import handleDestroyCardRequest from './card/destroyCard.handler.js';
 import handleFleaMarketPick from './fleaMarket/fleaMarket.handler.js';
+import handleReactionRequest from './reaction/reaction.handler.js';
 
 const { packetType } = config.packet;
 
@@ -153,7 +154,7 @@ const handlers = {
     protoType: 'game.S2CPhaseUpdateNotification',
   },
   [packetType.REACTION_REQUEST]: {
-    handler: undefined,
+    handler: handleReactionRequest,
     protoType: 'game.C2SReactionRequest',
   },
   [packetType.REACTION_RESPONSE]: {

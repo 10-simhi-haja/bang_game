@@ -175,3 +175,8 @@ export const WARNING_TYPE = {
   NO_WARNING: 0,
   BOMB_WARNING: 1,
 };
+
+export const REACTION_TYPE = {
+  NONE_REACTION: 0,
+  NOT_USE_CARD: 1,
+};
