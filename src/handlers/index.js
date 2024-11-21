@@ -15,6 +15,7 @@ import handleReactionRequest from './reaction/reaction.handler.js';
 import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 import { gameStartRequestHandler } from './game/gameStart.handler.js';
+import useCardHandler from './card/useCard.handler.js';
 
 const { packetType } = config.packet;
 
@@ -116,7 +117,7 @@ const handlers = {
     protoType: 'game.S2CPositionUpdateNotification',
   },
   [packetType.USE_CARD_REQUEST]: {
-    handler: undefined,
+    handler: useCardHandler,
     protoType: 'game.C2SUseCardRequest',
   },
   [packetType.USE_CARD_RESPONSE]: {

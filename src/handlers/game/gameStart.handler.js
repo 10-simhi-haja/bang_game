@@ -7,7 +7,7 @@ import handleError from '../../utils/errors/errorHandler.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
-  character: { characterType: CHARACTER_TYPE, characterSpownPoint: CHARACTER_SPOWN_POINT },
+  character: { characterType: CHARACTER_TYPE, characterSpawnPoint: CHARACTER_SPAWN_POINT },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
 } = config;
@@ -57,7 +57,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     console.log(`게임시작 응답`);
 
     const allUserDatas = game.getAllUserDatas();
-    const characterPos = shuffle(CHARACTER_SPOWN_POINT).slice(0, game.getUserLength());
+    const characterPos = shuffle(CHARACTER_SPAWN_POINT).slice(0, game.getUserLength());
 
     console.dir(characterPos, { depth: null });
     // message CharacterPositionData {
@@ -74,7 +74,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     // }
     const gameStateData = {
       phaseType: 1,
-      nextPhaseAt: 30000,
+      nextPhaseAt: 3000,
     };
     // 게임 시작 알림 데이터
     const gameStartNotiData = {
@@ -95,6 +95,8 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     users.forEach((notiUser) => {
       notiUser.socket.write(gameStartNoti);
     });
+
+    game.changeState(INGAME);
 
     // message S2CPhaseUpdateNotification {
     //     PhaseType phaseType = 1; // DAY 1, END 3 (EVENING은 필요시 추가)
