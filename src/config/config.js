@@ -61,7 +61,7 @@ const config = {
   },
   roomStateType: {
     wait: ROOM_STATE_TYPE.WAIT,
-    propare: ROOM_STATE_TYPE.PREPARE,
+    prepare: ROOM_STATE_TYPE.PREPARE,
     inGame: ROOM_STATE_TYPE.INGAME,
   },
   databases: {
