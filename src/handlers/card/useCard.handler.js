@@ -8,6 +8,8 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const useCardHandler = ({ socket, payload }) => {
   try {
+    console.log('QWEQWE');
+    console.log('userCard', payload);
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);

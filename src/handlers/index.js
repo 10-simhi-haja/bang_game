@@ -105,7 +105,7 @@ const handlers = {
     protoType: 'gameState.C2SGameStartNotification',
   },
   [packetType.POSITION_UPDATE_REQUEST]: {
-    handler: handlePositionUpdate,
+    handler: undefined,
     protoType: 'game.C2SPositionUpdateRequest',
   },
   [packetType.POSITION_UPDATE_NOTIFICATION]: {

@@ -119,7 +119,7 @@ class Game {
         userEntry.character.hp++;
       }
 
-      userEntry.character.weapon = 0;
+      userEntry.character.weapon = 13;
       userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
