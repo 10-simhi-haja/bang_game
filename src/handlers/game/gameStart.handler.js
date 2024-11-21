@@ -59,13 +59,29 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     const allUserDatas = game.getAllUserDatas();
     const characterPos = shuffle(CHARACTER_SPOWN_POINT).slice(0, game.getUserLength());
 
+    console.dir(characterPos, { depth: null });
+    // message CharacterPositionData {
+    //     int64 id = 1;
+    //     double x = 2;
+    //     double y = 3;
+    // }
+    game.setAllUserPos(characterPos);
+    const characterPosData = game.getAllUserPos();
+
+    // message GameStateData {
+    //     PhaseType phaseType = 1; // DAY 1, EVENING 2, END 3 (하루 종료시 카드 버리는 턴)
+    //     int64 nextPhaseAt = 2; // 다음 페이즈 시작 시점(밀리초 타임스탬프)
+    // }
+    const gameStateData = {
+      phaseType: 1,
+      nextPhaseAt: 30000,
+    };
     // 게임 시작 알림 데이터
     const gameStartNotiData = {
-      gameState: INGAME,
+      gameState: gameStateData,
       users: allUserDatas,
-      characterPositions: characterPos,
+      characterPositions: characterPosData,
     };
-    console.log(`게임시작 알림`);
 
     // 게임시작 알림 패킷 생성
     const gameStartNoti = createResponse(
@@ -79,7 +95,28 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     users.forEach((notiUser) => {
       notiUser.socket.write(gameStartNoti);
     });
-    console.log(`게임시작 알림 완료`);
+
+    // message S2CPhaseUpdateNotification {
+    //     PhaseType phaseType = 1; // DAY 1, END 3 (EVENING은 필요시 추가)
+    //     int64 nextPhaseAt = 2; // 다음 페이즈 시작 시점(밀리초 타임스탬프)
+    //     repeated CharacterPositionData characterPositions = 3; // 변경된 캐릭터 위치
+    // }
+
+    // const phaseUpdateNotiData = {
+    //   phaseType: 1,
+    //   nextPhaseAt: 30000,
+    //   characterPositions: characterPosData,
+    // };
+
+    // const phaseUpdateNoti = createResponse(
+    //   PACKET_TYPE.PHASE_UPDATE_NOTIFICATION,
+    //   socket.sequence,
+    //   phaseUpdateNotiData,
+    // );
+
+    // users.forEach((notiUser) => {
+    //   notiUser.socket.write(phaseUpdateNoti);
+    // });
   } catch (error) {
     handleError(socket, error);
   }
