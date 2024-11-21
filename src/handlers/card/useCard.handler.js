@@ -22,7 +22,7 @@ const useCardHandler = ({ socket, payload }) => {
      */
     switch (cardType) {
       case config.card.cardType.BBANG:
-        user.minusBbangCount(); // 사용유저의 빵카운트를 줄임
+        room.minusBbangCount(user.id); // 사용유저의 빵카운트를 줄임
       //
     }
 

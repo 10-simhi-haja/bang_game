@@ -13,14 +13,6 @@ class User {
     return ++this.sequence;
   }
 
-  minusBbangCount() {
-    return --this.character.bbangCount;
-  }
-
-  plusBbangCount() {
-    return ++this.character.bbangCount;
-  }
-
   getPos() {
     return {
       id: this.id,
