@@ -4,6 +4,7 @@ const {
   packet: { packetType: PACKET_TYPE },
   character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
+  roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -25,6 +26,16 @@ class Game {
     return this.userOrder.map((id) => this.users[id].user);
   }
 
+  getAllUserDatas() {
+    const userDatas = this.userOrder.map((id) => ({
+      id: this.users[id].user.id,
+      nickname: this.users[id].user.nickname,
+      character: { ...this.users[id].character },
+    }));
+
+    return userDatas;
+  }
+
   getRoomData() {
     return {
       id: this.id,
@@ -32,11 +43,7 @@ class Game {
       name: this.name,
       maxUserNum: this.maxUserNum,
       state: this.state,
-      users: this.userOrder.map((id) => ({
-        id: this.users[id].user.id,
-        nickname: this.users[id].user.nickname,
-        character: { ...this.users[id].character },
-      })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
+      users: this.getAllUserDatas(), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
     };
   }
 
@@ -86,7 +93,11 @@ class Game {
     ) {
       throw new Error('캐릭터 및 역할 배열의 길이가 유저 수와 일치하지 않습니다.');
     }
-    this.state = 1;
+
+    // 룸 상태 prepare로 변경
+    this.state = PREPARE;
+
+    // 역할 배분에 순서가 중요하진 않음.
     Object.values(this.users).forEach((userEntry, index) => {
       const characterType = preparedCharacter[index];
       const roleType = preparedRole[index];
@@ -94,6 +105,7 @@ class Game {
       userEntry.character.characterType = characterType;
       userEntry.character.roleType = roleType;
 
+      // 체력정보도 나중에 상수화 시키면 좋을듯.
       if (
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
@@ -114,7 +126,6 @@ class Game {
       userEntry.character.handCards = 0;
       userEntry.character.bbangCount = 0;
       userEntry.character.handCardsCount = 0;
-      console.log(`캐릭터 데이터 : ${userEntry.character.characterType}`);
     });
   }
 
@@ -152,16 +163,23 @@ class Game {
       .map((key) => this.users[key]); // 상대방 유저 데이터 배열로 반환
   }
 
-  getAllUsers() {
-    return Object.values(this.users).map((entry) => entry.user);
-  }
-
   setCharacterDataByUserId(userId, character) {
     if (!this.users[userId]) {
       throw new Error(`${userId}를 가지는 유저가 없습니다.`);
     }
 
     this.users[userId].character = character;
+  }
+
+  getAllUserPos() {
+    const userPosDatas = this.userOrder.map((id) => this.users[id].user.getPos());
+    return userPosDatas;
+  }
+
+  setAllUserPos(posDatas) {
+    this.getAllUsers().forEach((user, i) => {
+      user.setPos(posDatas[i].x, posDatas[i].y);
+    });
   }
 
   /////////////////// notification

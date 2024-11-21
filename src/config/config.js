@@ -31,6 +31,7 @@ import {
   ROLES_DISTRIBUTION,
   CHARACTER_STATE_TYPE,
   ROOM_STATE_TYPE,
+  CHARACTER_SPOWN_POINT,
   CARD_TYPE,
 } from '../constants/header.js';
 
@@ -54,16 +55,13 @@ const config = {
     characterType: CHARACTER_TYPE,
     characterStateType: CHARACTER_STATE_TYPE,
   },
-  card: {
-    cardType: CARD_TYPE,
-  },
   role: {
     roleType: ROLE_TYPE,
     rolesDistribution: ROLES_DISTRIBUTION,
   },
   roomStateType: {
     wait: ROOM_STATE_TYPE.WAIT,
-    propare: ROOM_STATE_TYPE.PREPARE,
+    prepare: ROOM_STATE_TYPE.PREPARE,
     inGame: ROOM_STATE_TYPE.INGAME,
   },
   databases: {
