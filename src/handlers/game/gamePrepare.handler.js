@@ -3,6 +3,7 @@ import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
+import handleError from '../../utils/errors/errorHandler.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -66,7 +67,7 @@ const {
 //     RoomData room = 1;
 // }
 
-export const prepareCharacter = (playersCount) => {
+const prepareCharacter = (playersCount) => {
   if (!playersCount) {
     throw new Error('플레이어 수를 지정하지 않았습니다.');
   }
@@ -94,7 +95,7 @@ export const prepareCharacter = (playersCount) => {
   return prepareCharacters;
 };
 
-export const prepareRole = (playersCount) => {
+const prepareRole = (playersCount) => {
   // 유효한 플레이어 수인지 확인
   if (!ROLES_DISTRIBUTION[playersCount]) {
     throw new Error(`플레이어 수 ${playersCount}인에 대한 역할 분배가 정의되지 않았습니다.`);
@@ -121,7 +122,6 @@ export const prepareRole = (playersCount) => {
   console.log(roles);
   return roles;
 };
-const prepare = (num) => {};
 
 // 게임 시작을 누르는것은 방장.
 // 요청을 보내고 다른 모든이들에게 알림을 보낸다.
@@ -130,11 +130,10 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     // 1. 방장의 소켓으로 prepare 요청이 들어온다.
     // 1-1. ownerId로 game세션을 찾을수 있어야함.
     const owner = getUserBySocket(socket);
-
     const game = getGameSessionByUser(owner);
 
     // 방 인원수
-    const playerCount = Object.keys(game.users).length;
+    const playerCount = game.getUserLength();
 
     const preparedCharacter = prepareCharacter(playerCount); // 배열
     const preparedRole = prepareRole(playerCount); // 배열
@@ -176,5 +175,7 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     });
 
     // 크리에이트 리스폰스(성공여부, 실패코드)
-  } catch (error) {}
+  } catch (error) {
+    handleError(socket, error);
+  }
 };
