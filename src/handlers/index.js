@@ -58,7 +58,7 @@ const handlers = {
     protoType: 'room.S2CJoinRoomResponse',
   },
   [packetType.JOIN_RANDOM_ROOM_REQUEST]: {
-    handler: undefined,
+    handler: joinRandomRoomHandler,
     protoType: 'room.C2SJoinRandomRoomRequest',
   },
   [packetType.JOIN_RANDOM_ROOM_RESPONSE]: {

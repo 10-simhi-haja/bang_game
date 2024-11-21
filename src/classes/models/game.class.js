@@ -15,12 +15,14 @@ class Game {
     this.maxUserNum = roomData.maxUserNum;
     this.state = roomData.state; // WAIT, PREPARE, INGAME
     this.users = {};
+    this.userOrder = [];
     // 인터버 매니저 추가되면.
     // this.intervalManager = new IntervalManager();
   }
 
+  // 들어온 순서대로 반영.
   getAllUsers() {
-    return Object.values(this.users).map((entry) => entry.user);
+    return this.userOrder.map((id) => this.users[id].user);
   }
 
   getRoomData() {
@@ -30,17 +32,16 @@ class Game {
       name: this.name,
       maxUserNum: this.maxUserNum,
       state: this.state,
-      users: Object.values(this.users).map((entry) => ({
-        id: entry.user.id,
-        nickname: entry.user.nickname,
-        characterData: entry.characterData,
+      users: this.userOrder.map((id) => ({
+        id: this.users[id].user.id,
+        nickname: this.users[id].user.nickname,
+        character: { ...this.users[id].character },
       })), // 클라이언트에 보낼때 유저의 유저데이터만을 보내야함. id, nickname, characterData
     };
   }
 
   getUserLength() {
-    const userLength = Object.keys(this.users).length;
-    return userLength;
+    return this.userOrder.length;
   }
 
   // 게임 상태 변경
@@ -57,7 +58,7 @@ class Game {
     }
 
     // 캐릭터 데이터
-    const defaultCharacterData = {
+    const defaultCharacter = {
       characterType: CHARACTER_TYPE.NONE_CHARACTER, // 캐릭터 종류
       roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
       hp: 0,
@@ -72,8 +73,9 @@ class Game {
 
     this.users[user.id] = {
       user, // 유저
-      characterData: { ...defaultCharacterData },
+      character: { ...defaultCharacter },
     };
+    this.userOrder.push(user.id);
   }
 
   // 캐릭터, 역할 분배 설정
@@ -84,43 +86,46 @@ class Game {
     ) {
       throw new Error('캐릭터 및 역할 배열의 길이가 유저 수와 일치하지 않습니다.');
     }
-
+    this.state = 1;
     Object.values(this.users).forEach((userEntry, index) => {
       const characterType = preparedCharacter[index];
       const roleType = preparedRole[index];
 
-      userEntry.characterData.characterType = characterType;
-      userEntry.characterData.roleType = roleType;
+      userEntry.character.characterType = characterType;
+      userEntry.character.roleType = roleType;
 
       if (
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.characterData.hp = 3;
+        userEntry.character.hp = 3;
       } else {
-        userEntry.characterData.hp = 4;
+        userEntry.character.hp = 4;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
-        userEntry.characterData.hp++;
+        userEntry.character.hp++;
       }
 
-      userEntry.characterData.weapon = 0;
-      userEntry.characterData.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
-      userEntry.characterData.equips = 0;
-      userEntry.characterData.debuffs = 0;
-      userEntry.characterData.handCards = 0;
-      userEntry.characterData.bbangCount = 0;
-      userEntry.characterData.handCardsCount = 0;
+      userEntry.character.weapon = 0;
+      userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
+      userEntry.character.equips = 0;
+      userEntry.character.debuffs = 0;
+      userEntry.character.handCards = 0;
+      userEntry.character.bbangCount = 0;
+      userEntry.character.handCardsCount = 0;
+      console.log(`캐릭터 데이터 : ${userEntry.character.characterType}`);
     });
   }
 
+  // 유저 제거
   removeUser(userId) {
-    if (this.getUserLength() == 0) {
+    if (!this.users[userId]) {
       return;
     }
 
     delete this.users[userId];
+    this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
     // 인터버 매니져 추가되면.
     // this.intervalManager.removePlayer(userId);
   }
@@ -151,12 +156,12 @@ class Game {
     return Object.values(this.users).map((entry) => entry.user);
   }
 
-  setCharacterDataByUserId(userId, characterData) {
+  setCharacterDataByUserId(userId, character) {
     if (!this.users[userId]) {
       throw new Error(`${userId}를 가지는 유저가 없습니다.`);
     }
 
-    this.users[userId].characterData = characterData;
+    this.users[userId].character = character;
   }
 
   /////////////////// notification

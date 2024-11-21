@@ -20,7 +20,7 @@ const joinRoomHandler = async ({ socket, payload }) => {
 
     room.addUser(user);
 
-    const defaultCharacterData = {
+    const defaultCharacter = {
       characterType: CHARACTER_TYPE.NONE_CHARACTER, // 캐릭터 종류
       roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
       hp: 0,
@@ -36,13 +36,13 @@ const joinRoomHandler = async ({ socket, payload }) => {
     const userData = {
       id: user.id,
       nickname: user.nickname,
-      characterData: defaultCharacterData,
+      character: defaultCharacter,
     };
 
     const responseData = {
       success: true,
       room: room.getRoomData(),
-      failcode: 0,
+      failCode: 0,
     };
 
     const joinRoomResponse = createResponse(
