@@ -31,7 +31,8 @@ import {
   ROLES_DISTRIBUTION,
   CHARACTER_STATE_TYPE,
   ROOM_STATE_TYPE,
-  CHARACTER_SPOWN_POINT,
+  CHARACTER_SPAWN_POINT,
+  CARD_TYPE,
 } from '../constants/header.js';
 
 const config = {
@@ -53,7 +54,10 @@ const config = {
   character: {
     characterType: CHARACTER_TYPE,
     characterStateType: CHARACTER_STATE_TYPE,
-    characterSpownPoint: CHARACTER_SPOWN_POINT,
+    characterSpawnPoint: CHARACTER_SPAWN_POINT,
+  },
+  card: {
+    cardType: CARD_TYPE,
   },
   role: {
     roleType: ROLE_TYPE,

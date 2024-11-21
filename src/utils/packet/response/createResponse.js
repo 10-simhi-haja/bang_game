@@ -64,9 +64,26 @@ export const createResponse = (packetType, sequence, payloadData = {}) => {
   responsePayload[PACKET_MAPS[packetType]] = payloadData;
   const payloadBuffer = gamePacket.encode(responsePayload).finish();
 
+  if (packetType === 19) {
+    console.log('스타트');
+    console.log(JSON.stringify(responsePayload, null, 2));
+    console.log('스타트2');
+    console.dir(gamePacket.decode(payloadBuffer), { depth: null });
+  }
+
   // 6. 페이로드 길이
   const payloadLengthBuffer = Buffer.alloc(config.packet.payloadLength);
   payloadLengthBuffer.writeUInt32BE(payloadBuffer.length);
+
+  console.log(`응답 ${packetType}`);
+
+  if (packetType === 18) {
+    console.log(`캐릭터 셔플 응답`);
+  }
+
+  if (packetType === 19) {
+    console.log(`캐릭터 셔플 노티`);
+  }
 
   return Buffer.concat([
     typeBuffer,

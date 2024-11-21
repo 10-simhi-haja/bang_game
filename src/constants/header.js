@@ -103,6 +103,33 @@ export const CHARACTER_TYPE = {
   PINK_SLIME: 13, // 핑크슬라임
 };
 
+export const CARD_TYPE = {
+  NONE: 0,
+  BBANG: 1, // 20장
+  BIG_BBANG: 2, // 1장
+  SHIELD: 3, // 10장
+  VACCINE: 4, // 6장
+  CALL_119: 5, // 2장
+  DEATH_MATCH: 6, // 4장
+  GUERRILLA: 7, // 1장
+  ABSORB: 8, // 4장
+  HALLUCINATION: 9, // 4장
+  FLEA_MARKET: 10, // 3장
+  MATURED_SAVINGS: 11, // 2장
+  WIN_LOTTERY: 12, // 1장
+  SNIPER_GUN: 13, // 1장
+  HAND_GUN: 14, // 2장
+  DESERT_EAGLE: 15, // 3장
+  AUTO_RIFLE: 16, // 2장
+  LASER_POINTER: 17, // 1장
+  RADAR: 18, // 1장
+  AUTO_SHIELD: 19, // 2장
+  STEALTH_SUIT: 20, // 2장
+  CONTAINMENT_UNIT: 21, // 3장
+  SATELLITE_TARGET: 22, // 1장
+  BOMB: 23, // 1장
+};
+
 export const ROLE_TYPE = {
   NONE_ROLE: 0,
   TARGET: 1,
@@ -151,7 +178,7 @@ export const ROOM_STATE_TYPE = {
   INGAME: 2,
 };
 
-export const CHARACTER_SPOWN_POINT = [
+export const CHARACTER_SPAWN_POINT = [
   { x: -3.972, y: 3.703 },
   { x: 10.897, y: 4.033 },
   { x: 11.737, y: -5.216 },
