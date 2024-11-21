@@ -26,10 +26,6 @@ export const getUserByDeviceId = (deviceId) => {
 
 export const getUserBySocket = (socket) => {
   const user = userSessions.find((user) => user.socket === socket);
-  if (!user) {
-    console.error('User not found: getUserBySocket');
-  }
-
   return user;
 };
 

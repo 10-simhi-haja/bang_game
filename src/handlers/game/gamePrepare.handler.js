@@ -131,6 +131,7 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     // 1. 방장의 소켓으로 prepare 요청이 들어온다.
     // 1-1. ownerId로 game세션을 찾을수 있어야함.
     const owner = getUserBySocket(socket);
+
     const game = getGameSessionByUser(owner);
 
     // 방 인원수

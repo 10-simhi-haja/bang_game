@@ -172,7 +172,22 @@ class Game {
 
   // userId로 user찾기
   getUser(userId) {
-    return this.users[userId].user;
+    const user = this.users[userId].user;
+    console.log('getUser: ', user);
+    return user;
+  }
+
+  getCharacter(userId) {
+    const Character = this.users[userId].character;
+    return Character;
+  }
+
+  minusBbangCount(userId) {
+    return --this.getCharacter(userId).bbangCount;
+  }
+
+  plusBbangCount(userId) {
+    return ++this.getCharacter(userId).bbangCount;
   }
 
   // 자신을 제외한 유저들 배열
