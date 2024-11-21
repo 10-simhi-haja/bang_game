@@ -6,10 +6,25 @@ class User {
     this.id = userId;
     this.nickname = nickname;
     this.sequence = 0;
+    this.x = 0;
+    this.y = 0;
   }
 
   getNextSequence() {
     return ++this.sequence;
+  }
+
+  getPos() {
+    return {
+      id: this.id,
+      x: this.x,
+      y: this.y,
+    };
+  }
+
+  setPos(x, y) {
+    this.x = x;
+    this.y = y;
   }
 }
 

@@ -171,6 +171,17 @@ class Game {
     this.users[userId].character = character;
   }
 
+  getAllUserPos() {
+    const userPosDatas = this.userOrder.map((id) => this.users[id].user.getPos());
+    return userPosDatas;
+  }
+
+  setAllUserPos(posDatas) {
+    this.getAllUsers().forEach((user, i) => {
+      user.setPos(posDatas[i].x, posDatas[i].y);
+    });
+  }
+
   /////////////////// notification
 
   prepareNotification() {
