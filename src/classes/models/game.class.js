@@ -1,10 +1,13 @@
 import config from '../../config/config.js';
+import IntervalManager from '../managers/interval.manager.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
   character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
+  interval: INTERVAL,
+  intervaltype: INTERVAL_TYPE,
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -17,8 +20,9 @@ class Game {
     this.state = roomData.state; // WAIT, PREPARE, INGAME
     this.users = {};
     this.userOrder = [];
-    // 인터버 매니저 추가되면.
-    // this.intervalManager = new IntervalManager();
+    // 인터버 매니저. 동기화중. 플레이어가 죽었으면? 관전을 위해서는 동기화도 이루어지긴해야함.
+    // 해야하는 동기화와 아닌동기화 구분할 필요 있을듯.
+    this.intervalManager = new IntervalManager();
   }
 
   // 들어온 순서대로 반영.
@@ -84,6 +88,20 @@ class Game {
     };
     this.userOrder.push(user.id);
   }
+
+  // 해당 아이디 유저에게 주기 셋팅
+  //              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
+  setUserInterval(userId, interval, intervalType, func, ...args) {
+    this.intervalManager.addPlayer(
+      userId,
+      () => func(...args), // A에 userId와 추가 매개변수를 전달
+      interval,
+      intervalType,
+    );
+  }
+
+  // 포지션 노티 여기서 쏴주면 됩니다.
+  userSync(user) {}
 
   // 캐릭터, 역할 분배 설정
   setPrepare(preparedCharacter, preparedRole) {
@@ -163,11 +181,11 @@ class Game {
     if (!this.users[userId]) {
       return;
     }
-
+    this.intervalManager.removePlayer(userId);
     delete this.users[userId];
     this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
     // 인터버 매니져 추가되면.
-    // this.intervalManager.removePlayer(userId);
+    this.intervalManager.removePlayer(userId);
   }
 
   // userId로 user찾기
@@ -223,15 +241,6 @@ class Game {
   setAllUserPos(posDatas) {
     this.getAllUsers().forEach((user, i) => {
       user.setPos(posDatas[i].x, posDatas[i].y);
-    });
-  }
-  /////////////////// notification
-
-  prepareNotification() {
-    const roomData = this.getRoomData();
-
-    Object.values(this.users).forEach((user) => {
-      user.socket.write(roomData);
     });
   }
 }

@@ -33,6 +33,8 @@ import {
   ROOM_STATE_TYPE,
   CHARACTER_SPAWN_POINT,
   CARD_TYPE,
+  INTERVAL,
+  INTERVAL_TYPE,
 } from '../constants/header.js';
 
 const config = {
@@ -80,6 +82,8 @@ const config = {
   jwt: {
     key: JWT_SECRET_KEY,
   },
+  interval: INTERVAL,
+  intervaltype: INTERVAL_TYPE,
 };
 
 export default config;

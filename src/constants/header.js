@@ -200,3 +200,13 @@ export const CHARACTER_SPAWN_POINT = [
   { x: 15.337, y: -12.296 },
   { x: -15.202, y: -4.736 },
 ];
+
+// 인터벌 주기
+// 필요한 주기가 있으면 추가해서 사용.
+export const INTERVAL = {
+  SYNC_POSITION: 1000,
+};
+
+export const INTERVAL_TYPE = {
+  POSITION: 0,
+};
