@@ -74,7 +74,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     // }
     const gameStateData = {
       phaseType: 1,
-      nextPhaseAt: 30000,
+      nextPhaseAt: 3000,
     };
     // 게임 시작 알림 데이터
     const gameStartNotiData = {
@@ -95,6 +95,8 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     users.forEach((notiUser) => {
       notiUser.socket.write(gameStartNoti);
     });
+
+    game.changeState(INGAME);
 
     // message S2CPhaseUpdateNotification {
     //     PhaseType phaseType = 1; // DAY 1, END 3 (EVENING은 필요시 추가)
