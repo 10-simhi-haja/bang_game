@@ -53,7 +53,7 @@ const joinRoomHandler = async ({ socket, payload }) => {
 
     socket.write(joinRoomResponse);
     joinRoomNotification(socket, user.id, userData, room);
-    console.log(userData);
+    //console.log(userData);
   } catch (error) {
     handleError(socket, error);
   }
