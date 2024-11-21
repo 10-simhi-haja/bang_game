@@ -4,6 +4,7 @@ import { getUserBySocket } from '../../sessions/user.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import gameStartNotification from '../../utils/notification/gameStartNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -14,6 +15,7 @@ const {
 
 // 배열을 중복없이 섞은다음 리턴
 // 배열과 숫자 => 배열
+// 유틸로 뺄까?
 const shuffle = (array) => {
   // 셔플 가능한지 확인
   if (array === undefined || array === null || array.length <= 1) {
@@ -37,6 +39,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
   try {
     const owner = getUserBySocket(socket);
     const game = getGameSessionByUser(owner);
+    game.changeState(INGAME);
 
     // 게임시작 응답 데이터
     const gameStartResponseData = {
@@ -44,7 +47,6 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
       failCode: 0,
     };
 
-    console.log(`게임시작 요청`);
     // 게임시작 응답 패킷 생성
     const gameStartResponse = createResponse(
       PACKET_TYPE.GAME_START_RESPONSE,
@@ -52,30 +54,22 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
       gameStartResponseData,
     );
 
-    // 게임시작 응답 패킷 전송
     socket.write(gameStartResponse);
-    console.log(`게임시작 응답`);
+
+    ////////// 리스폰 끝 노티 시작//////
 
     const allUserDatas = game.getAllUserDatas();
     const characterPos = shuffle(CHARACTER_SPAWN_POINT).slice(0, game.getUserLength());
 
-    console.dir(characterPos, { depth: null });
-    // message CharacterPositionData {
-    //     int64 id = 1;
-    //     double x = 2;
-    //     double y = 3;
-    // }
     game.setAllUserPos(characterPos);
     const characterPosData = game.getAllUserPos();
 
-    // message GameStateData {
-    //     PhaseType phaseType = 1; // DAY 1, EVENING 2, END 3 (하루 종료시 카드 버리는 턴)
-    //     int64 nextPhaseAt = 2; // 다음 페이즈 시작 시점(밀리초 타임스탬프)
-    // }
+    // phase 전환시간 밀리초. // 상수화 필요함.
     const gameStateData = {
       phaseType: 1,
-      nextPhaseAt: 3000,
+      nextPhaseAt: Date.now() + 10 * 1000, // 단위  1초
     };
+
     // 게임 시작 알림 데이터
     const gameStartNotiData = {
       gameState: gameStateData,
@@ -83,42 +77,11 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
       characterPositions: characterPosData,
     };
 
-    // 게임시작 알림 패킷 생성
-    const gameStartNoti = createResponse(
-      PACKET_TYPE.GAME_START_NOTIFICATION,
-      socket.sequence,
-      gameStartNotiData,
-    );
-
     const users = game.getAllUsers();
 
     users.forEach((notiUser) => {
-      notiUser.socket.write(gameStartNoti);
+      gameStartNotification(socket, notiUser, gameStartNotiData);
     });
-
-    game.changeState(INGAME);
-
-    // message S2CPhaseUpdateNotification {
-    //     PhaseType phaseType = 1; // DAY 1, END 3 (EVENING은 필요시 추가)
-    //     int64 nextPhaseAt = 2; // 다음 페이즈 시작 시점(밀리초 타임스탬프)
-    //     repeated CharacterPositionData characterPositions = 3; // 변경된 캐릭터 위치
-    // }
-
-    // const phaseUpdateNotiData = {
-    //   phaseType: 1,
-    //   nextPhaseAt: 30000,
-    //   characterPositions: characterPosData,
-    // };
-
-    // const phaseUpdateNoti = createResponse(
-    //   PACKET_TYPE.PHASE_UPDATE_NOTIFICATION,
-    //   socket.sequence,
-    //   phaseUpdateNotiData,
-    // );
-
-    // users.forEach((notiUser) => {
-    //   notiUser.socket.write(phaseUpdateNoti);
-    // });
   } catch (error) {
     handleError(socket, error);
   }
