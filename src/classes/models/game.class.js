@@ -119,9 +119,9 @@ class Game {
         userEntry.character.hp++;
       }
 
-      userEntry.character.weapon = 0;
+      userEntry.character.weapon = 13; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
       userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
-      userEntry.character.equips = [];
+      userEntry.character.equips = [17];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         {
@@ -153,7 +153,7 @@ class Game {
           count: 1,
         },
       ];
-      userEntry.character.bbangCount = 0;
+      userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = 4;
     });
   }
@@ -215,6 +215,7 @@ class Game {
     this.users[userId].character = character;
   }
 
+  // 게임 내 모든 유저 위치 배열로.
   getAllUserPos() {
     const userPosDatas = this.userOrder.map((id) => this.users[id].user.getPos());
     return userPosDatas;
@@ -225,7 +226,6 @@ class Game {
       user.setPos(posDatas[i].x, posDatas[i].y);
     });
   }
-
   /////////////////// notification
 
   prepareNotification() {

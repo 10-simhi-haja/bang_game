@@ -12,6 +12,7 @@ const packetParser = (payload) => {
   let payloadData;
   try {
     payloadData = packet.decode(payload);
+    console.log('\npayload Data: ', payloadData);
   } catch (error) {
     throw new CustomError(ErrorCodes.PACKET_DECODE_ERROR, '패킷 디코딩 중 오류가 발생했습니다.');
   }
