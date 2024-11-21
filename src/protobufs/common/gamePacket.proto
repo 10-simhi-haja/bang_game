@@ -88,7 +88,7 @@ message GamePacket {
 
     // 유저 정보 업데이트 알림(카드 사용, 체력 감소..)
     S2CUserUpdateNotification userUpdateNotification = 33;
-
+        
     // 페이즈 업데이트
     S2CPhaseUpdateNotification phaseUpdateNotification = 34;
 
@@ -114,5 +114,5 @@ message GamePacket {
 
     // 효과 알림
     S2CAnimationNotification animationNotification = 45;
+    }
   }
-}
