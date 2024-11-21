@@ -1,8 +1,8 @@
 import { getGameSessionBySocket } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { PACKET_TYPE } from '../../constants/header.js';
+import config from '../../config/config.js';
 
-const packetType = PACKET_TYPE;
+const packetType = config.packet.packetType;
 
 const handlePositionUpdate = async ({ socket, payload }) => {
   try {
@@ -22,73 +22,73 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
     }
 
-    let currentUser, opponent;
-
-    if (typeof gameSession.users === 'object') {
-      currentUser = Object.values(gameSession.users)
-        .map((entry) => entry.user)
-        .find((user) => user.socket === socket);
-      opponent = Object.values(gameSession.users)
-        .map((entry) => entry.user)
-        .find((user) => user.socket !== socket);
-    }
+    let currentUser = Object.values(gameSession.users)
+      .map((entry) => entry.user)
+      .find((user) => user.socket === socket);
 
     if (!currentUser) {
       throw new Error('유저가 존재하지 않습니다.');
     }
 
-    if (!opponent) {
-      throw new Error('상대 유저가 존재하지 않습니다.');
-    }
-
-    // 위치 업데이트 호출
     currentUser.setPos(x, y);
 
-    // 현재 유저에게 응답 전송
     const positionResponseData = {
       success: true,
       failCode: 0,
     };
 
-    const positionResponse = await createResponse(
+    console.log('Position Update Response Data:', positionResponseData);
+
+    const positionResponse = createResponse(
       packetType.POSITION_UPDATE_RESPONSE,
       socket.sequence,
       positionResponseData,
     );
 
-    socket.write(JSON.stringify(positionResponse));
+    socket.write(positionResponse);
 
-    // 상대 유저에게 알림 전송
-    const notificationData = {
-      userId: currentUser.id,
-      x,
-      y,
-      characterPositions: {
-        [currentUser.id]: { x, y },
-        [opponent.id]: { x: opponent.x, y: opponent.y },
-      },
+    const characterPositions = gameSession.getAllUserPos();
+
+    // // 캐릭터 위치 데이터 생성
+    // const characterPositions = Object.entries(gameSession.users).map(([userId, userEntry]) => ({
+    //   id: parseInt(userId, 10),
+    //   x: userEntry.user.x,
+    //   y: userEntry.user.y,
+    // }));
+
+    console.log('Notification Response Data:', { characterPositions });
+
+    const notiData = {
+      characterPositions: characterPositions,
     };
 
-    const notificationResponse = await createResponse(
+    // 노티피케이션 생성 및 전송
+    const notificationResponse = createResponse(
       packetType.POSITION_UPDATE_NOTIFICATION,
-      opponent.socket.sequence,
-      notificationData,
+      socket.sequence,
+      notiData,
     );
 
-    opponent.socket.write(JSON.stringify(notificationResponse));
+    Object.entries(gameSession.users).forEach(([key, userData]) => {
+      const userSocket = userData.user.socket;
+      if (userSocket && userSocket !== socket) {
+        console.log(`Sending notification to user ${key}`);
+        userSocket.write(notificationResponse);
+      }
+    });
   } catch (error) {
     console.error('위치 업데이트 중 에러 발생:', error.message);
 
-    const errorResponse = await createResponse(packetType.POSITION_UPDATE_RESPONSE, null, {
+    const errorResponse = createResponse(packetType.POSITION_UPDATE_RESPONSE, socket.sequence, {
       success: false,
       message: error.message,
       failCode: 1,
     });
 
     try {
-      socket.write(JSON.stringify(errorResponse));
+      socket.write(errorResponse);
     } catch (socketError) {
-      console.error('Failed to send error response:', socketError.message);
+      console.error('에러 응답 전송 실패:', socketError.message);
     }
   }
 };
