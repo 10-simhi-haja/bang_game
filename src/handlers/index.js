@@ -3,11 +3,15 @@ import ErrorCodes from './../utils/errors/errorCodes.js';
 import config from '../config/config.js';
 import handlePositionUpdate from './syncCharacter/position.handler.js';
 import registerHandler from './user/register.handler.js';
+import handleUserUpdate from './syncCharacter/userUpdate.handler.js';
 import loginHandler from './user/login.handler.js';
 import roomListHandler from './room/roomList.handler.js';
 import createRoomHandler from './room/createRoom.handler.js';
 import joinRoomHandler from './room/joinRoom.handler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
+import handleDestroyCardRequest from './card/destroyCard.handler.js';
+import handleFleaMarketPick from './fleaMarket/fleaMarket.handler.js';
+import handleReactionRequest from './reaction/reaction.handler.js';
 import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 import { gameStartRequestHandler } from './game/gameStart.handler.js';
@@ -137,7 +141,7 @@ const handlers = {
     protoType: 'game.S2CFleaMarketNotification',
   },
   [packetType.FLEA_MARKET_PICK_REQUEST]: {
-    handler: undefined,
+    handler: handleFleaMarketPick,
     protoType: 'game.C2SFleaMarketPickRequest',
   },
   [packetType.FLEA_MARKET_PICK_RESPONSE]: {
@@ -145,7 +149,7 @@ const handlers = {
     protoType: 'game.S2CFleaMarketPickResponse',
   },
   [packetType.USER_UPDATE_NOTIFICATION]: {
-    handler: undefined,
+    handler: handleUserUpdate,
     protoType: 'game.S2CUserUpdateNotification',
   },
   [packetType.PHASE_UPDATE_NOTIFICATION]: {
@@ -153,7 +157,7 @@ const handlers = {
     protoType: 'game.S2CPhaseUpdateNotification',
   },
   [packetType.REACTION_REQUEST]: {
-    handler: undefined,
+    handler: handleReactionRequest,
     protoType: 'game.C2SReactionRequest',
   },
   [packetType.REACTION_RESPONSE]: {
@@ -161,7 +165,7 @@ const handlers = {
     protoType: 'game.S2CReactionResponse',
   },
   [packetType.DESTROY_CARD_REQUEST]: {
-    handler: undefined,
+    handler: handleDestroyCardRequest,
     protoType: 'game.C2SDestroyCardRequest',
   },
   [packetType.DESTROY_CARD_RESPONSE]: {

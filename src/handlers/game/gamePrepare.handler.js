@@ -4,6 +4,7 @@ import { getUserBySocket } from '../../sessions/user.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import prepareNotification from '../../utils/notification/prepareNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -160,19 +161,12 @@ export const gamePrepareRequestHandler = ({ socket, payload }) => {
     socket.write(prepareResponse);
 
     // 응답 먼저 보내고 노티.
-
     const prepareNotiData = {
       room: roomData,
     };
 
-    const noti = createResponse(
-      PACKET_TYPE.GAME_PREPARE_NOTIFICATION,
-      socket.sequence,
-      prepareNotiData,
-    );
-
     users.forEach((notiUser) => {
-      notiUser.socket.write(noti);
+      prepareNotification(notiUser.socket, notiUser, prepareNotiData);
     });
 
     // 크리에이트 리스폰스(성공여부, 실패코드)
