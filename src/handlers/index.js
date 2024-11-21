@@ -11,6 +11,7 @@ import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
 import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 import { gameStartRequestHandler } from './game/gameStart.handler.js';
+import useCardHandler from './card/useCard.handler.js';
 
 const { packetType } = config.packet;
 

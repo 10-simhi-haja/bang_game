@@ -178,7 +178,7 @@ export const ROOM_STATE_TYPE = {
   INGAME: 2,
 };
 
-export const CHARACTER_SPOWN_POINT = [
+export const CHARACTER_SPAWN_POINT = [
   { x: -3.972, y: 3.703 },
   { x: 10.897, y: 4.033 },
   { x: 11.737, y: -5.216 },

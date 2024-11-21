@@ -6,7 +6,6 @@ class User {
     this.socket = socket;
     this.id = userId;
     this.nickname = nickname;
-    this.character = new characterData();
     this.sequence = 0;
     this.x = 0;
     this.y = 0;
