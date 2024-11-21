@@ -8,14 +8,12 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const useCardHandler = ({ socket, payload }) => {
   try {
-    console.log('QWEQWE');
     console.log('userCard', payload);
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
 
     /**
-     * ! 카드 함수 만들기 => 뭔가 잘못 판단한거 같음, 보류
      * TODO: cardType에따라 카드를 사용할 시 그 카드에 따른 효과를 적용해야 함
      * 행동카드를 사용한 유저와 대상이 된 유저는 행동카드 사용이 종료 될 때까지 움직일 수 없고,
      * 다른 유저의 타겟이 될 수 없다.
