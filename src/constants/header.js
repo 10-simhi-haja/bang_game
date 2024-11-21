@@ -230,10 +230,18 @@ export const CHARACTER_SPAWN_POINT = [
   { x: -15.202, y: -4.736 },
 ];
 
+export const PHASE_TYPE = {
+  DAY: 1,
+  // EVENING: 2, 필요시 추가,
+  END: 3,
+};
+
 // 인터벌 주기
 // 필요한 주기가 있으면 추가해서 사용.
 export const INTERVAL = {
   SYNC_POSITION: 1000,
+  PHASE_UPDATE_DAY: 30, // 초단위
+  PHASE_UPDATE_END: 30, // 초단위
 };
 
 export const INTERVAL_TYPE = {

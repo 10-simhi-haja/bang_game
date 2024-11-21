@@ -35,6 +35,7 @@ import {
   CARD_TYPE,
   INTERVAL,
   INTERVAL_TYPE,
+  PHASE_TYPE,
 } from '../constants/header.js';
 
 const config = {
@@ -84,6 +85,7 @@ const config = {
   },
   interval: INTERVAL,
   intervalType: INTERVAL_TYPE,
+  phaseType: PHASE_TYPE,
 };
 
 export default config;

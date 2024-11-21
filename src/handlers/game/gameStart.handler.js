@@ -67,9 +67,10 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     const characterPosData = game.getAllUserPos();
 
     // phase 전환시간 밀리초. // 상수화 필요함.
+    const time = INTERVAL.PHASE_UPDATE_DAY * 1000;
     const gameStateData = {
       phaseType: 1,
-      nextPhaseAt: Date.now() + 10 * 1000, // 단위  1초
+      nextPhaseAt: Date.now() + time, // 단위  1초
     };
 
     // 게임 시작 알림 데이터
@@ -83,9 +84,11 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
 
     users.forEach((notiUser) => {
       gameStartNotification(socket, notiUser, gameStartNotiData);
-      // 페이즈 넘어가는 시간 넣어야함
-      // game.setUserSyncInterval(notiUser);
     });
+
+    // 페이즈 넘어가는 시간 넣어야함
+
+    game.setPhaseUpdateInterval(time);
   } catch (error) {
     handleError(socket, error);
   }
