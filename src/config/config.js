@@ -83,7 +83,7 @@ const config = {
     key: JWT_SECRET_KEY,
   },
   interval: INTERVAL,
-  intervaltype: INTERVAL_TYPE,
+  intervalType: INTERVAL_TYPE,
 };
 
 export default config;

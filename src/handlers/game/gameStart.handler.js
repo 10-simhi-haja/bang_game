@@ -11,6 +11,8 @@ const {
   character: { characterType: CHARACTER_TYPE, characterSpawnPoint: CHARACTER_SPAWN_POINT },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
+  interval: INTERVAL,
+  intervalType: INTERVAL_TYPE,
 } = config;
 
 // 배열을 중복없이 섞은다음 리턴
@@ -81,6 +83,8 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
 
     users.forEach((notiUser) => {
       gameStartNotification(socket, notiUser, gameStartNotiData);
+      // 페이즈 넘어가는 시간 넣어야함
+      // game.setUserSyncInterval(notiUser);
     });
   } catch (error) {
     handleError(socket, error);

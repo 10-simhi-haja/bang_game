@@ -238,4 +238,5 @@ export const INTERVAL = {
 
 export const INTERVAL_TYPE = {
   POSITION: 0,
+  PHASE_UPDATE: 1,
 };

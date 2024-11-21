@@ -1,4 +1,5 @@
 import config from '../../config/config.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
 
 const {
@@ -7,7 +8,7 @@ const {
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
   interval: INTERVAL,
-  intervaltype: INTERVAL_TYPE,
+  intervalType: INTERVAL_TYPE,
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -88,20 +89,6 @@ class Game {
     };
     this.userOrder.push(user.id);
   }
-
-  // 해당 아이디 유저에게 주기 셋팅
-  //              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
-  setUserInterval(userId, interval, intervalType, func, ...args) {
-    this.intervalManager.addPlayer(
-      userId,
-      () => func(...args), // A에 userId와 추가 매개변수를 전달
-      interval,
-      intervalType,
-    );
-  }
-
-  // 포지션 노티 여기서 쏴주면 됩니다.
-  userSync(user) {}
 
   // 캐릭터, 역할 분배 설정
   setPrepare(preparedCharacter, preparedRole) {
@@ -244,6 +231,64 @@ class Game {
       user.setPos(posDatas[i].x, posDatas[i].y);
     });
   }
+
+  ///////////////////// intervalManager 관련.
+  // 해당 아이디 유저에게 주기 셋팅
+  //              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
+  setUserSyncInterval(user) {
+    this.intervalManager.addPlayer(
+      user.id,
+      () => this.userSync(user),
+      INTERVAL.SYNC_POSITION,
+      INTERVAL_TYPE.POSITION,
+    );
+  }
+
+  // 포지션 노티 여기서 쏴주면 됩니다.
+  // 적용하면 상대 캐릭터가 끊기듯이 움직임.
+  userSync(user) {
+    const characterPositions = [];
+    const allUser = this.getAllUsers();
+
+    allUser.forEach((user) => {
+      const posData = {
+        id: user.id,
+        x: user.x,
+        y: user.y,
+      };
+      characterPositions.push(posData);
+    });
+
+    console.log('Notification Response Data:', { characterPositions });
+
+    const notiData = {
+      characterPositions: characterPositions,
+    };
+
+    // 노티피케이션 생성 및 전송
+    const notificationResponse = createResponse(
+      PACKET_TYPE.POSITION_UPDATE_NOTIFICATION,
+      user.socket.sequence,
+      notiData,
+    );
+
+    allUser.forEach((notiUser) => {
+      notiUser.socket.write(notificationResponse);
+    });
+  }
+
+  setPhaseInterval(user, time) {
+    this.intervalManager.addInterval(
+      user.id,
+      () => this.phaseUpdate(user),
+      time,
+      INTERVAL_TYPE.PHASE_UPDATE,
+    );
+  }
+
+  // 설정한 시간이 되면 발동.
+  // 노티 업데이트 알림 쏘기
+  phaseUpdate(user) {}
 }
 
 export default Game;
