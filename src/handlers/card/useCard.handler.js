@@ -3,6 +3,7 @@ import { PACKET_TYPE } from '../../constants/header.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
@@ -12,6 +13,8 @@ const useCardHandler = ({ socket, payload }) => {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
+    const game = getGameSessionByUser(user);
+    const users = game.getAllUsers();
 
     /**
      * TODO: cardType에따라 카드를 사용할 시 그 카드에 따른 효과를 적용해야 함
@@ -37,8 +40,14 @@ const useCardHandler = ({ socket, payload }) => {
       responsePayload,
     );
 
+    
     socket.write(userCardResponse);
     useCardNotification(socket, user.id, room, payload);
+    if (cardType == 17)
+      users.forEach((user) => {
+        equipNotification(socket, user.id, cardType, user);
+      });
+
   } catch (err) {
     handleError(socket, err);
   }
