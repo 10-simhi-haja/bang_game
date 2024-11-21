@@ -171,6 +171,7 @@ class Game {
     this.users[userId].character = character;
   }
 
+  // 게임 내 모든 유저 위치 배열로.
   getAllUserPos() {
     const userPosDatas = this.userOrder.map((id) => this.users[id].user.getPos());
     return userPosDatas;
