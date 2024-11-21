@@ -19,12 +19,14 @@ const handleReactionRequest = async (socket, payload) => {
       throw new Error('현재 유저가 존재하지 않습니다.');
     }
 
+    // 기본은 논 리액션으로 가기, 만약에 카드를 사용 할 수 있으면 쓸지 말지 선택하기? (스위치 말고 조건문으로?)
+    // 클라이언트 코드 보고 결정
     switch (reactionType) {
       case REACTION_TYPE.NOT_USE_CARD:
-        // 카드 미사용 처리 로직
+        // 카드를 사용 할 수 있으나 사용을 안함
         break;
       case REACTION_TYPE.NONE_REACTION:
-        // 카드를 사용 하지 않았을때 로직?
+        // 기본값, 카드를 사용 할 수 없음
         break;
       default:
         throw new Error('유효하지 않은 리액션 타입입니다.');
