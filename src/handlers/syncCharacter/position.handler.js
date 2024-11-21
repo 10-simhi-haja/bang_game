@@ -61,13 +61,6 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       characterPositions.push(posData);
     });
 
-    // 캐릭터 위치 데이터 생성
-    // const characterPositions = Object.entries(gameSession.users).map(([userId, userEntry]) => ({
-    //   id: parseInt(userId, 10),
-    //   x: userEntry.user.x,
-    //   y: userEntry.user.y,
-    // }));
-
     console.log('Notification Response Data:', { characterPositions });
 
     const notiData = {
@@ -81,34 +74,11 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       notiData,
     );
 
-    //const opponents = gameSession.getOpponents(currentUser.id);
     allUser.forEach((notiUser) => {
       notiUser.socket.write(notificationResponse);
     });
-
-    // Object.entries(gameSession.users).forEach(([key, userData]) => {
-    //   const userSocket = userData.user.socket;
-    //   if (userSocket && userSocket !== socket) {
-    //     console.log(`Sending notification to user ${key}`);
-    //     userSocket.write(notificationResponse);
-    //   }
-    // });
   } catch (error) {
     handleError(socket, error);
-
-    // console.error('위치 업데이트 중 에러 발생:', error.message);
-
-    // const errorResponse = createResponse(packetType.POSITION_UPDATE_RESPONSE, socket.sequence, {
-    //   success: false,
-    //   message: error.message,
-    //   failCode: 1,
-    // });
-
-    // try {
-    //   socket.write(errorResponse);
-    // } catch (socketError) {
-    //   console.error('에러 응답 전송 실패:', socketError.message);
-    // }
   }
 };
 
