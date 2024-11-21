@@ -66,8 +66,8 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
 
     // phase 전환시간 밀리초. // 상수화 필요함.
     const gameStateData = {
-      phaseType: 1,
-      nextPhaseAt: 3000,
+      phaseType: 1, // 단위  1초
+      nextPhaseAt: Date.now() + 10 * 1000,
     };
 
     // 게임 시작 알림 데이터
