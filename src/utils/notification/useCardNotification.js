@@ -4,6 +4,7 @@ import { createResponse } from '../packet/response/createResponse.js';
 
 const useCardNotification = (socket, userId, room, payload) => {
   try {
+    console.log('그냥 useCard');
     const { cardType, targetUserId } = payload;
 
     const responseData = {
@@ -18,13 +19,10 @@ const useCardNotification = (socket, userId, room, payload) => {
       responseData,
     );
 
-    // 다른 사람에게 알림
     Object.entries(room.users).forEach(([key, userData]) => {
-      if (key !== userId.toString()) {
-        const userSocket = userData.user.socket;
-        if (userSocket) {
-          userSocket.write(responsePayload);
-        }
+      const userSocket = userData.user.socket;
+      if (userSocket) {
+        userSocket.write(responsePayload);
       }
     });
   } catch (err) {

@@ -37,7 +37,7 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       failCode: 0,
     };
 
-    console.log('Position Update Response Data:', positionResponseData);
+    // console.log('Position Update Response Data:', positionResponseData);
 
     const positionResponse = createResponse(
       packetType.POSITION_UPDATE_RESPONSE,
@@ -61,7 +61,7 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       characterPositions.push(posData);
     });
 
-    console.log('Notification Response Data:', { characterPositions });
+    // console.log('Notification Response Data:', { characterPositions });
 
     const notiData = {
       characterPositions: characterPositions,

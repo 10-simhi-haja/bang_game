@@ -40,14 +40,11 @@ const useCardHandler = ({ socket, payload }) => {
       responsePayload,
     );
 
-    
     socket.write(userCardResponse);
-    useCardNotification(socket, user.id, room, payload);
-    if (cardType == 17)
-      users.forEach((user) => {
-        equipNotification(socket, user.id, cardType, user);
-      });
-
+    console.log(`cardType = ${cardType}, Type = ${typeof cardType}`);
+    cardType !== 17
+      ? useCardNotification(socket, user.id, room, payload)
+      : equipNotification(socket, user.id, room, cardType);
   } catch (err) {
     handleError(socket, err);
   }

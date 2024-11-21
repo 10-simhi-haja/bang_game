@@ -16,6 +16,7 @@ import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 import { gameStartRequestHandler } from './game/gameStart.handler.js';
 import useCardHandler from './card/useCard.handler.js';
+import equipNotification from '../utils/notification/equipCardNotification.js';
 
 const { packetType } = config.packet;
 
@@ -129,7 +130,7 @@ const handlers = {
     protoType: 'game.S2CUseCardNotification',
   },
   [packetType.EQUIP_CARD_NOTIFICATION]: {
-    handler: undefined,
+    handler: equipNotification,
     protoType: 'game.S2CEquipCardNotification',
   },
   [packetType.CARD_EFFECT_NOTIFICATION]: {
