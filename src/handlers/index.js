@@ -10,6 +10,7 @@ import joinRoomHandler from './room/joinRoom.handler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
 import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
+import { gameStartRequestHandler } from './game/gameStart.handler.js';
 
 const { packetType } = config.packet;
 
@@ -91,7 +92,7 @@ const handlers = {
     protoType: 'gameState.S2CGamePrepareNotification',
   },
   [packetType.GAME_START_REQUEST]: {
-    handler: undefined,
+    handler: gameStartRequestHandler,
     protoType: 'gameState.C2SGameStartRequest',
   },
   [packetType.GAME_START_RESPONSE]: {
