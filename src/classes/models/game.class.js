@@ -71,9 +71,9 @@ class Game {
       hp: 0,
       weapon: 0,
       stateInfo: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE, // 캐릭터 스테이트 타입
-      equips: 0,
-      debuffs: 0,
-      handCards: 0,
+      equips: [],
+      debuffs: [],
+      handCards: [],
       bbangCount: 0,
       handCardsCount: 0,
     };
@@ -110,9 +110,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 3;
+        userEntry.character.hp = 1;
       } else {
-        userEntry.character.hp = 4;
+        userEntry.character.hp = 2;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -121,11 +121,40 @@ class Game {
 
       userEntry.character.weapon = 0;
       userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
-      userEntry.character.equips = 0;
-      userEntry.character.debuffs = 0;
-      userEntry.character.handCards = 0;
+      userEntry.character.equips = [];
+      userEntry.character.debuffs = [];
+      userEntry.character.handCards = [
+        {
+          type: 1,
+          count: 1,
+        },
+        {
+          type: 3,
+          count: 1,
+        },
+        {
+          type: 9,
+          count: 1,
+        },
+        {
+          type: 13,
+          count: 1,
+        },
+        {
+          type: 17,
+          count: 1,
+        },
+        {
+          type: 11,
+          count: 1,
+        },
+        {
+          type: 23,
+          count: 1,
+        },
+      ];
       userEntry.character.bbangCount = 0;
-      userEntry.character.handCardsCount = 0;
+      userEntry.character.handCardsCount = 4;
     });
   }
 
