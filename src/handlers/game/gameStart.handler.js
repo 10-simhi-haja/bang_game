@@ -11,6 +11,8 @@ const {
   character: { characterType: CHARACTER_TYPE, characterSpawnPoint: CHARACTER_SPAWN_POINT },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
+  interval: INTERVAL,
+  intervalType: INTERVAL_TYPE,
 } = config;
 
 // 배열을 중복없이 섞은다음 리턴
@@ -65,9 +67,10 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     const characterPosData = game.getAllUserPos();
 
     // phase 전환시간 밀리초. // 상수화 필요함.
+    const time = INTERVAL.PHASE_UPDATE_DAY * 1000;
     const gameStateData = {
       phaseType: 1,
-      nextPhaseAt: Date.now() + 10 * 1000, // 단위  1초
+      nextPhaseAt: Date.now() + time, // 단위  1초
     };
 
     // 게임 시작 알림 데이터
@@ -82,6 +85,11 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     users.forEach((notiUser) => {
       gameStartNotification(socket, notiUser, gameStartNotiData);
     });
+
+    // 페이즈 넘어가는 시간 넣어야함
+
+    game.setPhaseUpdateInterval(time);
+    game.setGameUpdateInterval();
   } catch (error) {
     handleError(socket, error);
   }

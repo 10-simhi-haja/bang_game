@@ -2,27 +2,25 @@ import config from '../../config/config.js';
 import handleError from '../errors/errorHandler.js';
 import { createResponse } from '../packet/response/createResponse.js';
 
-const useCardNotification = (socket, userId, room, payload) => {
+// 방에 남은 유저들에게 전달
+const equipNotification = (socket, userId, room, cardType) => {
+  // 응답 패킷 생성
   try {
-    const { cardType, targetUserId } = payload;
-
-    const responseData = {
+    console.log('========장비 알림======');
+    const notificationData = {
       cardType,
       userId,
-      targetUserId,
     };
-
-    const responsePayload = createResponse(
-      config.packet.packetType.USE_CARD_NOTIFICATION,
+    const equipNotification = createResponse(
+      config.packet.packetType.EQUIP_CARD_NOTIFICATION,
       socket.sequence,
-      responseData,
+      notificationData,
     );
 
-    // 다른 사람에게 알림
     Object.entries(room.users).forEach(([key, userData]) => {
       const userSocket = userData.user.socket;
       if (userSocket) {
-        userSocket.write(responsePayload);
+        userSocket.write(equipNotification);
       }
     });
   } catch (err) {
@@ -30,4 +28,4 @@ const useCardNotification = (socket, userId, room, payload) => {
   }
 };
 
-export default useCardNotification;
+export default equipNotification;

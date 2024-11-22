@@ -1,10 +1,18 @@
 import config from '../../config/config.js';
+import gameEndNotification from '../../utils/notification/gameEndNotification.js';
+import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
+import IntervalManager from '../managers/interval.manager.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
   character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
+  interval: INTERVAL,
+  intervalType: INTERVAL_TYPE,
+  phaseType: PHASE_TYPE,
+  winType: WIN_TYPE,
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -17,15 +25,24 @@ class Game {
     this.state = roomData.state; // WAIT, PREPARE, INGAME
     this.users = {};
     this.userOrder = [];
-    // 인터버 매니저 추가되면.
-    // this.intervalManager = new IntervalManager();
+    // 인터버 매니저. 동기화중. 플레이어가 죽었으면? 관전을 위해서는 동기화도 이루어지긴해야함.
+    // 해야하는 동기화와 아닌동기화 구분할 필요 있을듯.
+    this.intervalManager = new IntervalManager();
+    this.phase = PHASE_TYPE.DAY;
+
+    // 게임내의 생존한 역할 숫자.
+    this.targetCount = 0;
+    this.hitmanCount = 0;
+    this.psychopathCount = 0;
   }
 
   // 들어온 순서대로 반영.
+  // 유저의 계정 user클래스
   getAllUsers() {
     return this.userOrder.map((id) => this.users[id].user);
   }
 
+  // 유저의 데이터 캐릭터데이터를 포함.
   getAllUserDatas() {
     const userDatas = this.userOrder.map((id) => ({
       id: this.users[id].user.id,
@@ -117,12 +134,17 @@ class Game {
 
       if (roleType === ROLE_TYPE.TARGET) {
         userEntry.character.hp++;
+        this.targetCount++;
+      } else if (roleType === ROLE_TYPE.HITMAN) {
+        this.hitmanCount++;
+      } else if (roleType === ROLE_TYPE.PSYCHOPATH) {
+        this.psychopathCount++;
       }
 
-      userEntry.character.weapon = 13; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
+      userEntry.character.weapon = 14; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
       userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
-      userEntry.character.equips = [17];
-      userEntry.character.debuffs = [];
+      userEntry.character.equips = [17, 19, 18, 20];
+      userEntry.character.debuffs = [21, 22, 23];
       userEntry.character.handCards = [
         {
           type: 1,
@@ -154,7 +176,7 @@ class Game {
         },
       ];
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
-      userEntry.character.handCardsCount = 4;
+      userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
   }
 
@@ -163,11 +185,11 @@ class Game {
     if (!this.users[userId]) {
       return;
     }
-
+    this.intervalManager.removeInterval(userId);
     delete this.users[userId];
     this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
     // 인터버 매니져 추가되면.
-    // this.intervalManager.removePlayer(userId);
+    //this.intervalManager.removePlayer(userId);
   }
 
   // userId로 user찾기
@@ -226,15 +248,121 @@ class Game {
       user.setPos(posDatas[i].x, posDatas[i].y);
     });
   }
-  /////////////////// notification
 
-  prepareNotification() {
-    const roomData = this.getRoomData();
+  nextPhase() {
+    if (this.phase === PHASE_TYPE.DAY) {
+      this.phase = PHASE_TYPE.END;
+    } else if (this.phase === PHASE_TYPE.END) {
+      this.phase = PHASE_TYPE.DAY;
+    }
+  }
 
-    Object.values(this.users).forEach((user) => {
-      user.socket.write(roomData);
-    });
+  //   유저배열, 승리직업배열
+  getWinnerUser(targetRoles) {
+    const winners = this.getAllUserDatas()
+      .filter((user) => targetRoles.includes(user.character.role))
+      .map((user) => user.id);
+    return winners;
+  }
+
+  winnerUpdate(notiData) {
+    let winRoles = [];
+    if (this.targetCount === 0 && this.hitmanCount === 0) {
+      notiData.winType = WIN_TYPE.PSYCHOPATH_WIN;
+      winRoles = [ROLE_TYPE.PSYCHOPATH];
+      notiData.winners = this.getWinnerUser(winRoles);
+    } else if (this.targetCount === 0) {
+      notiData.winType = WIN_TYPE.HITMAN_WIN;
+      winRoles = [ROLE_TYPE.HITMAN];
+      notiData.winners = this.getWinnerUser(winRoles);
+    } else if (this.hitmanCount === 0 && this.psychopathCount === 0) {
+      notiData.winType = WIN_TYPE.TARGET_AND_BODYGUARD_WIN;
+      winRoles = [ROLE_TYPE.TARGET, ROLE_TYPE.BODYGUARD];
+      notiData.winners = this.getWinnerUser(winRoles);
+    } else {
+      return;
+    }
+  }
+
+  // 게임싱크에 관해.
+  // 주기적으로 플레이어들의 체력상태를 확인하여 어느 역할군이 몇명살아있나 확인해야 게임END 노티를 보낼수 있음.
+  // 유저 업데이트 노티도 여기서 할듯
+  gameUpdate() {
+    const gameEndNotiData = {
+      winners: null,
+      winType: 0,
+    };
+
+    this.winnerUpdate(gameEndNotiData);
+
+    if (gameEndNotiData.winners !== null) {
+      gameEndNotification(this.getAllUsers(), gameEndNotiData);
+    }
+  }
+  ///////////////////// intervalManager 관련.
+
+  setPhaseUpdateInterval(time) {
+    this.intervalManager.addGameInterval(
+      this.id,
+      () => phaseUpdateNotification(this),
+      time,
+      INTERVAL_TYPE.PHASE_UPDATE,
+    );
+  }
+
+  setGameUpdateInterval() {
+    this.intervalManager.addGameInterval(
+      this.id,
+      () => this.gameUpdate(),
+      INTERVAL.SYNC_GAME,
+      INTERVAL_TYPE.GAME_UPDATE,
+    );
   }
 }
 
 export default Game;
+
+///// 필요하면 살림.
+// 해당 아이디 유저에게 주기 셋팅
+//              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
+// setUserSyncInterval(user) {
+//   this.intervalManager.addPlayer(
+//     user.id,
+//     () => this.userSync(user),
+//     INTERVAL.SYNC_POSITION,
+//     INTERVAL_TYPE.POSITION,
+//   );
+// }
+
+// // 포지션 노티 여기서 쏴주면 됩니다.
+// // 적용하면 상대 캐릭터가 끊기듯이 움직임.
+// userSync(user) {
+//   const characterPositions = [];
+//   const allUser = this.getAllUsers();
+
+//   allUser.forEach((user) => {
+//     const posData = {
+//       id: user.id,
+//       x: user.x,
+//       y: user.y,
+//     };
+//     characterPositions.push(posData);
+//   });
+
+//   console.log('Notification Response Data:', { characterPositions });
+
+//   const notiData = {
+//     characterPositions: characterPositions,
+//   };
+
+//   // 노티피케이션 생성 및 전송
+//   const notificationResponse = createResponse(
+//     PACKET_TYPE.POSITION_UPDATE_NOTIFICATION,
+//     user.socket.sequence,
+//     notiData,
+//   );
+
+//   allUser.forEach((notiUser) => {
+//     notiUser.socket.write(notificationResponse);
+//   });
+// }
