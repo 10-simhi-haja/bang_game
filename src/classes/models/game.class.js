@@ -2,7 +2,6 @@ import config from '../../config/config.js';
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
-import CharacterStateInfoData from './CharacterStateInfoData.class.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
