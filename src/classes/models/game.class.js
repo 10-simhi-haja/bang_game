@@ -8,6 +8,7 @@ import { removeGameSessionById } from '../../sessions/game.session.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
+  globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
   character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
@@ -157,16 +158,48 @@ class Game {
           count: 1,
         },
         {
+          type: 2,
+          count: 1,
+        },
+        {
           type: 3,
           count: 1,
         },
         {
           type: 4,
-          count: 1,
+          count: 2,
+        },
+        {
+          type: 5,
+          count: 2,
+        },
+        {
+          type: 6,
+          count: 2,
+        },
+        {
+          type: 7,
+          count: 2,
+        },
+        {
+          type: 8,
+          count: 2,
         },
         {
           type: 9,
-          count: 1,
+          count: 3,
+        },
+        {
+          type: 10,
+          count: 3,
+        },
+        {
+          type: 11,
+          count: 3,
+        },
+        {
+          type: 12,
+          count: 3,
         },
         {
           type: 13,
@@ -201,11 +234,11 @@ class Game {
           count: 1,
         },
         {
-          type: 17,
+          type: 21,
           count: 1,
         },
         {
-          type: 11,
+          type: 22,
           count: 1,
         },
         {
@@ -297,6 +330,11 @@ class Game {
   // ! 장비 추가
   addEquip(userId, cardType) {
     this.getCharacter(userId).equips.push(cardType);
+  }
+
+  //^ 디버프
+  addbuffs(targeId, cardType) {
+    this.getCharacter(targeId).debuffs.push(cardType);
   }
 
   // 자신을 제외한 유저들 배열
