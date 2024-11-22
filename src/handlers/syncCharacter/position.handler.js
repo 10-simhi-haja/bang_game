@@ -61,8 +61,6 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       characterPositions.push(posData);
     });
 
-    console.log('Notification Response Data:', { characterPositions });
-
     const notiData = {
       characterPositions: characterPositions,
     };

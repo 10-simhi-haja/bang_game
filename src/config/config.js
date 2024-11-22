@@ -33,6 +33,7 @@ import {
   ROOM_STATE_TYPE,
   CHARACTER_SPAWN_POINT,
   CARD_TYPE,
+  GLOBAL_FAIL_CODE,
   INTERVAL,
   INTERVAL_TYPE,
   PHASE_TYPE,
@@ -70,6 +71,9 @@ const config = {
     wait: ROOM_STATE_TYPE.WAIT,
     prepare: ROOM_STATE_TYPE.PREPARE,
     inGame: ROOM_STATE_TYPE.INGAME,
+  },
+  globalFailCode: {
+    globalFailCode: GLOBAL_FAIL_CODE,
   },
   databases: {
     USER_DB: {

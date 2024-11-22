@@ -127,10 +127,10 @@ class Game {
         userEntry.character.hp++;
       }
 
-      userEntry.character.weapon = 13; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
+      userEntry.character.weapon = 14; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
       userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
-      userEntry.character.equips = [17];
-      userEntry.character.debuffs = [];
+      userEntry.character.equips = [17, 19, 18, 20];
+      userEntry.character.debuffs = [21, 22, 23];
       userEntry.character.handCards = [
         {
           type: 1,

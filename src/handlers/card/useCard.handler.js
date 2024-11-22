@@ -3,8 +3,13 @@ import { PACKET_TYPE } from '../../constants/header.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+
+const {
+  globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
+} = config;
 
 const useCardHandler = ({ socket, payload }) => {
   try {
@@ -12,6 +17,8 @@ const useCardHandler = ({ socket, payload }) => {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
+    const game = getGameSessionByUser(user);
+    const users = game.getAllUsers();
 
     /**
      * TODO: cardType에따라 카드를 사용할 시 그 카드에 따른 효과를 적용해야 함
@@ -28,7 +35,7 @@ const useCardHandler = ({ socket, payload }) => {
 
     const responsePayload = {
       success: true,
-      failCode: 0, // * GlobalFailCode 사용 예정
+      failCode: GLOBAL_FAIL_CODE.NONE_FAILCODE,
     };
 
     const userCardResponse = createResponse(
@@ -38,7 +45,10 @@ const useCardHandler = ({ socket, payload }) => {
     );
 
     socket.write(userCardResponse);
-    useCardNotification(socket, user.id, room, payload);
+    console.log(`cardType = ${cardType}, Type = ${typeof cardType}`);
+    cardType !== 17
+      ? useCardNotification(socket, user.id, room, payload)
+      : equipNotification(socket, user.id, room, cardType);
   } catch (err) {
     handleError(socket, err);
   }
