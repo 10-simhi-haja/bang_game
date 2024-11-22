@@ -2,6 +2,7 @@ import config from '../../config/config.js';
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
+import CharacterStateInfoData from './CharacterStateInfoData.class.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -129,7 +130,7 @@ class Game {
 
       userEntry.character.weapon = 13; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
       userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
-      userEntry.character.equips = [];
+      userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         {
@@ -190,6 +191,7 @@ class Game {
     return Character;
   }
 
+  // 카드 사용 효과
   minusBbangCount(userId) {
     return --this.getCharacter(userId).bbangCount;
   }
@@ -197,6 +199,46 @@ class Game {
   plusBbangCount(userId) {
     return ++this.getCharacter(userId).bbangCount;
   }
+
+  minusHp(userId) {
+    return --this.getCharacter(userId).hp;
+  }
+
+  minusHandCardsCount(userId) {
+    --this.getCharacter(userId).handCardsCount;
+  }
+
+  removeCard(userId, cardType) {
+    const handCards = this.getCharacter(userId).handCards;
+    const index = handCards.findIndex((card) => card.type === cardType);
+    if (index !== -1) {
+      handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
+    }
+  }
+
+  //   message CharacterStateInfoData {
+  //     CharacterStateType state = 1;
+  //     CharacterStateType nextState = 2;
+  //     int64 nextStateAt = 3; // state가 nextState로 풀리는 밀리초 타임스탬프. state가 NONE이면 0
+  //     string stateTargetUserId = 4; // state에 target이 있을 경우
+  // }
+  BbangShooterStateInfo(userId, targetUserId) {
+    this.getCharacter(userId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
+    this.getCharacter(userId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+    this.getCharacter(userId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(userId).stateInfo.stateTargetUserId = targetUserId;
+  }
+
+  BbangTargetStateInfo(targetUserId) {
+    this.getCharacter(targetUserId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
+    this.getCharacter(targetUserId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+    this.getCharacter(targetUserId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(targetUserId).stateInfo.stateTargetUserId = 0;
+  }
+
+  // ShieudUserStateInfo(userId) {
+  //   this.getCharacter(userId).stateInfo = CHARACTER_STATE_TYPE.;
+  // }
 
   // 자신을 제외한 유저들 배열
   getOpponents(userId) {

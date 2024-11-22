@@ -26,9 +26,17 @@ const useCardHandler = ({ socket, payload }) => {
      * (유저 1이 유저2에게 발포 사용 시 쉴드카드를 사용하거나 사용하지 않을 때 까지 정지 상태,
      * 선택 여부를 결정하는데 주어진 시간을 카드별로 3~5초)
      */
+
+    room.minusHandCardsCount(user.id);
+    room.removeCard(user.id, cardType);
+
     switch (cardType) {
       case CARD_TYPE.BBANG:
-        room.minusBbangCount(user.id); // 사용유저의 빵카운트를 줄임
+        room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
+        room.BbangShooterStateInfo(user.id, targetUserId);
+        room.BbangTargetStateInfo(targetUserId);
+
+      case CARD_TYPE.SHIELD:
     }
 
     const responsePayload = {
@@ -47,6 +55,7 @@ const useCardHandler = ({ socket, payload }) => {
 
     if (cardType >= 13 && cardType <= 20) {
       equipNotification(socket, user.id, room, cardType);
+      cardEffectNotification(socket, user.Id, room, cardType);
     }
   } catch (err) {
     handleError(socket, err);
@@ -54,3 +63,30 @@ const useCardHandler = ({ socket, payload }) => {
 };
 
 export default useCardHandler;
+
+// enum CardType {
+//   NONE = 0;
+//   BBANG = 1;              // 20장
+//   BIG_BBANG = 2;          // 1장
+//   SHIELD = 3;             // 10장
+//   VACCINE = 4;            // 6장
+//   CALL_119 = 5;           // 2장
+//   DEATH_MATCH = 6;        // 4장
+//   GUERRILLA = 7;          // 1장
+//   ABSORB = 8;             // 4장
+//   HALLUCINATION = 9;      // 4장
+//   FLEA_MARKET = 10;       // 3장
+//   MATURED_SAVINGS = 11;   // 2장
+//   WIN_LOTTERY = 12;       // 1장
+//   SNIPER_GUN = 13;        // 1장
+//   HAND_GUN = 14;          // 2장
+//   DESERT_EAGLE = 15;      // 3장
+//   AUTO_RIFLE = 16;        // 2장
+//   LASER_POINTER = 17;     // 1장
+//   RADAR = 18;             // 1장
+//   AUTO_SHIELD = 19;       // 2장
+//   STEALTH_SUIT = 20;      // 2장
+//   CONTAINMENT_UNIT = 21;  // 3장
+//   SATELLITE_TARGET = 22;  // 1장
+//   BOMB = 23;              // 1장
+// }
