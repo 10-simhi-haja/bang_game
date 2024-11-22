@@ -4,8 +4,17 @@ import { PACKET_TYPE } from '../../constants/header.js';
 
 const packetType = PACKET_TYPE;
 
+// message C2SDestroyCardRequest {
+//   repeated CardData destroyCards = 1;
+// }
+
+// message CardData {
+//   CardType type = 1;
+//   int32 count = 2;
+// }
+
 // 카드 버리기 요청 핸들러
-const handleDestroyCardRequest = async (socket, payload) => {
+const destroyCardRequest = async (socket, payload) => {
   try {
     const { destroyCards } = payload;
 
@@ -60,4 +69,4 @@ const handleDestroyCardRequest = async (socket, payload) => {
   }
 };
 
-export default handleDestroyCardRequest;
+export default destroyCardRequest;
