@@ -5,6 +5,7 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
+import CardDeck from './cardDeck.class.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -37,6 +38,8 @@ class Game {
     this.targetCount = 0;
     this.hitmanCount = 0;
     this.psychopathCount = 0;
+
+    this.cardDeck = new CardDeck();
   }
 
   // 들어온 순서대로 반영.
@@ -152,100 +155,9 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [
-        {
-          type: 1,
-          count: 1,
-        },
-        {
-          type: 2,
-          count: 1,
-        },
-        {
-          type: 3,
-          count: 1,
-        },
-        {
-          type: 4,
-          count: 2,
-        },
-        {
-          type: 5,
-          count: 2,
-        },
-        {
-          type: 6,
-          count: 2,
-        },
-        {
-          type: 7,
-          count: 2,
-        },
-        {
-          type: 8,
-          count: 2,
-        },
-        {
-          type: 9,
-          count: 3,
-        },
-        {
-          type: 10,
-          count: 3,
-        },
-        {
-          type: 11,
-          count: 3,
-        },
-        {
-          type: 12,
-          count: 3,
-        },
-        {
-          type: 13,
-          count: 1,
-        },
-        {
-          type: 14,
-          count: 1,
-        },
-        {
-          type: 15,
-          count: 1,
-        },
-        {
-          type: 16,
-          count: 1,
-        },
-        {
-          type: 17,
-          count: 1,
-        },
-        {
-          type: 18,
-          count: 1,
-        },
-        {
-          type: 19,
-          count: 1,
-        },
-        {
-          type: 20,
-          count: 1,
-        },
-        {
-          type: 21,
-          count: 1,
-        },
-        {
-          type: 22,
-          count: 1,
-        },
-        {
-          type: 23,
-          count: 1,
-        },
-      ];
+      userEntry.character.handCards = [];
+      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
+      userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
@@ -299,6 +211,7 @@ class Game {
   removeCard(userId, cardType) {
     const handCards = this.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
+    this.cardDeck.addUseCard(cardType);
     if (index !== -1) {
       handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
     }
@@ -324,6 +237,9 @@ class Game {
 
   // ! 무기 카드 추가/변경
   addWeapon(userId, cardType) {
+    if (this.getCharacter(userId).weapon !== 0) {
+      this.cardDeck.addUseCard(this.getCharacter(userId).weapon);
+    }
     this.getCharacter(userId).weapon = cardType;
   }
 
