@@ -17,7 +17,6 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     // 방장이 나가면 모든 사람을 내쫒고 방은 삭제
     let usersLength = room.getUserLength();
     if (user.id === room.ownerId) {
-      // room.ownerId = room.userOrder[0];
       leaveRoomNotification(socket, user.id, room, true);
       usersLength = 0;
     }
