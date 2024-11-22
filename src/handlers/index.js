@@ -128,11 +128,11 @@ const handlers = {
     protoType: 'game.S2CUseCardResponse',
   },
   [packetType.USE_CARD_NOTIFICATION]: {
-    handler: useCardNotification,
+    handler: undefined,
     protoType: 'game.S2CUseCardNotification',
   },
   [packetType.EQUIP_CARD_NOTIFICATION]: {
-    handler: equipNotification,
+    handler: undefined,
     protoType: 'game.S2CEquipCardNotification',
   },
   [packetType.CARD_EFFECT_NOTIFICATION]: {

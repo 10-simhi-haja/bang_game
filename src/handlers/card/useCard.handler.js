@@ -3,6 +3,7 @@ import { PACKET_TYPE } from '../../constants/header.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import cardEffectNotification from '../../utils/notification/cardEffectNotification.js';
 import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
