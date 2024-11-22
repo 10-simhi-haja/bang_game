@@ -4,9 +4,11 @@ import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotific
 import IntervalManager from '../managers/interval.manager.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
+import CardDeck from './cardDeck.class.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
+  globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
   character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
@@ -35,6 +37,8 @@ class Game {
     this.targetCount = 0;
     this.hitmanCount = 0;
     this.psychopathCount = 0;
+
+    this.cardDeck = new CardDeck();
   }
 
   // 들어온 순서대로 반영.
@@ -150,68 +154,9 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [
-        {
-          type: 1,
-          count: 1,
-        },
-        {
-          type: 3,
-          count: 1,
-        },
-        {
-          type: 4,
-          count: 1,
-        },
-        {
-          type: 9,
-          count: 1,
-        },
-        {
-          type: 13,
-          count: 1,
-        },
-        {
-          type: 14,
-          count: 1,
-        },
-        {
-          type: 15,
-          count: 1,
-        },
-        {
-          type: 16,
-          count: 1,
-        },
-        {
-          type: 17,
-          count: 1,
-        },
-        {
-          type: 18,
-          count: 1,
-        },
-        {
-          type: 19,
-          count: 1,
-        },
-        {
-          type: 20,
-          count: 1,
-        },
-        {
-          type: 17,
-          count: 1,
-        },
-        {
-          type: 11,
-          count: 1,
-        },
-        {
-          type: 23,
-          count: 1,
-        },
-      ];
+      userEntry.character.handCards = [];
+      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
+      userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
@@ -265,6 +210,7 @@ class Game {
   removeCard(userId, cardType) {
     const handCards = this.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
+    this.cardDeck.addUseCard(cardType);
     if (index !== -1) {
       handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
     }
@@ -273,15 +219,15 @@ class Game {
   BbangShooterStateInfo(userId, targeId) {
     this.getCharacter(userId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
     this.getCharacter(userId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(userId).stateInfo.nextStateAt = Date.now();
+    this.getCharacter(userId).stateInfo.nextStateAt = Date.now() + 3000;
     this.getCharacter(userId).stateInfo.stateTargetUserId = targeId;
   }
 
   BbangTargetStateInfo(targeId) {
     this.getCharacter(targeId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
     this.getCharacter(targeId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(targeId).stateInfo.nextStateAt = Date.now();
-    this.getCharacter(targeId).stateInfo.stateTargetUserId = 0;
+    this.getCharacter(targeId).stateInfo.nextStateAt = Date.now() + 3000;
+    this.getCharacter(targeId).stateInfo.stateTargetUserId = targeId;
   }
 
   // ShieudUserStateInfo(userId) {
@@ -290,12 +236,20 @@ class Game {
 
   // ! 무기 카드 추가/변경
   addWeapon(userId, cardType) {
+    if (this.getCharacter(userId).weapon !== 0) {
+      this.cardDeck.addUseCard(this.getCharacter(userId).weapon);
+    }
     this.getCharacter(userId).weapon = cardType;
   }
 
   // ! 장비 추가
   addEquip(userId, cardType) {
     this.getCharacter(userId).equips.push(cardType);
+  }
+
+  //^ 디버프
+  addbuffs(targeId, cardType) {
+    this.getCharacter(targeId).debuffs.push(cardType);
   }
 
   // 자신을 제외한 유저들 배열

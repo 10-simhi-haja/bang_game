@@ -5,6 +5,7 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import gameStartNotification from '../../utils/notification/gameStartNotification.js';
+import { shuffle } from '../../utils/util/shuffle.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -14,26 +15,6 @@ const {
   interval: INTERVAL,
   intervalType: INTERVAL_TYPE,
 } = config;
-
-// 배열을 중복없이 섞은다음 리턴
-// 배열과 숫자 => 배열
-// 유틸로 뺄까?
-const shuffle = (array) => {
-  // 셔플 가능한지 확인
-  if (array === undefined || array === null || array.length <= 1) {
-    throw new Error(`섞을수 없는 배열입니다.`);
-  }
-
-  const newArray = [...array];
-
-  // 역할 섞기
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const randomIndex = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[randomIndex]] = [newArray[randomIndex], newArray[i]];
-  }
-
-  return newArray;
-};
 
 // 방장이 게임시작을 누르고 역할분배가 완료되면 게임시작 요청이 온다.
 // 게임 시작 요청을 받고 모두에게 알림을 보낸다.

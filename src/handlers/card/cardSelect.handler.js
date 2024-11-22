@@ -1,28 +1,42 @@
 import config from '../../config/config.js';
+import { getGameSessionByUser } from '../../sessions/game.session.js';
+import { getUserBySocket } from '../../sessions/user.session.js';
+import handleError from '../../utils/errors/errorHandler.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
+  packet: { packetType: PACKET_TYPE },
   card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
 } = config;
 
 const cardSelectHandler = ({ socket, payload }) => {
-  console.log('socket: ', socket);
-  const { selectType, selectCardType } = payload;
-  console.log(`selectType = ${selectType}, selectCardType = ${selectCardType}`);
+  try {
+    const user = getUserBySocket(socket);
+    const room = getGameSessionByUser(user);
+    const { selectType, selectCardType } = payload;
+    console.log(`selectType = ${selectType}, selectCardType = ${selectCardType}`);
 
-  const responseData = {
-    success: true,
-    failCode: GLOBAL_FAIL_CODE.NONE_FAILCODE,
-  };
+    // switch (selectCardType) {
+    //   case CARD_TYPE.HALLUCINATION:
 
-  const cardSelectPayload = createResponse(
-    config.packet.packetType.CARD_SELECT_RESPONSE,
-    socket.sequence,
-    responseData,
-  );
+    // }
 
-  socket.write(cardSelectPayload);
+    const responsePayload = {
+      success: true,
+      failCode: GLOBAL_FAIL_CODE.NONE_FAILCODE,
+    };
+
+    const cardSelectPayload = createResponse(
+      PACKET_TYPE.CARD_SELECT_RESPONSE,
+      socket.sequence,
+      responsePayload,
+    );
+
+    socket.write(cardSelectPayload);
+  } catch (err) {
+    handleError(socket, err);
+  }
 };
 
 export default cardSelectHandler;
