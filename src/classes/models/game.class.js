@@ -162,7 +162,7 @@ class Game {
         },
       ];
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
-      userEntry.character.handCardsCount = 4;
+      userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
   }
 
@@ -248,16 +248,10 @@ class Game {
   setPhaseUpdateInterval(time) {
     this.intervalManager.addGameInterval(
       this.id,
-      () => this.phaseUpdate(),
+      () => phaseUpdateNotification(this),
       time,
       INTERVAL_TYPE.PHASE_UPDATE,
     );
-  }
-
-  // 설정한 시간이 되면 발동.
-  // 노티 업데이트 알림 쏘기
-  phaseUpdate() {
-    phaseUpdateNotification(this);
   }
 }
 
