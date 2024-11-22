@@ -3,6 +3,7 @@ import gameEndNotification from '../../utils/notification/gameEndNotification.js
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
+import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -294,6 +295,10 @@ class Game {
     };
 
     this.winnerUpdate(gameEndNotiData);
+
+    // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
+    // users 노티보낼유저배열, payload 보낼데이터
+    userUpdateNotification(this);
 
     if (gameEndNotiData.winners !== null) {
       gameEndNotification(this.getAllUsers(), gameEndNotiData);
