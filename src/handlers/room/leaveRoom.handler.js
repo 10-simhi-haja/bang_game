@@ -12,16 +12,17 @@ const leaveRoomHandler = async ({ socket, payload }) => {
 
     // 나간 유저를 게임 세션에서 없앤다.
     room.removeUser(user.id);
-    console.log('나간 후: ', room);
 
     // 방장이 나갔을 경우
+    // 방장이 나가면 모든 사람을 내쫒고 방은 삭제
+    let usersLength = room.getUserLength();
     if (user.id === room.ownerId) {
-      console.log('방장이 나갔다.');
+      // room.ownerId = room.userOrder[0];
       leaveRoomNotification(socket, user.id, room, true);
+      usersLength = 0;
     }
 
     // 방에 남아 있는 사람이 0 이하면 방은 삭제 된다.
-    let usersLength = room.getUserLength();
     if (usersLength <= 0) {
       removeGameSessionById(room.id);
     } else {
