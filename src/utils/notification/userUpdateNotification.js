@@ -31,11 +31,13 @@ const userUpdateNotification = (game) => {
     };
 
     const allUser = game.getAllUsers();
+    let socket = null;
 
     allUser.forEach((notiUser) => {
+      socket = notiUser.socket;
       const notificationResponse = createResponse(
         packetType.USER_UPDATE_NOTIFICATION,
-        notiUser.socket.sequence,
+        socket.sequence,
         notiData,
       );
       notiUser.socket.write(notificationResponse);
