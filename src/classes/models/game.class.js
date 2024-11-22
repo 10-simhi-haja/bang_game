@@ -210,6 +210,7 @@ class Game {
   removeCard(userId, cardType) {
     const handCards = this.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
+    this.cardDeck.addUseCard(cardType);
     if (index !== -1) {
       handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
     }
