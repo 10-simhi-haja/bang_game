@@ -1,10 +1,16 @@
 import config from '../../config/config.js';
+import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
+import IntervalManager from '../managers/interval.manager.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
   character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
+  interval: INTERVAL,
+  intervalType: INTERVAL_TYPE,
+  phaseType: PHASE_TYPE,
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -17,8 +23,10 @@ class Game {
     this.state = roomData.state; // WAIT, PREPARE, INGAME
     this.users = {};
     this.userOrder = [];
-    // 인터버 매니저 추가되면.
-    // this.intervalManager = new IntervalManager();
+    // 인터버 매니저. 동기화중. 플레이어가 죽었으면? 관전을 위해서는 동기화도 이루어지긴해야함.
+    // 해야하는 동기화와 아닌동기화 구분할 필요 있을듯.
+    this.intervalManager = new IntervalManager();
+    this.phase = PHASE_TYPE.DAY;
   }
 
   // 들어온 순서대로 반영.
@@ -154,7 +162,7 @@ class Game {
         },
       ];
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
-      userEntry.character.handCardsCount = 4;
+      userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
   }
 
@@ -163,11 +171,11 @@ class Game {
     if (!this.users[userId]) {
       return;
     }
-
+    this.intervalManager.removePlayer(userId);
     delete this.users[userId];
     this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
     // 인터버 매니져 추가되면.
-    // this.intervalManager.removePlayer(userId);
+    this.intervalManager.removePlayer(userId);
   }
 
   // userId로 user찾기
@@ -226,15 +234,70 @@ class Game {
       user.setPos(posDatas[i].x, posDatas[i].y);
     });
   }
-  /////////////////// notification
 
-  prepareNotification() {
-    const roomData = this.getRoomData();
+  nextPhase() {
+    if (this.phase === PHASE_TYPE.DAY) {
+      this.phase = PHASE_TYPE.END;
+    } else if (this.phase === PHASE_TYPE.END) {
+      this.phase = PHASE_TYPE.DAY;
+    }
+  }
 
-    Object.values(this.users).forEach((user) => {
-      user.socket.write(roomData);
-    });
+  ///////////////////// intervalManager 관련.
+
+  setPhaseUpdateInterval(time) {
+    this.intervalManager.addGameInterval(
+      this.id,
+      () => phaseUpdateNotification(this),
+      time,
+      INTERVAL_TYPE.PHASE_UPDATE,
+    );
   }
 }
 
 export default Game;
+
+///// 필요하면 살림.
+// 해당 아이디 유저에게 주기 셋팅
+//              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
+// setUserSyncInterval(user) {
+//   this.intervalManager.addPlayer(
+//     user.id,
+//     () => this.userSync(user),
+//     INTERVAL.SYNC_POSITION,
+//     INTERVAL_TYPE.POSITION,
+//   );
+// }
+
+// // 포지션 노티 여기서 쏴주면 됩니다.
+// // 적용하면 상대 캐릭터가 끊기듯이 움직임.
+// userSync(user) {
+//   const characterPositions = [];
+//   const allUser = this.getAllUsers();
+
+//   allUser.forEach((user) => {
+//     const posData = {
+//       id: user.id,
+//       x: user.x,
+//       y: user.y,
+//     };
+//     characterPositions.push(posData);
+//   });
+
+//   console.log('Notification Response Data:', { characterPositions });
+
+//   const notiData = {
+//     characterPositions: characterPositions,
+//   };
+
+//   // 노티피케이션 생성 및 전송
+//   const notificationResponse = createResponse(
+//     PACKET_TYPE.POSITION_UPDATE_NOTIFICATION,
+//     user.socket.sequence,
+//     notiData,
+//   );
+
+//   allUser.forEach((notiUser) => {
+//     notiUser.socket.write(notificationResponse);
+//   });
+// }

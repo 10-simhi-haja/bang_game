@@ -32,18 +32,20 @@ const handlePositionUpdate = async ({ socket, payload }) => {
 
     currentUser.setPos(x, y);
 
-    const positionResponseData = {
-      success: true,
-      failCode: 0,
-    };
+    // const positionResponseData = {
+    //   success: true,
+    //   failCode: 0,
+    // };
 
-    const positionResponse = createResponse(
-      packetType.POSITION_UPDATE_RESPONSE,
-      socket.sequence,
-      positionResponseData,
-    );
+    // console.log('Position Update Response Data:', positionResponseData);
 
-    socket.write(positionResponse);
+    // const positionResponse = createResponse(
+    //   packetType.POSITION_UPDATE_RESPONSE,
+    //   socket.sequence,
+    //   positionResponseData,
+    // );
+
+    // socket.write(positionResponse);
 
     /// 포지션 응답 완
 

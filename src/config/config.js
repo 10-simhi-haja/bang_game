@@ -34,6 +34,9 @@ import {
   CHARACTER_SPAWN_POINT,
   CARD_TYPE,
   GLOBAL_FAIL_CODE,
+  INTERVAL,
+  INTERVAL_TYPE,
+  PHASE_TYPE,
 } from '../constants/header.js';
 
 const config = {
@@ -84,6 +87,9 @@ const config = {
   jwt: {
     key: JWT_SECRET_KEY,
   },
+  interval: INTERVAL,
+  intervalType: INTERVAL_TYPE,
+  phaseType: PHASE_TYPE,
 };
 
 export default config;
