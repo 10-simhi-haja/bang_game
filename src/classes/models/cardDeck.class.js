@@ -37,7 +37,12 @@ class CardDeck {
     if (this.deck.length === 0 && this.useCards.length !== 0) {
       this.useCardToDeck();
     }
+
+    if (this.deck.length === 0) {
+      return null;
+    }
     const card = this.deck.pop();
+    console.log(this.deck);
     return { type: card.type, count: 1 };
   }
 
@@ -45,7 +50,11 @@ class CardDeck {
   drawMultipleCards(count) {
     const cards = [];
     for (let i = 0; i < count; i++) {
-      cards.push(this.drawCard());
+      const card = this.drawCard();
+      if (card === null) {
+        return cards;
+      }
+      cards.push(card);
     }
     return cards;
   }
