@@ -1,46 +1,43 @@
 import { getGameSessionBySocket } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { PACKET_TYPE, REACTION_TYPE } from '../../constants/header.js';
-import { getUserBySocket } from '../../sessions/user.session.js';
+import { PACKET_TYPE } from '../../constants/header.js';
+import handleError from '../../utils/errors/errorHandler.js';
 
 const packetType = PACKET_TYPE;
 
-// 리액션 요청 핸들러
-const handleReactionRequest = async (socket, payload) => {
+const handleReactionRequest = async ({ socket, payload }) => {
   try {
+    console.log('handleReactionRequest - Received payload:', payload);
+
     if (!payload || typeof payload !== 'object') {
       throw new Error('Payload가 올바르지 않습니다.');
     }
 
     const { reactionType } = payload;
+    console.log('handleReactionRequest - reactionType:', reactionType);
 
-    if (
-      typeof reactionType !== 'number' ||
-      ![REACTION_TYPE.NONE_REACTION, REACTION_TYPE.NOT_USE_CARD].includes(reactionType)
-    ) {
+    const REACTION_TYPE = {
+      NONE_REACTION: 0,
+      NOT_USE_CARD: 1,
+    };
+
+    if (!Object.values(REACTION_TYPE).includes(reactionType)) {
       throw new Error('유효하지 않은 리액션 타입입니다.');
     }
 
-    const gameSession = getGameSessionBySocket(socket);
+    const gameSession = await getGameSessionBySocket(socket);
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
     }
+    console.log('handleReactionRequest - gameSession found');
 
-    const currentUser = getUserBySocket(socket);
-    if (!currentUser) {
-      throw new Error('유저가 존재하지 않습니다.');
-    }
-
-    // 리액션 타입에 따른 처리
     if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
-      // 카드를 사용 할 수 있으나 사용을 안함
-      gameSession.processNotUseCard(currentUser, payload);
+      console.log('handleReactionRequest - NOT_USE_CARD 처리');
+      console.log('handleReactionRequest - After processNotUseCard');
     } else if (reactionType === REACTION_TYPE.NONE_REACTION) {
-      // 기본값, 카드를 사용 할 수 없음
-      gameSession.processNoneReaction(currentUser, payload);
+      console.log('handleReactionRequest - NONE_REACTION 처리');
     }
 
-    // 요청을 보낸 소켓에 성공 여부 보내기
     const reactionResponseData = {
       success: true,
       failCode: 0,
@@ -50,17 +47,29 @@ const handleReactionRequest = async (socket, payload) => {
       socket.sequence,
       reactionResponseData,
     );
-    socket.write(reactionResponse);
+    console.log('handleReactionRequest - Sending response:', reactionResponse);
+
+    if (typeof socket.write === 'function') {
+      socket.write(reactionResponse);
+    } else {
+      throw new Error('socket.write is not a function');
+    }
   } catch (error) {
     console.error('리액션 처리 중 에러 발생:', error.message);
 
-    // 요청을 보낸 소켓에 실패 여부 보내기
     const errorResponse = createResponse(packetType.REACTION_RESPONSE, socket.sequence, {
       success: false,
       failCode: 1,
       message: error.message || 'Reaction failed',
     });
-    socket.write(errorResponse);
+
+    if (typeof socket.write === 'function') {
+      socket.write(errorResponse);
+    } else {
+      console.error('socket.write is not a function:', socket);
+    }
+
+    handleError(socket, error);
   }
 };
 
