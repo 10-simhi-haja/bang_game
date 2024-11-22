@@ -126,7 +126,7 @@ class Game {
       userEntry.character.handCards = [
         {
           type: 1,
-          count: 3,
+          count: 1,
         },
         {
           type: 3,
