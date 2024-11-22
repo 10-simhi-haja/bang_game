@@ -2,7 +2,6 @@ import config from '../../config/config.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import ErrorCodes from '../../utils/errors/errorCodes.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import gameStartNotification from '../../utils/notification/gameStartNotification.js';
 import { shuffle } from '../../utils/util/shuffle.js';
@@ -48,7 +47,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     const characterPosData = game.getAllUserPos();
 
     // phase 전환시간 밀리초. // 상수화 필요함.
-    const time = INTERVAL.PHASE_UPDATE_DAY * 1000;
+    const time = INTERVAL.PHASE_UPDATE_DAY * 50000;
     const gameStateData = {
       phaseType: 1,
       nextPhaseAt: Date.now() + time, // 단위  1초

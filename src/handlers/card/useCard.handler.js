@@ -96,18 +96,18 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.AUTO_SHIELD:
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
-        console.log('전', responsePayload);
+        // console.log('전', responsePayload);
         if (room.getCharacter(user.id).equips.includes(cardType)) {
           responsePayload.success = false;
           responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
         } else {
           room.addEquip(user.id, cardType);
         }
-        console.log('후', responsePayload);
+        // console.log('후', responsePayload);
 
         break;
     }
-    console.log('후', responsePayload);
+    // console.log('후', responsePayload);
 
     const userCardResponse = createResponse(
       PACKET_TYPE.USE_CARD_RESPONSE,

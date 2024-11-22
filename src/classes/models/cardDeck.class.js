@@ -23,7 +23,7 @@ class CardDeck {
     }, []);
 
     this.deck = shuffle(this.deck);
-    console.log(this.deck);
+    // console.log(this.deck);
     this.useCards = [];
   }
 
@@ -42,7 +42,7 @@ class CardDeck {
       return null;
     }
     const card = this.deck.pop();
-    console.log(this.deck);
+    // console.log(this.deck);
     return { type: card.type, count: 1 };
   }
 

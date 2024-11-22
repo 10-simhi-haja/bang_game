@@ -18,9 +18,9 @@ const phaseUpdateNotification = (game) => {
   let time = 0;
 
   if (game.phase === PHASE_TYPE.DAY) {
-    time = INTERVAL.PHASE_UPDATE_DAY * 1000;
+    time = INTERVAL.PHASE_UPDATE_DAY * 50000;
   } else if (game.phase === PHASE_TYPE.END) {
-    time = INTERVAL.PHASE_UPDATE_END * 1000;
+    time = INTERVAL.PHASE_UPDATE_END * 50000;
   }
 
   const characterPosData = game.getAllUserPos();

@@ -2,7 +2,6 @@ import config from '../../config/config.js';
 import gameEndNotification from '../../utils/notification/gameEndNotification.js';
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
 import IntervalManager from '../managers/interval.manager.js';
-import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 
@@ -219,14 +218,14 @@ class Game {
   BbangShooterStateInfo(userId, targeId) {
     this.getCharacter(userId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
     this.getCharacter(userId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(userId).stateInfo.nextStateAt = Date.now() + 3000;
+    this.getCharacter(userId).stateInfo.nextStateAt = Date.now();
     this.getCharacter(userId).stateInfo.stateTargetUserId = targeId;
   }
 
   BbangTargetStateInfo(targeId) {
     this.getCharacter(targeId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
     this.getCharacter(targeId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(targeId).stateInfo.nextStateAt = Date.now() + 3000;
+    this.getCharacter(targeId).stateInfo.nextStateAt = Date.now();
     this.getCharacter(targeId).stateInfo.stateTargetUserId = targeId;
   }
 
@@ -335,10 +334,6 @@ class Game {
 
     this.winnerUpdate(gameEndNotiData);
 
-    // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
-    // users 노티보낼유저배열, payload 보낼데이터
-    userUpdateNotification(this);
-
     if (gameEndNotiData.winners !== null) {
       gameEndNotification(this.getAllUsers(), gameEndNotiData);
       removeGameSessionById(this.id);
@@ -384,48 +379,9 @@ class Game {
   // 쉴드가 있으면 쓸지 말지 선택하고 막거나 맞기(또는 피하기)
   // (만약에?) 한대 맞았는데 상대가 장착한 무기가 데저트 이글이면 체력 두배 감소
   // 나머지 룰은 클라이언트에서 처리
-  processNoneReaction(user, payload) {
-    const { damage, attacker } = payload;
-    if (typeof damage !== 'number' || damage <= 0) {
-      return;
-    }
-
-    const weapon = attacker.characterData.weapon; // 무기 정보... 를 어디서 가져오지???
-    let finalDamage = damage;
-
-    // 데저트 이글인 경우 데미지를 두 배로 처리
-    if (weapon === '데저트 이글') {
-      finalDamage *= 2;
-    }
-    // 기본 리액션은 바로 데미지 적용
-    this.handleUserTakeDamage(user, finalDamage);
-  }
-
-  processNotUseCard(user, payload) {
-    const { damage, attacker } = payload;
-    if (typeof damage !== 'number' || damage <= 0) {
-      return;
-    }
-
-    const weapon = attacker.characterData.weapon; // 무기 정보... 를 어디서 가져오지???
-    let finalDamage = damage;
-
-    // 데저트 이글인 경우 데미지를 두 배로 처리
-    if (weapon === '데저트 이글') {
-      finalDamage *= 2;
-    }
-    // 쉴드를 사용하지 않았을 경우 데미지 적용
-    this.handleUserTakeDamage(user, finalDamage);
-  }
-
-  handleUserTakeDamage(user, damage) {
-    // 유저의 HP를 감소
-    user.character.hp -= damage;
-  }
 }
 
 export default Game;
-
 ///// 필요하면 살림.
 // 해당 아이디 유저에게 주기 셋팅
 //              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
