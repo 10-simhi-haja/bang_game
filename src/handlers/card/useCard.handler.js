@@ -16,6 +16,7 @@ const {
 
 const useCardHandler = ({ socket, payload }) => {
   try {
+    console.log('useCard 실행');
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     const targeId = targetUserId.low;
     const user = getUserBySocket(socket);
@@ -78,9 +79,14 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.HAND_GUN:
       case CARD_TYPE.DESERT_EAGLE:
       case CARD_TYPE.AUTO_RIFLE:
-        if (room.getCharacter(user.id).weapon === cardType) {
-          responsePayload.success = fail;
-          responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
+        // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
+        try {
+          if (room.getCharacter(user.id).weapon === cardType) {
+            responsePayload.success = false;
+            responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
+          }
+        } catch (err) {
+          console.error(err);
         }
         room.addWeapon(user.id, cardType);
         break;
@@ -90,14 +96,19 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.RADAR:
       case CARD_TYPE.AUTO_SHIELD:
       case CARD_TYPE.STEALTH_SUIT:
+        // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
+        console.log('전', responsePayload);
         if (room.getCharacter(user.id).equips.includes(cardType)) {
-          responsePayload.success = fail;
+          responsePayload.success = false;
           responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
+        } else {
+          room.addEquip(user.id, cardType);
         }
-        room.addEquip(user.id, cardType);
+        console.log('후', responsePayload);
 
         break;
     }
+    console.log('후', responsePayload);
 
     const userCardResponse = createResponse(
       PACKET_TYPE.USE_CARD_RESPONSE,
@@ -109,7 +120,7 @@ const useCardHandler = ({ socket, payload }) => {
     useCardNotification(socket, user.id, room, payload);
 
     room.minusHandCardsCount(user.id);
-    room.removeCard(user.id, cardType);
+    if (responsePayload.success === true) room.removeCard(user.id, cardType);
 
     if (cardType >= 13 && cardType <= 20) {
       equipNotification(socket, user.id, room, cardType);

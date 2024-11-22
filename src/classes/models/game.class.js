@@ -307,15 +307,15 @@ class Game {
   BbangShooterStateInfo(userId, targeId) {
     this.getCharacter(userId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
     this.getCharacter(userId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(userId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(userId).stateInfo.nextStateAt = Date.now() + 3000;
     this.getCharacter(userId).stateInfo.stateTargetUserId = targeId;
   }
 
   BbangTargetStateInfo(targeId) {
     this.getCharacter(targeId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
     this.getCharacter(targeId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(targeId).stateInfo.nextStateAt = 3000;
-    this.getCharacter(targeId).stateInfo.stateTargetUserId = 0;
+    this.getCharacter(targeId).stateInfo.nextStateAt = Date.now() + 3000;
+    this.getCharacter(targeId).stateInfo.stateTargetUserId = targeId;
   }
 
   // ShieudUserStateInfo(userId) {

@@ -22,7 +22,7 @@ const cardSelectHandler = ({ socket, payload }) => {
 
     // }
 
-    const responseData = {
+    const responsePayload = {
       success: true,
       failCode: GLOBAL_FAIL_CODE.NONE_FAILCODE,
     };
@@ -30,7 +30,7 @@ const cardSelectHandler = ({ socket, payload }) => {
     const cardSelectPayload = createResponse(
       PACKET_TYPE.CARD_SELECT_RESPONSE,
       socket.sequence,
-      responseData,
+      responsePayload,
     );
 
     socket.write(cardSelectPayload);
