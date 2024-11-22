@@ -6,7 +6,6 @@ import handleError from '../../utils/errors/errorHandler.js';
 import cardEffectNotification from '../../utils/notification/cardEffectNotification.js';
 import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
-import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
@@ -34,9 +33,9 @@ const useCardHandler = ({ socket, payload }) => {
 
     switch (cardType) {
       case CARD_TYPE.BBANG:
-        // room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
-        // room.BbangShooterStateInfo(user.id, targeId);
-        // room.BbangTargetStateInfo(targeId);
+        room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
+        room.BbangShooterStateInfo(user.id, targeId);
+        room.BbangTargetStateInfo(targeId);
         break;
       case CARD_TYPE.SHIELD:
         break;

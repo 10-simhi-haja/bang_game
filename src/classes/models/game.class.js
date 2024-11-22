@@ -273,14 +273,14 @@ class Game {
   BbangShooterStateInfo(userId, targeId) {
     this.getCharacter(userId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
     this.getCharacter(userId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(userId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(userId).stateInfo.nextStateAt = Date.now();
     this.getCharacter(userId).stateInfo.stateTargetUserId = targeId;
   }
 
   BbangTargetStateInfo(targeId) {
     this.getCharacter(targeId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
     this.getCharacter(targeId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(targeId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(targeId).stateInfo.nextStateAt = Date.now();
     this.getCharacter(targeId).stateInfo.stateTargetUserId = 0;
   }
 
@@ -412,6 +412,18 @@ class Game {
   }
 
   ///////////////// 리엑션 관련 로직 /////////////////////////
+
+  // 왜 리엑션 리퀘스트가 안넘어 오는지?
+  // 누군가가 빵야를 사용했을때 x
+  // 빵야를 사용했다고 모든 유저에게 알렸을때 x
+
+  // 캐릭터 스테이트 타입 참고
+  // 빵야 시전자가 빵야 타켓에게 빵야 카드를 사용 시 리엑션 리퀘스트가 들어간다.
+  // 쉴드가 없으면 클라이언트가 알아서 패킷을 보내준다
+
+  // 유저 업데이트 - 특정 조건이 걸리면 그때마다 하나씩 보내기
+
+  // 쉴드 사용시 남은시간 - 10이라고 나옴 (미구현 상태)
 
   // 카드 상호작용 팝업 창
   // 빵야를 맞으면 쉴드 카드가 없을 때 한대 맞기(또는 피하기)
