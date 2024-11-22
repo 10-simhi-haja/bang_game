@@ -7,7 +7,18 @@ const packetType = PACKET_TYPE;
 // 리액션 요청 핸들러
 const handleReactionRequest = async (socket, payload) => {
   try {
+    if (!payload || typeof payload !== 'object') {
+      throw new Error('Payload가 올바르지 않습니다.');
+    }
+
     const { reactionType } = payload;
+
+    if (
+      typeof reactionType !== 'number' ||
+      ![REACTION_TYPE.NONE_REACTION, REACTION_TYPE.NOT_USE_CARD].includes(reactionType)
+    ) {
+      throw new Error('유효하지 않은 리액션 타입입니다.');
+    }
 
     const gameSession = getGameSessionBySocket(socket);
     if (!gameSession) {
@@ -19,17 +30,13 @@ const handleReactionRequest = async (socket, payload) => {
       throw new Error('현재 유저가 존재하지 않습니다.');
     }
 
-    // 기본은 논 리액션으로 가기, 만약에 카드를 사용 할 수 있으면 쓸지 말지 선택하기? (스위치 말고 조건문으로?)
-    // 클라이언트 코드 보고 결정
-    switch (reactionType) {
-      case REACTION_TYPE.NOT_USE_CARD:
-        // 카드를 사용 할 수 있으나 사용을 안함
-        break;
-      case REACTION_TYPE.NONE_REACTION:
-        // 기본값, 카드를 사용 할 수 없음
-        break;
-      default:
-        throw new Error('유효하지 않은 리액션 타입입니다.');
+    // 리액션 타입에 따른 처리
+    if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
+      // 카드를 사용 할 수 있으나 사용을 안함
+      gameSession.processNotUseCard(currentUser, payload);
+    } else if (reactionType === REACTION_TYPE.NONE_REACTION) {
+      // 기본값, 카드를 사용 할 수 없음
+      gameSession.processNoneReaction(currentUser, payload);
     }
 
     // 요청을 보낸 소켓에 성공 여부 보내기

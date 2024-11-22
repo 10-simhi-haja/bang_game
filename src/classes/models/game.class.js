@@ -1,7 +1,6 @@
 import config from '../../config/config.js';
 import gameEndNotification from '../../utils/notification/gameEndNotification.js';
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
-import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
@@ -304,6 +303,7 @@ class Game {
       gameEndNotification(this.getAllUsers(), gameEndNotiData);
     }
   }
+
   ///////////////////// intervalManager 관련.
 
   setPhaseUpdateInterval(time) {
@@ -322,6 +322,52 @@ class Game {
       INTERVAL.SYNC_GAME,
       INTERVAL_TYPE.GAME_UPDATE,
     );
+  }
+
+  ///////////////// 리엑션 관련 로직 /////////////////////////
+
+  // 카드 상호작용 팝업 창
+  // 빵야를 맞으면 쉴드 카드가 없을 때 한대 맞기(또는 피하기)
+  // 쉴드가 있으면 쓸지 말지 선택하고 막거나 맞기(또는 피하기)
+  // (만약에?) 한대 맞았는데 상대가 장착한 무기가 데저트 이글이면 체력 두배 감소
+  // 나머지 룰은 클라이언트에서 처리
+  processNoneReaction(user, payload) {
+    const { damage, attacker } = payload;
+    if (typeof damage !== 'number' || damage <= 0) {
+      return;
+    }
+
+    const weapon = attacker.characterData.weapon; // 무기 정보... 를 어디서 가져오지???
+    let finalDamage = damage;
+
+    // 데저트 이글인 경우 데미지를 두 배로 처리
+    if (weapon === '데저트 이글') {
+      finalDamage *= 2;
+    }
+    // 기본 리액션은 바로 데미지 적용
+    this.handleUserTakeDamage(user, finalDamage);
+  }
+
+  processNotUseCard(user, payload) {
+    const { damage, attacker } = payload;
+    if (typeof damage !== 'number' || damage <= 0) {
+      return;
+    }
+
+    const weapon = attacker.characterData.weapon; // 무기 정보... 를 어디서 가져오지???
+    let finalDamage = damage;
+
+    // 데저트 이글인 경우 데미지를 두 배로 처리
+    if (weapon === '데저트 이글') {
+      finalDamage *= 2;
+    }
+    // 쉴드를 사용하지 않았을 경우 데미지 적용
+    this.handleUserTakeDamage(user, finalDamage);
+  }
+
+  handleUserTakeDamage(user, damage) {
+    // 유저의 HP를 감소
+    user.character.hp -= damage;
   }
 }
 
