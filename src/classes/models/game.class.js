@@ -236,6 +236,9 @@ class Game {
 
   // ! 무기 카드 추가/변경
   addWeapon(userId, cardType) {
+    if (this.getCharacter(userId).weapon !== 0) {
+      this.cardDeck.addUseCard(this.getCharacter(userId).weapon);
+    }
     this.getCharacter(userId).weapon = cardType;
   }
 
