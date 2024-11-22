@@ -135,7 +135,8 @@ class Game {
 
       if (roleType === ROLE_TYPE.TARGET) {
         userEntry.character.hp++;
-        this.targetCount++;
+        // this.targetCount++;
+        this.targetCount = 10;
       } else if (roleType === ROLE_TYPE.HITMAN) {
         this.hitmanCount++;
       } else if (roleType === ROLE_TYPE.PSYCHOPATH) {
@@ -295,6 +296,7 @@ class Game {
     };
 
     this.winnerUpdate(gameEndNotiData);
+    this.targetCount--;
 
     // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
     // users 노티보낼유저배열, payload 보낼데이터
