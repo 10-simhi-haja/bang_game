@@ -1,8 +1,10 @@
 import config from '../../config/config.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
-const cardSelectHandler = (socket, payload) => {
+const cardSelectHandler = ({ socket, payload }) => {
+  console.log(payload);
   const { selectType, selectCardType } = payload;
+  console.log(`selectType = ${selectType}, selectCardType = ${selectCardType}`);
 
   const responseData = {
     success: true,

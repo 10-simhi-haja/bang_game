@@ -16,6 +16,9 @@ import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 import { gameStartRequestHandler } from './game/gameStart.handler.js';
 import useCardHandler from './card/useCard.handler.js';
+import useCardNotification from '../utils/notification/useCardNotification.js';
+import cardSelectHandler from './card/cardSelect.handler.js';
+import equipNotification from '../utils/notification/equipCardNotification.js';
 
 const { packetType } = config.packet;
 
@@ -125,11 +128,11 @@ const handlers = {
     protoType: 'game.S2CUseCardResponse',
   },
   [packetType.USE_CARD_NOTIFICATION]: {
-    handler: undefined,
+    handler: useCardNotification,
     protoType: 'game.S2CUseCardNotification',
   },
   [packetType.EQUIP_CARD_NOTIFICATION]: {
-    handler: undefined,
+    handler: equipNotification,
     protoType: 'game.S2CEquipCardNotification',
   },
   [packetType.CARD_EFFECT_NOTIFICATION]: {
@@ -177,7 +180,7 @@ const handlers = {
     protoType: 'game.S2CGameEndNotification',
   },
   [packetType.CARD_SELECT_REQUEST]: {
-    handler: undefined,
+    handler: cardSelectHandler,
     protoType: 'game.C2SCardSelectRequest',
   },
   [packetType.CARD_SELECT_RESPONSE]: {
