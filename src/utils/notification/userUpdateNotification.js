@@ -6,6 +6,16 @@ import handleError from '../../utils/errors/errorHandler.js';
 
 const packetType = config.packet.packetType;
 
+// message S2CUserUpdateNotification {
+//   repeated UserData user = 1;
+// }
+
+// message UserData {
+//   int64 id = 1;
+//   string nickname = 2;
+//   CharacterData character = 3;
+// }
+
 const handleUserUpdateNotification = async ({ socket, payload }) => {
   try {
     if (!payload || typeof payload !== 'object') {
@@ -31,27 +41,10 @@ const handleUserUpdateNotification = async ({ socket, payload }) => {
     }
 
     // 유저 데이터 변환
-    const userDataArray = users.map((user) => ({
-      id: user.id,
-      nickname: user.nickname,
-      character: {
-        characterType: user.character.characterType,
-        roleType: user.character.roleType,
-        hp: user.character.hp,
-        weapon: user.character.weapon,
-        stateInfo: user.character.stateInfo,
-        equips: user.character.equips,
-        debuffs: user.character.debuffs,
-        handCards: user.character.handCards,
-        bbangCount: user.character.bbangCount,
-        handCardsCount: user.character.handCardsCount,
-      },
-    }));
-
-    console.log('User Update Notification Data:', { user: userDataArray });
+    const userData = gameSession.getAllUserDatas();
 
     const notiData = {
-      user: userDataArray,
+      user: userData,
     };
 
     // 노티피케이션 생성 및 전송
