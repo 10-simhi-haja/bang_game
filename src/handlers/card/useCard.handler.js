@@ -6,6 +6,7 @@ import handleError from '../../utils/errors/errorHandler.js';
 import cardEffectNotification from '../../utils/notification/cardEffectNotification.js';
 import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
+import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
@@ -16,6 +17,7 @@ const {
 const useCardHandler = ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
+    const targeId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
 
@@ -32,11 +34,30 @@ const useCardHandler = ({ socket, payload }) => {
 
     switch (cardType) {
       case CARD_TYPE.BBANG:
-        room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
-        room.BbangShooterStateInfo(user.id, targetUserId);
-        room.BbangTargetStateInfo(targetUserId);
-
+        // room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
+        // room.BbangShooterStateInfo(user.id, targeId);
+        // room.BbangTargetStateInfo(targeId);
+        break;
       case CARD_TYPE.SHIELD:
+        break;
+
+      case CARD_TYPE.VACCINE:
+        room.plusHp(user.id);
+        break;
+
+      case CARD_TYPE.SNIPER_GUN:
+      case CARD_TYPE.HAND_GUN:
+      case CARD_TYPE.DESERT_EAGLE:
+      case CARD_TYPE.AUTO_RIFLE:
+        room.addWeapon(user.id, cardType);
+        break;
+
+      case CARD_TYPE.LASER_POINTER:
+      case CARD_TYPE.RADAR:
+      case CARD_TYPE.AUTO_SHIELD:
+      case CARD_TYPE.STEALTH_SUIT:
+        room.addEquip(user.id, cardType);
+        break;
     }
 
     const responsePayload = {

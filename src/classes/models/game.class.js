@@ -160,11 +160,43 @@ class Game {
           count: 1,
         },
         {
+          type: 4,
+          count: 1,
+        },
+        {
           type: 9,
           count: 1,
         },
         {
           type: 13,
+          count: 1,
+        },
+        {
+          type: 14,
+          count: 1,
+        },
+        {
+          type: 15,
+          count: 1,
+        },
+        {
+          type: 16,
+          count: 1,
+        },
+        {
+          type: 17,
+          count: 1,
+        },
+        {
+          type: 18,
+          count: 1,
+        },
+        {
+          type: 19,
+          count: 1,
+        },
+        {
+          type: 20,
           count: 1,
         },
         {
@@ -209,7 +241,7 @@ class Game {
     return Character;
   }
 
-  // 카드 사용 효과
+  //!  ===  카드 사용 효과 ===
   minusBbangCount(userId) {
     return --this.getCharacter(userId).bbangCount;
   }
@@ -222,8 +254,12 @@ class Game {
     return --this.getCharacter(userId).hp;
   }
 
+  plusHp(userId) {
+    return ++this.getCharacter(userId).hp;
+  }
+
   minusHandCardsCount(userId) {
-    --this.getCharacter(userId).handCardsCount;
+    return --this.getCharacter(userId).handCardsCount;
   }
 
   removeCard(userId, cardType) {
@@ -234,29 +270,33 @@ class Game {
     }
   }
 
-  //   message CharacterStateInfoData {
-  //     CharacterStateType state = 1;
-  //     CharacterStateType nextState = 2;
-  //     int64 nextStateAt = 3; // state가 nextState로 풀리는 밀리초 타임스탬프. state가 NONE이면 0
-  //     string stateTargetUserId = 4; // state에 target이 있을 경우
-  // }
-  BbangShooterStateInfo(userId, targetUserId) {
+  BbangShooterStateInfo(userId, targeId) {
     this.getCharacter(userId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
     this.getCharacter(userId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
     this.getCharacter(userId).stateInfo.nextStateAt = 3000;
-    this.getCharacter(userId).stateInfo.stateTargetUserId = targetUserId;
+    this.getCharacter(userId).stateInfo.stateTargetUserId = targeId;
   }
 
-  BbangTargetStateInfo(targetUserId) {
-    this.getCharacter(targetUserId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
-    this.getCharacter(targetUserId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(targetUserId).stateInfo.nextStateAt = 3000;
-    this.getCharacter(targetUserId).stateInfo.stateTargetUserId = 0;
+  BbangTargetStateInfo(targeId) {
+    this.getCharacter(targeId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
+    this.getCharacter(targeId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+    this.getCharacter(targeId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(targeId).stateInfo.stateTargetUserId = 0;
   }
 
   // ShieudUserStateInfo(userId) {
   //   this.getCharacter(userId).stateInfo = CHARACTER_STATE_TYPE.;
   // }
+
+  // ! 무기 카드 추가/변경
+  addWeapon(userId, cardType) {
+    this.getCharacter(userId).weapon = cardType;
+  }
+
+  // ! 장비 추가
+  addEquip(userId, cardType) {
+    this.getCharacter(userId).equips.push(cardType);
+  }
 
   // 자신을 제외한 유저들 배열
   getOpponents(userId) {

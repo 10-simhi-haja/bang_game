@@ -5,6 +5,8 @@ import { createResponse } from '../packet/response/createResponse.js';
 const useCardNotification = (socket, userId, room, payload) => {
   try {
     const { cardType, targetUserId } = payload;
+    const targeId = targetUserId.low;
+    console.log('targetUserId: ', targetUserId.low);
 
     const responseData = {
       cardType,
@@ -17,8 +19,9 @@ const useCardNotification = (socket, userId, room, payload) => {
       socket.sequence,
       responseData,
     );
-    const character = room.getCharacter(userId);
-    console.log('유저 캐릭터', character);
+    const users = room.getAllUserDatas(userId);
+    console.log('게임 내 유저들', JSON.stringify(users, null, 2));
+
     // 다른 사람에게 알림
     room.getAllUsers().forEach((user) => {
       user.socket.write(responsePayload);
