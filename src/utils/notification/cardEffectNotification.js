@@ -1,26 +1,26 @@
 import config from '../../config/config.js';
 import { createResponse } from '../packet/response/createResponse.js';
 
-const cardEffectNotification = (socket) => {
-  console.log('이것은 카드 효과 노티 뼈대이다.');
+const cardEffectNotification = (socket, userId, room, cardType) => {
+  try {
+    const responseData = {
+      cardType: cardType,
+      userId: userId,
+      success: 0,
+    };
 
-  const responseData = {
-    cardType: 0,
-    userId: 0,
-    success: 0,
-  };
+    const cardEffectNotification = createResponse(
+      config.packet.packetType.CARD_EFFECT_NOTIFICATION,
+      socket.sequence,
+      responseData,
+    );
 
-  const cardEffectNotification = createResponse(
-    config.packet.packetType.CARD_EFFECT_NOTIFICATION,
-    socket.sequence,
-    responseData,
-  );
+    room.getAllUsers().forEach((user) => {
+      user.socket.write(cardEffectNotification);
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export default cardEffectNotification;
-
-// message S2CCardEffectNotification {
-//     CardType cardType = 1;
-//     int64  userId = 2;
-//     bool success = 3;
-//     }
