@@ -141,11 +141,15 @@ class Game {
       } else if (roleType === ROLE_TYPE.PSYCHOPATH) {
         this.psychopathCount++;
       }
-
-      userEntry.character.weapon = 14; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
-      userEntry.character.stateInfo = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE; // 캐릭터 스테이트 타입
-      userEntry.character.equips = [17, 19, 18, 20];
-      userEntry.character.debuffs = [21, 22, 23];
+      userEntry.character.weapon = 13; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
+      userEntry.character.stateInfo = {
+        state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        nextStateAt: 0,
+        stateTargetUserId: 0,
+      }; // 캐릭터 스테이트 타입
+      userEntry.character.equips = [18, 20];
+      userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         {
           type: 1,
@@ -156,11 +160,43 @@ class Game {
           count: 1,
         },
         {
+          type: 4,
+          count: 1,
+        },
+        {
           type: 9,
           count: 1,
         },
         {
           type: 13,
+          count: 1,
+        },
+        {
+          type: 14,
+          count: 1,
+        },
+        {
+          type: 15,
+          count: 1,
+        },
+        {
+          type: 16,
+          count: 1,
+        },
+        {
+          type: 17,
+          count: 1,
+        },
+        {
+          type: 18,
+          count: 1,
+        },
+        {
+          type: 19,
+          count: 1,
+        },
+        {
+          type: 20,
           count: 1,
         },
         {
@@ -205,12 +241,61 @@ class Game {
     return Character;
   }
 
+  //!  ===  카드 사용 효과 ===
   minusBbangCount(userId) {
     return --this.getCharacter(userId).bbangCount;
   }
 
   plusBbangCount(userId) {
     return ++this.getCharacter(userId).bbangCount;
+  }
+
+  minusHp(userId) {
+    return --this.getCharacter(userId).hp;
+  }
+
+  plusHp(userId) {
+    return ++this.getCharacter(userId).hp;
+  }
+
+  minusHandCardsCount(userId) {
+    return --this.getCharacter(userId).handCardsCount;
+  }
+
+  removeCard(userId, cardType) {
+    const handCards = this.getCharacter(userId).handCards;
+    const index = handCards.findIndex((card) => card.type === cardType);
+    if (index !== -1) {
+      handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
+    }
+  }
+
+  BbangShooterStateInfo(userId, targeId) {
+    this.getCharacter(userId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
+    this.getCharacter(userId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+    this.getCharacter(userId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(userId).stateInfo.stateTargetUserId = targeId;
+  }
+
+  BbangTargetStateInfo(targeId) {
+    this.getCharacter(targeId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
+    this.getCharacter(targeId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+    this.getCharacter(targeId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(targeId).stateInfo.stateTargetUserId = 0;
+  }
+
+  // ShieudUserStateInfo(userId) {
+  //   this.getCharacter(userId).stateInfo = CHARACTER_STATE_TYPE.;
+  // }
+
+  // ! 무기 카드 추가/변경
+  addWeapon(userId, cardType) {
+    this.getCharacter(userId).weapon = cardType;
+  }
+
+  // ! 장비 추가
+  addEquip(userId, cardType) {
+    this.getCharacter(userId).equips.push(cardType);
   }
 
   // 자신을 제외한 유저들 배열
