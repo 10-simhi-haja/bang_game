@@ -31,7 +31,6 @@ const phaseUpdateNotification = (game) => {
     characterPositions: characterPosData,
   };
 
-  console.log(`페이즈 노티${time}`);
   const users = game.getAllUsers();
 
   users.forEach((notiUser) => {

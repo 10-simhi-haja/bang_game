@@ -89,6 +89,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     // 페이즈 넘어가는 시간 넣어야함
 
     game.setPhaseUpdateInterval(time);
+    game.setGameUpdateInterval();
   } catch (error) {
     handleError(socket, error);
   }

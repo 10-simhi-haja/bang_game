@@ -240,11 +240,19 @@ export const PHASE_TYPE = {
 // 필요한 주기가 있으면 추가해서 사용.
 export const INTERVAL = {
   SYNC_POSITION: 1000,
-  PHASE_UPDATE_DAY: 120, // 초단위
-  PHASE_UPDATE_END: 60, // 초단위
+  SYNC_GAME: 1000,
+  PHASE_UPDATE_DAY: 300, // 초단위
+  PHASE_UPDATE_END: 5, // 초단위
 };
 
 export const INTERVAL_TYPE = {
   POSITION: 0,
   PHASE_UPDATE: 1,
+  GAME_UPDATE: 2,
+};
+
+export const WIN_TYPE = {
+  TARGET_AND_BODYGUARD_WIN: 0,
+  HITMAN_WIN: 1,
+  PSYCHOPATH_WIN: 2,
 };
