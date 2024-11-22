@@ -1,4 +1,5 @@
 import config from '../../config/config.js';
+import gameEndNotification from '../../utils/notification/gameEndNotification.js';
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
@@ -11,6 +12,7 @@ const {
   interval: INTERVAL,
   intervalType: INTERVAL_TYPE,
   phaseType: PHASE_TYPE,
+  winType: WIN_TYPE,
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -27,13 +29,20 @@ class Game {
     // 해야하는 동기화와 아닌동기화 구분할 필요 있을듯.
     this.intervalManager = new IntervalManager();
     this.phase = PHASE_TYPE.DAY;
+
+    // 게임내의 생존한 역할 숫자.
+    this.targetCount = 0;
+    this.hitmanCount = 0;
+    this.psychopathCount = 0;
   }
 
   // 들어온 순서대로 반영.
+  // 유저의 계정 user클래스
   getAllUsers() {
     return this.userOrder.map((id) => this.users[id].user);
   }
 
+  // 유저의 데이터 캐릭터데이터를 포함.
   getAllUserDatas() {
     const userDatas = this.userOrder.map((id) => ({
       id: this.users[id].user.id,
@@ -125,6 +134,11 @@ class Game {
 
       if (roleType === ROLE_TYPE.TARGET) {
         userEntry.character.hp++;
+        this.targetCount++;
+      } else if (roleType === ROLE_TYPE.HITMAN) {
+        this.hitmanCount++;
+      } else if (roleType === ROLE_TYPE.PSYCHOPATH) {
+        this.psychopathCount++;
       }
 
       userEntry.character.weapon = 14; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
@@ -171,11 +185,11 @@ class Game {
     if (!this.users[userId]) {
       return;
     }
-    this.intervalManager.removePlayer(userId);
+    this.intervalManager.removeInterval(userId);
     delete this.users[userId];
     this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
     // 인터버 매니져 추가되면.
-    this.intervalManager.removePlayer(userId);
+    //this.intervalManager.removePlayer(userId);
   }
 
   // userId로 user찾기
@@ -243,6 +257,48 @@ class Game {
     }
   }
 
+  //   유저배열, 승리직업배열
+  getWinnerUser(targetRoles) {
+    const winners = this.getAllUserDatas()
+      .filter((user) => targetRoles.includes(user.character.role))
+      .map((user) => user.id);
+    return winners;
+  }
+
+  winnerUpdate(notiData) {
+    let winRoles = [];
+    if (this.targetCount === 0 && this.hitmanCount === 0) {
+      notiData.winType = WIN_TYPE.PSYCHOPATH_WIN;
+      winRoles = [ROLE_TYPE.PSYCHOPATH];
+      notiData.winners = this.getWinnerUser(winRoles);
+    } else if (this.targetCount === 0) {
+      notiData.winType = WIN_TYPE.HITMAN_WIN;
+      winRoles = [ROLE_TYPE.HITMAN];
+      notiData.winners = this.getWinnerUser(winRoles);
+    } else if (this.hitmanCount === 0 && this.psychopathCount === 0) {
+      notiData.winType = WIN_TYPE.TARGET_AND_BODYGUARD_WIN;
+      winRoles = [ROLE_TYPE.TARGET, ROLE_TYPE.BODYGUARD];
+      notiData.winners = this.getWinnerUser(winRoles);
+    } else {
+      return;
+    }
+  }
+
+  // 게임싱크에 관해.
+  // 주기적으로 플레이어들의 체력상태를 확인하여 어느 역할군이 몇명살아있나 확인해야 게임END 노티를 보낼수 있음.
+  // 유저 업데이트 노티도 여기서 할듯
+  gameUpdate() {
+    const gameEndNotiData = {
+      winners: null,
+      winType: 0,
+    };
+
+    this.winnerUpdate(gameEndNotiData);
+
+    if (gameEndNotiData.winners !== null) {
+      gameEndNotification(this.getAllUsers(), gameEndNotiData);
+    }
+  }
   ///////////////////// intervalManager 관련.
 
   setPhaseUpdateInterval(time) {
@@ -251,6 +307,15 @@ class Game {
       () => phaseUpdateNotification(this),
       time,
       INTERVAL_TYPE.PHASE_UPDATE,
+    );
+  }
+
+  setGameUpdateInterval() {
+    this.intervalManager.addGameInterval(
+      this.id,
+      () => this.gameUpdate(),
+      INTERVAL.SYNC_GAME,
+      INTERVAL_TYPE.GAME_UPDATE,
     );
   }
 }
