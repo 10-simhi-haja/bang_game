@@ -185,11 +185,11 @@ class Game {
     if (!this.users[userId]) {
       return;
     }
-    this.intervalManager.removePlayer(userId);
+    this.intervalManager.removeInterval(userId);
     delete this.users[userId];
     this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
     // 인터버 매니져 추가되면.
-    this.intervalManager.removePlayer(userId);
+    //this.intervalManager.removePlayer(userId);
   }
 
   // userId로 user찾기
