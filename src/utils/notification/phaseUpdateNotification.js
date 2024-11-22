@@ -16,9 +16,11 @@ const phaseUpdateNotification = (game) => {
   // }
   game.nextPhase();
   let time = 0;
+  let drawCard = [];
 
   if (game.phase === PHASE_TYPE.DAY) {
     time = INTERVAL.PHASE_UPDATE_DAY * 1000;
+    drawCard = game.cardDeck.drawMultipleCards(2);
   } else if (game.phase === PHASE_TYPE.END) {
     time = INTERVAL.PHASE_UPDATE_END * 1000;
   }
@@ -40,6 +42,8 @@ const phaseUpdateNotification = (game) => {
       phaseUpdateNotiData,
     );
     notiUser.socket.write(phaseUpdateNoti);
+
+    game.getCharacter(notiUser.id).handCards.push(...drawCard);
   });
 
   game.setPhaseUpdateInterval(time);
