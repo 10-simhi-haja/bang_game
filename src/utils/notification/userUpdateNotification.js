@@ -31,19 +31,17 @@ const userUpdateNotification = (game) => {
     };
 
     const allUser = game.getAllUsers();
-    let socket = null;
 
     allUser.forEach((notiUser) => {
-      socket = notiUser.socket;
       const notificationResponse = createResponse(
         packetType.USER_UPDATE_NOTIFICATION,
-        socket.sequence,
+        notiUser.socket.sequence,
         notiData,
       );
       notiUser.socket.write(notificationResponse);
     });
   } catch (error) {
-    handleError(socket, error);
+    new Error(error);
   }
 };
 
