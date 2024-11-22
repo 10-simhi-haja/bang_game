@@ -3,6 +3,7 @@ import { PACKET_TYPE } from '../../constants/header.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import cardEffectNotification from '../../utils/notification/cardEffectNotification.js';
 import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
@@ -46,9 +47,14 @@ const useCardHandler = ({ socket, payload }) => {
 
     socket.write(userCardResponse);
     console.log(`cardType = ${cardType}, Type = ${typeof cardType}`);
-    cardType !== 17
-      ? useCardNotification(socket, user.id, room, payload)
-      : equipNotification(socket, user.id, room, cardType);
+
+    useCardNotification(socket, user.id, room, payload);
+
+    if (cardType !== 17) {
+    } else {
+      equipNotification(socket, user.id, room, cardType);
+      cardEffectNotification(socket, user.Id, room, cardType);
+    }
   } catch (err) {
     handleError(socket, err);
   }
