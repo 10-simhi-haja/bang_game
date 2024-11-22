@@ -38,6 +38,7 @@ import {
   INTERVAL_TYPE,
   PHASE_TYPE,
   WIN_TYPE,
+  CARD_POOL,
 } from '../constants/header.js';
 
 const config = {
@@ -63,6 +64,7 @@ const config = {
   },
   card: {
     cardType: CARD_TYPE,
+    cardPool: CARD_POOL,
   },
   role: {
     roleType: ROLE_TYPE,

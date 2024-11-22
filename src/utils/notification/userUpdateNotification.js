@@ -26,6 +26,11 @@ const userUpdateNotification = (game) => {
     // 유저 데이터 변환
     const userData = game.getAllUserDatas();
 
+    // 유저 업데이트 부분.
+    userData.forEach((user) => {
+      user.character.handCardsCount = user.character.handCards.length;
+    });
+
     const notiData = {
       user: userData,
     };
