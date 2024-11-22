@@ -9,6 +9,7 @@ import CardDeck from './cardDeck.class.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
+  globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
   character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
   role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
@@ -219,15 +220,15 @@ class Game {
   BbangShooterStateInfo(userId, targeId) {
     this.getCharacter(userId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
     this.getCharacter(userId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(userId).stateInfo.nextStateAt = 3000;
+    this.getCharacter(userId).stateInfo.nextStateAt = Date.now() + 3000;
     this.getCharacter(userId).stateInfo.stateTargetUserId = targeId;
   }
 
   BbangTargetStateInfo(targeId) {
     this.getCharacter(targeId).stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
     this.getCharacter(targeId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(targeId).stateInfo.nextStateAt = 3000;
-    this.getCharacter(targeId).stateInfo.stateTargetUserId = 0;
+    this.getCharacter(targeId).stateInfo.nextStateAt = Date.now() + 3000;
+    this.getCharacter(targeId).stateInfo.stateTargetUserId = targeId;
   }
 
   // ShieudUserStateInfo(userId) {
@@ -245,6 +246,11 @@ class Game {
   // ! 장비 추가
   addEquip(userId, cardType) {
     this.getCharacter(userId).equips.push(cardType);
+  }
+
+  //^ 디버프
+  addbuffs(targeId, cardType) {
+    this.getCharacter(targeId).debuffs.push(cardType);
   }
 
   // 자신을 제외한 유저들 배열

@@ -1,5 +1,4 @@
 import config from '../../config/config.js';
-import { PACKET_TYPE } from '../../constants/header.js';
 import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
@@ -10,16 +9,23 @@ import userUpdateNotification from '../../utils/notification/userUpdateNotificat
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
+  packet: { packetType: PACKET_TYPE },
   card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
 } = config;
 
 const useCardHandler = ({ socket, payload }) => {
   try {
+    console.log('useCard 실행');
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     const targeId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
+
+    const responsePayload = {
+      success: true,
+      failCode: GLOBAL_FAIL_CODE.NONE_FAILCODE,
+    };
 
     /**
      * TODO: cardType에따라 카드를 사용할 시 그 카드에 따른 효과를 적용해야 함
@@ -29,41 +35,80 @@ const useCardHandler = ({ socket, payload }) => {
      * 선택 여부를 결정하는데 주어진 시간을 카드별로 3~5초)
      */
 
-    room.minusHandCardsCount(user.id);
-    room.removeCard(user.id, cardType);
-
     switch (cardType) {
+      //^ 공격
       case CARD_TYPE.BBANG:
-        // room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
-        // room.BbangShooterStateInfo(user.id, targeId);
-        // room.BbangTargetStateInfo(targeId);
+        room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
+        room.BbangShooterStateInfo(user.id, targeId);
+        room.BbangTargetStateInfo(targeId);
         break;
+      case CARD_TYPE.BIG_BBANG:
+        break;
+      case CARD_TYPE.GUERRILLA:
+        break;
+      case CARD_TYPE.DEATH_MATCH:
+        break;
+
+      //^ 방어
       case CARD_TYPE.SHIELD:
         break;
-
       case CARD_TYPE.VACCINE:
-        room.plusHp(user.id);
+        room.minusHp(user.id); // 테스트를 위해 체력이 깎이게 해놓음
+        break;
+      case CARD_TYPE.CALL_119:
+        //? 나에게, 모두에게 선택하는데 어떻게 받아와서 처리하는지?
         break;
 
+      //^ 유틸
+      // case CARD_TYPE.HALLUCINATION:
+      case CARD_TYPE.ABSORB:
+      case CARD_TYPE.FLEA_MARKET:
+      case CARD_TYPE.MATURED_SAVINGS:
+      case CARD_TYPE.WIN_LOTTERY:
+        break;
+
+      //^ 디버프
+      case CARD_TYPE.CONTAINMENT_UNIT:
+      case CARD_TYPE.SATELLITE_TARGET:
+      case CARD_TYPE.BOMB:
+        room.addbuffs(targeId, cardType);
+        break;
+
+      //^ 무기
       case CARD_TYPE.SNIPER_GUN:
       case CARD_TYPE.HAND_GUN:
       case CARD_TYPE.DESERT_EAGLE:
       case CARD_TYPE.AUTO_RIFLE:
+        // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
+        try {
+          if (room.getCharacter(user.id).weapon === cardType) {
+            responsePayload.success = false;
+            responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
+          }
+        } catch (err) {
+          console.error(err);
+        }
         room.addWeapon(user.id, cardType);
         break;
 
+      //^ 장비
       case CARD_TYPE.LASER_POINTER:
       case CARD_TYPE.RADAR:
       case CARD_TYPE.AUTO_SHIELD:
       case CARD_TYPE.STEALTH_SUIT:
-        room.addEquip(user.id, cardType);
+        // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
+        console.log('전', responsePayload);
+        if (room.getCharacter(user.id).equips.includes(cardType)) {
+          responsePayload.success = false;
+          responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
+        } else {
+          room.addEquip(user.id, cardType);
+        }
+        console.log('후', responsePayload);
+
         break;
     }
-
-    const responsePayload = {
-      success: true,
-      failCode: GLOBAL_FAIL_CODE.NONE_FAILCODE,
-    };
+    console.log('후', responsePayload);
 
     const userCardResponse = createResponse(
       PACKET_TYPE.USE_CARD_RESPONSE,
@@ -73,6 +118,9 @@ const useCardHandler = ({ socket, payload }) => {
 
     socket.write(userCardResponse);
     useCardNotification(socket, user.id, room, payload);
+
+    room.minusHandCardsCount(user.id);
+    if (responsePayload.success === true) room.removeCard(user.id, cardType);
 
     if (cardType >= 13 && cardType <= 20) {
       equipNotification(socket, user.id, room, cardType);
