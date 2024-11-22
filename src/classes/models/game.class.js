@@ -4,6 +4,7 @@ import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotific
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
+import CardDeck from './cardDeck.class.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -35,6 +36,8 @@ class Game {
     this.targetCount = 0;
     this.hitmanCount = 0;
     this.psychopathCount = 0;
+
+    this.cardDeck = new CardDeck();
   }
 
   // 들어온 순서대로 반영.
