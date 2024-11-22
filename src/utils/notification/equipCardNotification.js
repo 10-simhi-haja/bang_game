@@ -8,20 +8,19 @@ const equipNotification = (socket, userId, room, cardType) => {
   try {
     console.log('========장비 알림======');
     const notificationData = {
-      cardType,
-      userId,
+      cardType: cardType,
+      userId: userId,
     };
+
     const equipNotification = createResponse(
       config.packet.packetType.EQUIP_CARD_NOTIFICATION,
       socket.sequence,
       notificationData,
     );
 
-    Object.entries(room.users).forEach(([key, userData]) => {
-      const userSocket = userData.user.socket;
-      if (userSocket) {
-        userSocket.write(equipNotification);
-      }
+    // 게임에 참가한 모든 유저에게 알림
+    room.getAllUsers().forEach((user) => {
+      user.socket.write(equipNotification);
     });
   } catch (err) {
     handleError(socket, err);
