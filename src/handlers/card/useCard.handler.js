@@ -8,17 +8,15 @@ import useCardNotification from '../../utils/notification/useCardNotification.js
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
+  card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
 } = config;
 
 const useCardHandler = ({ socket, payload }) => {
   try {
-    console.log('userCard', payload);
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
-    const game = getGameSessionByUser(user);
-    const users = game.getAllUsers();
 
     /**
      * TODO: cardType에따라 카드를 사용할 시 그 카드에 따른 효과를 적용해야 함
@@ -28,9 +26,8 @@ const useCardHandler = ({ socket, payload }) => {
      * 선택 여부를 결정하는데 주어진 시간을 카드별로 3~5초)
      */
     switch (cardType) {
-      case config.card.cardType.BBANG:
+      case CARD_TYPE.BBANG:
         room.minusBbangCount(user.id); // 사용유저의 빵카운트를 줄임
-      //
     }
 
     const responsePayload = {
@@ -45,10 +42,11 @@ const useCardHandler = ({ socket, payload }) => {
     );
 
     socket.write(userCardResponse);
-    console.log(`cardType = ${cardType}, Type = ${typeof cardType}`);
-    cardType !== 17
-      ? useCardNotification(socket, user.id, room, payload)
-      : equipNotification(socket, user.id, room, cardType);
+    useCardNotification(socket, user.id, room, payload);
+
+    if (cardType >= 13 && cardType <= 20) {
+      equipNotification(socket, user.id, room, cardType);
+    }
   } catch (err) {
     handleError(socket, err);
   }

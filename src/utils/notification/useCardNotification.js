@@ -19,11 +19,8 @@ const useCardNotification = (socket, userId, room, payload) => {
     );
 
     // 다른 사람에게 알림
-    Object.entries(room.users).forEach(([key, userData]) => {
-      const userSocket = userData.user.socket;
-      if (userSocket) {
-        userSocket.write(responsePayload);
-      }
+    room.getAllUsers().forEach((user) => {
+      user.socket.write(responsePayload);
     });
   } catch (err) {
     handleError(socket, err);
