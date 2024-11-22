@@ -1,6 +1,7 @@
 import { getGameSessionBySocket } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import { PACKET_TYPE, REACTION_TYPE } from '../../constants/header.js';
+import { getUserBySocket } from '../../sessions/user.session.js';
 
 const packetType = PACKET_TYPE;
 
@@ -25,9 +26,9 @@ const handleReactionRequest = async (socket, payload) => {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
     }
 
-    const currentUser = gameSession.users.find((user) => user.socket === socket);
+    const currentUser = getUserBySocket(socket);
     if (!currentUser) {
-      throw new Error('현재 유저가 존재하지 않습니다.');
+      throw new Error('유저가 존재하지 않습니다.');
     }
 
     // 리액션 타입에 따른 처리
