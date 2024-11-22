@@ -16,46 +16,28 @@ const packetType = config.packet.packetType;
 //   CharacterData character = 3;
 // }
 
-const handleUserUpdateNotification = async ({ socket, payload }) => {
+// 전체 유저에게 일정 주기마다 전송
+const userUpdateNotification = (game) => {
   try {
-    if (!payload || typeof payload !== 'object') {
-      throw new Error('Payload가 올바르지 않습니다.');
-    }
-
-    const { users } = payload;
-
-    if (!Array.isArray(users)) {
-      throw new Error('페이로드에 유저 배열이 없습니다.');
-    }
-
-    const gameSession = getGameSessionBySocket(socket);
-
-    if (!gameSession) {
+    if (!game) {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
     }
 
-    const currentUser = getUserBySocket(socket);
-
-    if (!currentUser) {
-      throw new Error('유저가 존재하지 않습니다.');
-    }
-
     // 유저 데이터 변환
-    const userData = gameSession.getAllUserDatas();
+    const userData = game.getAllUserDatas();
 
     const notiData = {
       user: userData,
     };
 
-    // 노티피케이션 생성 및 전송
-    const notificationResponse = createResponse(
-      packetType.USER_UPDATE_NOTIFICATION,
-      socket.sequence,
-      notiData,
-    );
+    const allUser = game.getAllUsers();
 
-    const allUser = gameSession.getAllUsers();
     allUser.forEach((notiUser) => {
+      const notificationResponse = createResponse(
+        packetType.USER_UPDATE_NOTIFICATION,
+        notiUser.socket.sequence,
+        notiData,
+      );
       notiUser.socket.write(notificationResponse);
     });
   } catch (error) {
@@ -63,4 +45,4 @@ const handleUserUpdateNotification = async ({ socket, payload }) => {
   }
 };
 
-export default handleUserUpdateNotification;
+export default userUpdateNotification;

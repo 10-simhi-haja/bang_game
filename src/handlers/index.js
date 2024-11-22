@@ -3,7 +3,6 @@ import ErrorCodes from './../utils/errors/errorCodes.js';
 import config from '../config/config.js';
 import handlePositionUpdate from './syncCharacter/position.handler.js';
 import registerHandler from './user/register.handler.js';
-import handleUserUpdate from './syncCharacter/userUpdate.handler.js';
 import loginHandler from './user/login.handler.js';
 import roomListHandler from './room/roomList.handler.js';
 import createRoomHandler from './room/createRoom.handler.js';
@@ -17,9 +16,7 @@ import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 import { gameStartRequestHandler } from './game/gameStart.handler.js';
 import useCardHandler from './card/useCard.handler.js';
 import handleAnimationNotification from './reaction/animation.handler.js';
-import useCardNotification from '../utils/notification/useCardNotification.js';
 import cardSelectHandler from './card/cardSelect.handler.js';
-import equipNotification from '../utils/notification/equipCardNotification.js';
 
 const { packetType } = config.packet;
 
@@ -153,7 +150,7 @@ const handlers = {
     protoType: 'game.S2CFleaMarketPickResponse',
   },
   [packetType.USER_UPDATE_NOTIFICATION]: {
-    handler: handleUserUpdate,
+    handler: undefined,
     protoType: 'game.S2CUserUpdateNotification',
   },
   [packetType.PHASE_UPDATE_NOTIFICATION]: {
