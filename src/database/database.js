@@ -3,10 +3,7 @@ import config from '../config/config.js';
 
 const createPool = () => {
   const pool = mysql.createPool({
-    user: config.databases.USER_DB.user,
-    password: config.databases.USER_DB.password,
-    database: config.databases.USER_DB.name, // 명시적으로 추가
-    port: config.databases.USER_DB.port,
+    ...config.databases,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,

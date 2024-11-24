@@ -79,13 +79,11 @@ const config = {
     globalFailCode: GLOBAL_FAIL_CODE,
   },
   databases: {
-    USER_DB: {
-      name: DB_NAME,
-      user: DB_USER,
-      password: DB_PASSWORD,
-      host: DB_HOST,
-      port: DB_PORT,
-    },
+    database: DB_NAME,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    host: DB_HOST,
+    port: DB_PORT,
   },
   jwt: {
     key: JWT_SECRET_KEY,
