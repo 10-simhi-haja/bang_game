@@ -5,54 +5,11 @@ import handleError from '../../utils/errors/errorHandler.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 
-// Packet type constant
 const packetType = PACKET_TYPE;
 
 const REACTION_TYPE = {
   NONE_REACTION: 0,
   NOT_USE_CARD: 1,
-};
-
-const handleDefenseAction = async (user, room, socket) => {
-  return new Promise((resolve) => {
-    const timer = setTimeout(() => {
-      // 10초 후 타임 아웃 시 피해 받기 처리
-      console.log(`${user.id} 유저가 방어 카드를 사용하지 않아 피해를 받습니다.`);
-      if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
-        room.users[user.id].character.hp -= 1;
-        // 유저 정보 초기화 및 업데이트
-        userUpdateNotification(room);
-      } else {
-        console.error(`User with id ${user.id} not found in room users or already dead.`);
-      }
-      resolve(false); // 방어 카드 미사용으로 판단
-    }, 10000); // 10초 대기
-
-    const defenseResponseHandler = (reactionType) => {
-      clearTimeout(timer); // 타이머 멈춤
-      if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
-        console.log(`Defense card used by user ${user.id}`);
-        if (room.users && room.users[user.id]) {
-          // 방어 카드 사용 시 피해 받지 않음
-          userUpdateNotification(room);
-          resolve(true);
-        } else {
-          console.error(`User with id ${user.id} not found in room users.`);
-        }
-      } else if (reactionType === REACTION_TYPE.NONE_REACTION) {
-        console.log(`No defense card used by user ${user.id}`);
-        if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
-          room.users[user.id].character.hp -= 1;
-          userUpdateNotification(room);
-        } else {
-          console.error(`User with id ${user.id} not found in room users or already dead.`);
-        }
-        resolve(false);
-      }
-    };
-
-    socket.once('defenseResponse', defenseResponseHandler);
-  });
 };
 
 const handleReactionRequest = async ({ socket, payload }) => {
@@ -83,19 +40,50 @@ const handleReactionRequest = async ({ socket, payload }) => {
       throw new Error(`User with id ${user.id} not found in room users.`);
     }
 
-    if (reactionType === REACTION_TYPE.NONE_REACTION) {
-      console.log('handleReactionRequest - NONE_REACTION 처리');
-      if (room.users[user.id].character.hp > 0) {
-        room.users[user.id].character.hp -= 1;
-        userUpdateNotification(room);
+    let defenseUsed = false;
+    let timer = null;
+
+    // 방어 반응 시 이벤트 핸들러 등록
+    console.log('Registering defenseResponse event listener for socket:', socket.id);
+
+    socket.once('defenseResponse', (reactionType) => {
+      console.log('defenseResponse event received:', reactionType);
+      clearTimeout(timer); // 타이머 멈춤
+
+      if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
+        console.log(`Defense card used by user ${user.id}`);
+        if (room.users && room.users[user.id]) {
+          room.resetStateInfoAllUsers();
+          userUpdateNotification(room);
+          defenseUsed = true;
+        } else {
+          console.error(`User with id ${user.id} not found in room users.`);
+        }
       } else {
-        console.error('User is already dead, no further damage will be applied.');
+        console.log(`No defense card used by user ${user.id}`);
+        if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
+          room.users[user.id].character.hp -= 1;
+        } else {
+          console.error(`User with id ${user.id} not found in room users or already dead.`);
+        }
+        room.resetStateInfoAllUsers();
+        userUpdateNotification(room);
       }
-    } else if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
-      console.log('handleReactionRequest - NOT_USE_CARD 처리');
-      await handleDefenseAction(user, room, socket);
+    });
+
+    // `reactionType`가 NONE_REACTION이거나 아무 반응이 없는 경우 즉시 피해 적용
+    if (reactionType === REACTION_TYPE.NONE_REACTION) {
+      console.log(`Immediate damage applied to user ${user.id}`);
+      if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
+        room.users[user.id].character.hp -= 1;
+      } else {
+        console.error(`User with id ${user.id} not found in room users or already dead.`);
+      }
+      room.resetStateInfoAllUsers();
+      userUpdateNotification(room);
     }
 
+    // 리액션 처리 완료 후 응답 전송
     const reactionResponseData = {
       success: true,
       failCode: 0,
@@ -109,17 +97,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
 
     if (typeof socket.write === 'function') {
       socket.write(reactionResponse);
-
-      // 모든 유저의 상태를 초기화하며 업데이트 알림
-      Object.values(room.users).forEach((roomUser) => {
-        roomUser.character.stateInfo.state = 0;
-        roomUser.character.stateInfo.nextState = 0;
-        roomUser.character.stateInfo.stateTargetUserId = null;
-        roomUser.character.stateInfo.nextStateAt = null;
-      });
-
-      // 유저 업데이트 알림 호출
-      userUpdateNotification(room);
     } else {
       throw new Error('socket.write is not a function');
     }
