@@ -18,7 +18,7 @@ const useCardHandler = ({ socket, payload }) => {
   try {
     console.log('useCard 실행');
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
-    const targeId = targetUserId.low;
+    const targetId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
     const users = room.getAllUserDatas();
@@ -39,9 +39,11 @@ const useCardHandler = ({ socket, payload }) => {
     switch (cardType) {
       //^ 공격
       case CARD_TYPE.BBANG:
+        console.log(`빵야카드사용시 payload: ${JSON.stringify(payload, null, 2)}`);
         room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
-        room.BbangShooterStateInfo(user.id, targeId);
-        room.BbangTargetStateInfo(targeId);
+        // room.BbangShooterStateInfo(user.id, targetId, 10000);
+        // room.BbangTargetStateInfo(targetId, 10000);
+        room.bbangStateInfo(user.id, targetId, 10000, room);
         break;
       case CARD_TYPE.BIG_BBANG:
         break;
@@ -53,14 +55,21 @@ const useCardHandler = ({ socket, payload }) => {
       //^ 방어
       case CARD_TYPE.SHIELD:
         console.log('방어 카드 사용');
-        // room.resetStateInfoAllUsers(); // 모든 유저의 상태 초기화 (공격을 사용하기 전으로 돌리는 방식)
+        console.log(`쉴드카드사용시 payload: ${JSON.stringify(payload, null, 2)}`);
+        const bbangShooter =
+          users.find(
+            (user) =>
+              user.character.stateInfo.stateTargetUserId === targetId &&
+              user.character.stateInfo.state === 1,
+          )?.id || null; // find값이 undifined 일 경우 null 반환
+        room.shieldUserStateInfo(bbangShooter, targetId); // (빵을 쏜사람과, 빵을 맞은사람)
         break;
       case CARD_TYPE.VACCINE:
         room.minusHp(user.id); // 테스트를 위해 체력이 깎이게 해놓음
         break;
       case CARD_TYPE.CALL_119:
-        if (targeId !== 0) {
-          room.plusHp(targeId);
+        if (targetId !== 0) {
+          room.plusHp(targetId);
         } else {
           room.plusAllUsersHp(user.id, users);
         }
@@ -78,7 +87,7 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.CONTAINMENT_UNIT:
       case CARD_TYPE.SATELLITE_TARGET:
       case CARD_TYPE.BOMB:
-        room.addbuffs(targeId, cardType);
+        room.addbuffs(targetId, cardType);
         break;
 
       //^ 무기
@@ -115,7 +124,7 @@ const useCardHandler = ({ socket, payload }) => {
     }
 
     // 카드 사용 후 카드 삭제 및 유저 업데이트
-    room.minusHandCardsCount(user.id);
+    // room.minusHandCardsCount(user.id);
     if (responsePayload.success === true) {
       room.removeCard(user.id, cardType);
     }
@@ -140,6 +149,7 @@ const useCardHandler = ({ socket, payload }) => {
     );
 
     socket.write(userCardResponse);
+    console.log('userCard핸들러 작동 끝');
     // useCardNotification(socket, user.id, room, payload);
     //
     // room.minusHandCardsCount(user.id);
