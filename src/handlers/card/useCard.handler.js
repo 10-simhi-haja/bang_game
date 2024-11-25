@@ -6,6 +6,7 @@ import cardEffectNotification from '../../utils/notification/cardEffectNotificat
 import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -50,6 +51,8 @@ const useCardHandler = ({ socket, payload }) => {
 
       //^ 방어
       case CARD_TYPE.SHIELD:
+        console.log('방어 카드 사용');
+        room.resetStateInfoAllUsers(); // 모든 유저의 상태 초기화 (공격을 사용하기 전으로 돌리는 방식)
         break;
       case CARD_TYPE.VACCINE:
         room.minusHp(user.id); // 테스트를 위해 체력이 깎이게 해놓음
@@ -109,6 +112,25 @@ const useCardHandler = ({ socket, payload }) => {
     }
     // console.log('후', responsePayload);
 
+    // 카드 사용 후 카드 삭제 및 유저 업데이트
+    room.minusHandCardsCount(user.id);
+    if (responsePayload.success === true) {
+      room.removeCard(user.id, cardType);
+    }
+
+    // 유저 업데이트 노티피케이션 발송
+    userUpdateNotification(room);
+
+    // 카드 사용 노티피케이션 발송
+    useCardNotification(socket, user.id, room, payload);
+
+    // 카드 효과 노티피케이션 발송
+    if (cardType >= 13 && cardType <= 20) {
+      equipNotification(socket, user.id, room, cardType);
+      cardEffectNotification(socket, user.id, room, cardType);
+    }
+
+    // 카드 사용 응답 전송
     const userCardResponse = createResponse(
       PACKET_TYPE.USE_CARD_RESPONSE,
       socket.sequence,
@@ -116,15 +138,15 @@ const useCardHandler = ({ socket, payload }) => {
     );
 
     socket.write(userCardResponse);
-    useCardNotification(socket, user.id, room, payload);
-
-    room.minusHandCardsCount(user.id);
-    if (responsePayload.success === true) room.removeCard(user.id, cardType);
-
-    if (cardType >= 13 && cardType <= 20) {
-      equipNotification(socket, user.id, room, cardType);
-      cardEffectNotification(socket, user.Id, room, cardType);
-    }
+    // useCardNotification(socket, user.id, room, payload);
+    //
+    // room.minusHandCardsCount(user.id);
+    // if (responsePayload.success === true) room.removeCard(user.id, cardType);
+    //
+    // if (cardType >= 13 && cardType <= 20) {
+    //   equipNotification(socket, user.id, room, cardType);
+    //   cardEffectNotification(socket, user.Id, room, cardType);
+    // }
   } catch (err) {
     handleError(socket, err);
   }
