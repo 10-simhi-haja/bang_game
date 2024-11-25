@@ -3,6 +3,7 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import config from '../../config/config.js';
+import handCardNotification from '../../utils/notification/handCardsNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -34,21 +35,7 @@ const destroyCardRequestHandler = ({ socket, payload }) => {
     });
 
     // 여기까지 오면 요청받은 카드는 제거 당한 상태.
-
-    const userCharacter = game.getCharacter(user.id);
-
-    const destroyCardResponseData = {
-      handCards: userCharacter.handCards,
-    };
-
-    // 응답 패킷 생성
-    const destroyCardResponse = createResponse(
-      PACKET_TYPE.DESTROY_CARD_RESPONSE,
-      socket.sequence,
-      destroyCardResponseData,
-    );
-
-    socket.write(destroyCardResponse);
+    handCardNotification(user);
   } catch (error) {
     handleError(socket, error);
   }

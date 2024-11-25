@@ -242,7 +242,7 @@ export const INTERVAL = {
   SYNC_POSITION: 1000,
   SYNC_GAME: 1000,
   PHASE_UPDATE_DAY: 5, // 초단위
-  PHASE_UPDATE_END: 300, // 초단위
+  PHASE_UPDATE_END: 5, // 초단위
 };
 
 export const INTERVAL_TYPE = {

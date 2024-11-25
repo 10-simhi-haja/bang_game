@@ -1,6 +1,7 @@
 import config from '../../config/config.js';
 import { PHASE_TYPE } from '../../constants/header.js';
 import { createResponse } from '../packet/response/createResponse.js';
+import handCardNotification from './handCardsNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -9,11 +10,6 @@ const {
 
 // 페이즈 업데이트 알림
 const phaseUpdateNotification = (game) => {
-  // message S2CPhaseUpdateNotification {
-  //     PhaseType phaseType = 1; // DAY 1, END 3 (EVENING은 필요시 추가) // 바꿔줄 페이즈 타입
-  //     int64 nextPhaseAt = 2; // 다음 페이즈 시작 시점(밀리초 타임스탬프) // 다음 알림이 시작될 시간.
-  //     repeated CharacterPositionData characterPositions = 3; // 변경된 캐릭터 위치
-  // }
   game.nextPhase();
   let time = 0;
 
@@ -39,10 +35,24 @@ const phaseUpdateNotification = (game) => {
       notiUser.socket.sequence,
       phaseUpdateNotiData,
     );
+
     notiUser.socket.write(phaseUpdateNoti);
+
     if (game.phase === PHASE_TYPE.DAY) {
+      const userCharacter = game.getCharacter(notiUser.id);
+
+      if (userCharacter.handCardsCount > userCharacter.hp) {
+        const count = userCharacter.handCardsCount - userCharacter.hp;
+        for (let i = 0; i < count; i++) {
+          const card = userCharacter.handCards.pop();
+          game.removeCard(notiUser.id, card.type);
+        }
+      }
+
+      handCardNotification(notiUser);
+
       const drawCard = game.cardDeck.drawMultipleCards(2);
-      game.getCharacter(notiUser.id).handCards.push(...drawCard);
+      userCharacter.handCards.push(...drawCard);
     }
   });
 
