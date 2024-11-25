@@ -17,6 +17,7 @@ import { gameStartRequestHandler } from './game/gameStart.handler.js';
 import useCardHandler from './card/useCard.handler.js';
 import handleAnimationNotification from './reaction/animation.handler.js';
 import cardSelectHandler from './card/cardSelect.handler.js';
+import handlePassDebuffRequest from './debuff/debuff.handler.js';
 
 const { packetType } = config.packet;
 
@@ -186,7 +187,7 @@ const handlers = {
     protoType: 'game.S2CCardSelectResponse',
   },
   [packetType.PASS_DEBUFF_REQUEST]: {
-    handler: undefined,
+    handler: handlePassDebuffRequest,
     protoType: 'game.C2SPassDebuffRequest',
   },
   [packetType.PASS_DEBUFF_RESPONSE]: {
