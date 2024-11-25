@@ -216,6 +216,7 @@ class Game {
     return --this.getCharacter(userId).handCardsCount;
   }
 
+  // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {
     const handCards = this.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
@@ -223,6 +224,7 @@ class Game {
     if (index !== -1) {
       handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
     }
+    this.getCharacter(userId).handCardsCount = handCards.length;
   }
 
   BbangShooterStateInfo(userId, targeId) {
