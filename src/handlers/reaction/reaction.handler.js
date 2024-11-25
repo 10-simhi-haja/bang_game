@@ -5,7 +5,55 @@ import handleError from '../../utils/errors/errorHandler.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 
+// Packet type constant
 const packetType = PACKET_TYPE;
+
+const REACTION_TYPE = {
+  NONE_REACTION: 0,
+  NOT_USE_CARD: 1,
+};
+
+const handleDefenseAction = async (user, room, socket) => {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      // 10초 후 타임 아웃 시 피해 받기 처리
+      console.log(`${user.id} 유저가 방어 카드를 사용하지 않아 피해를 받습니다.`);
+      if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
+        room.users[user.id].character.hp -= 1;
+        // 유저 정보 초기화 및 업데이트
+        userUpdateNotification(room);
+      } else {
+        console.error(`User with id ${user.id} not found in room users or already dead.`);
+      }
+      resolve(false); // 방어 카드 미사용으로 판단
+    }, 10000); // 10초 대기
+
+    const defenseResponseHandler = (reactionType) => {
+      clearTimeout(timer); // 타이머 멈춤
+      if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
+        console.log(`Defense card used by user ${user.id}`);
+        if (room.users && room.users[user.id]) {
+          // 방어 카드 사용 시 피해 받지 않음
+          userUpdateNotification(room);
+          resolve(true);
+        } else {
+          console.error(`User with id ${user.id} not found in room users.`);
+        }
+      } else if (reactionType === REACTION_TYPE.NONE_REACTION) {
+        console.log(`No defense card used by user ${user.id}`);
+        if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
+          room.users[user.id].character.hp -= 1;
+          userUpdateNotification(room);
+        } else {
+          console.error(`User with id ${user.id} not found in room users or already dead.`);
+        }
+        resolve(false);
+      }
+    };
+
+    socket.once('defenseResponse', defenseResponseHandler);
+  });
+};
 
 const handleReactionRequest = async ({ socket, payload }) => {
   try {
@@ -18,11 +66,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
     const { reactionType } = payload;
     console.log('handleReactionRequest - reactionType:', reactionType);
 
-    const REACTION_TYPE = {
-      NONE_REACTION: 0,
-      NOT_USE_CARD: 1,
-    };
-
     if (!Object.values(REACTION_TYPE).includes(reactionType)) {
       throw new Error('유효하지 않은 리액션 타입입니다.');
     }
@@ -33,12 +76,24 @@ const handleReactionRequest = async ({ socket, payload }) => {
     }
     console.log('handleReactionRequest - gameSession found');
 
-    if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
-      console.log('handleReactionRequest - NOT_USE_CARD 처리');
-      console.log('handleReactionRequest - After processNotUseCard');
-    } else if (reactionType === REACTION_TYPE.NONE_REACTION) {
-      // 피해받기 선택 시 동작 & 실드가 없어서 빵야 맞을 때도 동작...
+    const user = getUserBySocket(socket);
+    const room = getGameSessionByUser(user);
+
+    if (!room.users || !room.users[user.id]) {
+      throw new Error(`User with id ${user.id} not found in room users.`);
+    }
+
+    if (reactionType === REACTION_TYPE.NONE_REACTION) {
       console.log('handleReactionRequest - NONE_REACTION 처리');
+      if (room.users[user.id].character.hp > 0) {
+        room.users[user.id].character.hp -= 1;
+        userUpdateNotification(room);
+      } else {
+        console.error('User is already dead, no further damage will be applied.');
+      }
+    } else if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
+      console.log('handleReactionRequest - NOT_USE_CARD 처리');
+      await handleDefenseAction(user, room, socket);
     }
 
     const reactionResponseData = {
@@ -54,22 +109,16 @@ const handleReactionRequest = async ({ socket, payload }) => {
 
     if (typeof socket.write === 'function') {
       socket.write(reactionResponse);
-      const user = getUserBySocket(socket);
-      const room = getGameSessionByUser(user);
-      console.log(
-        'StateInfo for User 1:',
-        JSON.stringify(room.users['1'].character.stateInfo, null, 2),
-      );
-      room.users['1'].character.stateInfo.state = 0;
-      console.log(
-        'StateInfo for User 2:',
-        JSON.stringify(room.users['2'].character.stateInfo, null, 2),
-      );
-      room.users['2'].character.stateInfo.state = 0;
 
-      // console.log(`${room.users}의 상태: ${room.users.character}`);
+      // 모든 유저의 상태를 초기화하며 업데이트 알림
+      Object.values(room.users).forEach((roomUser) => {
+        roomUser.character.stateInfo.state = 0;
+        roomUser.character.stateInfo.nextState = 0;
+        roomUser.character.stateInfo.stateTargetUserId = null;
+        roomUser.character.stateInfo.nextStateAt = null;
+      });
 
-      // room.minusHp(user.id);
+      // 유저 업데이트 알림 호출
       userUpdateNotification(room);
     } else {
       throw new Error('socket.write is not a function');
