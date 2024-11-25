@@ -53,7 +53,7 @@ const useCardHandler = ({ socket, payload }) => {
       //^ 방어
       case CARD_TYPE.SHIELD:
         console.log('방어 카드 사용');
-        room.resetStateInfoAllUsers(); // 모든 유저의 상태 초기화 (공격을 사용하기 전으로 돌리는 방식)
+        // room.resetStateInfoAllUsers(); // 모든 유저의 상태 초기화 (공격을 사용하기 전으로 돌리는 방식)
         break;
       case CARD_TYPE.VACCINE:
         room.minusHp(user.id); // 테스트를 위해 체력이 깎이게 해놓음
@@ -67,7 +67,7 @@ const useCardHandler = ({ socket, payload }) => {
         break;
 
       //^ 유틸
-      // case CARD_TYPE.HALLUCINATION:
+      case CARD_TYPE.HALLUCINATION:
       case CARD_TYPE.ABSORB:
       case CARD_TYPE.FLEA_MARKET:
       case CARD_TYPE.MATURED_SAVINGS:
@@ -104,18 +104,15 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.AUTO_SHIELD:
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
-        // console.log('전', responsePayload);
         if (room.getCharacter(user.id).equips.includes(cardType)) {
           responsePayload.success = false;
           responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
         } else {
           room.addEquip(user.id, cardType);
         }
-        // console.log('후', responsePayload);
 
         break;
     }
-    // console.log('후', responsePayload);
 
     // 카드 사용 후 카드 삭제 및 유저 업데이트
     room.minusHandCardsCount(user.id);
@@ -152,17 +149,6 @@ const useCardHandler = ({ socket, payload }) => {
     //   equipNotification(socket, user.id, room, cardType);
     //   cardEffectNotification(socket, user.Id, room, cardType);
     // }
-    useCardNotification(socket, user.id, room, payload);
-    // 유저 업데이트 노티피케이션 전송
-    userUpdateNotification(room);
-
-    room.minusHandCardsCount(user.id);
-    if (responsePayload.success === true) room.removeCard(user.id, cardType);
-
-    if (cardType >= 13 && cardType <= 20) {
-      equipNotification(socket, user.id, room, cardType);
-      cardEffectNotification(socket, user.Id, room, cardType);
-    }
   } catch (err) {
     handleError(socket, err);
   }

@@ -235,6 +235,16 @@ class Game {
     this.getCharacter(targeId).stateInfo.stateTargetUserId = targeId;
   }
 
+  // resetStateInfoAllUsers() {
+  //   Object.values(this.users).forEach((roomUser) => {
+  //     roomUser.character.stateInfo.state = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+  //     roomUser.character.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+  //     roomUser.character.stateInfo.stateTargetUserId = null;
+  //     roomUser.character.stateInfo.nextStateAt = null;
+  //   });
+  //   console.log("All users' state info have been reset.");
+  // }
+
   // ShieudUserStateInfo(userId) {
   //   this.getCharacter(userId).stateInfo = CHARACTER_STATE_TYPE.;
   // }
@@ -389,16 +399,6 @@ class Game {
   // 쉴드가 있으면 쓸지 말지 선택하고 막거나 맞기(또는 피하기)
   // (만약에?) 한대 맞았는데 상대가 장착한 무기가 데저트 이글이면 체력 두배 감소
   // 나머지 룰은 클라이언트에서 처리
-
-  resetStateInfoAllUsers() {
-    Object.values(this.users).forEach((roomUser) => {
-      roomUser.character.stateInfo.state = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-      roomUser.character.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-      roomUser.character.stateInfo.stateTargetUserId = null;
-      roomUser.character.stateInfo.nextStateAt = null;
-    });
-    console.log("All users' state info have been reset.");
-  }
 }
 
 export default Game;
