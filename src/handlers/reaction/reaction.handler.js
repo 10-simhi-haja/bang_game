@@ -5,9 +5,11 @@ import { PACKET_TYPE, REACTION_TYPE } from '../../constants/header.js';
 const packetType = PACKET_TYPE;
 
 // 리액션 요청 핸들러
-const handleReactionRequest = async (socket, payload) => {
+const handleReactionRequest = ({ socket, payload }) => {
   try {
+    console.log('리액션 핸들러 payload: ', payload);
     const { reactionType } = payload;
+    console.log('리액션 reactionType: ', reactionType);
 
     const gameSession = getGameSessionBySocket(socket);
     if (!gameSession) {

@@ -123,6 +123,8 @@ const useCardHandler = ({ socket, payload }) => {
 
     socket.write(userCardResponse);
     useCardNotification(socket, user.id, room, payload);
+    // 유저 업데이트 노티피케이션 전송
+    userUpdateNotification(room);
 
     room.minusHandCardsCount(user.id);
     if (responsePayload.success === true) room.removeCard(user.id, cardType);

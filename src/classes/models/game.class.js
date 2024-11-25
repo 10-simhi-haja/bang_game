@@ -155,7 +155,7 @@ class Game {
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [];
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
-      userEntry.character.handCards.push(...drawCard, { type: 4, count: 2 }, { type: 5, count: 2 });
+      userEntry.character.handCards.push(...drawCard, { type: 1, count: 2 }, { type: 3, count: 2 });
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
