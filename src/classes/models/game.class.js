@@ -1,9 +1,7 @@
 import config from '../../config/config.js';
 import gameEndNotification from '../../utils/notification/gameEndNotification.js';
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
-import { createResponse } from '../../utils/packet/response/createResponse.js';
 import IntervalManager from '../managers/interval.manager.js';
-import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 
@@ -342,15 +340,16 @@ class Game {
 
     this.winnerUpdate(gameEndNotiData);
 
-    // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
-    // users 노티보낼유저배열, payload 보낼데이터
-    userUpdateNotification(this);
+    // // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
+    // // users 노티보낼유저배열, payload 보낼데이터
+    // userUpdateNotification(this);
 
     if (gameEndNotiData.winners !== null) {
       gameEndNotification(this.getAllUsers(), gameEndNotiData);
       removeGameSessionById(this.id);
     }
   }
+
   ///////////////////// intervalManager 관련.
 
   setPhaseUpdateInterval(time) {
