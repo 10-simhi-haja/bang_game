@@ -7,12 +7,21 @@ class IntervalManager extends BaseManager {
     this.gameIntervals = new Map();
   }
 
+  //^ 유저 인터버
   // 있으면 덮어쓰고 없으면 추가
   addInterval(playerId, callback, interval, type) {
     if (!this.intervals.has(playerId)) {
       this.intervals.set(playerId, new Map());
     }
-    this.intervals.get(playerId).set(type, setInterval(callback, interval));
+    const Intervals = this.intervals.get(playerId);
+
+    // 동일 type의 기존 Interval 제거
+    if (Intervals.has(type)) {
+      clearInterval(Intervals.get(type));
+    }
+
+    // 새로운 Interval 추가
+    Intervals.set(type, setInterval(callback, interval));
   }
 
   // playerId에 해당하는 type무관 전부
@@ -35,7 +44,7 @@ class IntervalManager extends BaseManager {
     }
   }
 
-  //////// game Interval
+  //^ game Interval
 
   // 있으면 덮어쓰고 없으면 추가
   addGameInterval(gameId, callback, interval, type) {
