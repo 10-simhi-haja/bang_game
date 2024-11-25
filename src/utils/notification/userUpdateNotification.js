@@ -1,22 +1,9 @@
-import { getGameSessionBySocket } from '../../sessions/game.session.js';
-import { createResponse } from '../../utils/packet/response/createResponse.js';
+import { createResponse } from '../packet/response/createResponse.js';
 import config from '../../config/config.js';
-import { getUserBySocket } from '../../sessions/user.session.js';
-import handleError from '../../utils/errors/errorHandler.js';
 
 const packetType = config.packet.packetType;
 
-// message S2CUserUpdateNotification {
-//   repeated UserData user = 1;
-// }
-
-// message UserData {
-//   int64 id = 1;
-//   string nickname = 2;
-//   CharacterData character = 3;
-// }
-
-// 전체 유저에게 일정 주기마다 전송
+// 유저 업데이트 노티피케이션 함수
 const userUpdateNotification = (game) => {
   try {
     if (!game) {
