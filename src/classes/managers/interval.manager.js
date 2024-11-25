@@ -3,11 +3,14 @@ import BaseManager from './base.manager.js';
 class IntervalManager extends BaseManager {
   constructor() {
     super();
+    // 유저를 넣어서 유저가 각각 시간이지날때 사용되어야할 기능들
     this.intervals = new Map();
+    // 게임이 시간이지날때 사용될 기능들
     this.gameIntervals = new Map();
   }
 
   // 있으면 덮어쓰고 없으면 추가
+  //          유저 아이디, 사용될 함수, 몇초 후 사용할 시간,
   addInterval(playerId, callback, interval, type) {
     if (!this.intervals.has(playerId)) {
       this.intervals.set(playerId, new Map());
@@ -35,7 +38,7 @@ class IntervalManager extends BaseManager {
     }
   }
 
-  //////// game Interval
+  //! game Interval
 
   // 있으면 덮어쓰고 없으면 추가
   addGameInterval(gameId, callback, interval, type) {

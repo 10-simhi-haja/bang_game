@@ -15,6 +15,7 @@ const {
   intervalType: INTERVAL_TYPE,
   phaseType: PHASE_TYPE,
   winType: WIN_TYPE,
+  card: { cardType: CARD_TYPE },
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -38,12 +39,20 @@ class Game {
     this.psychopathCount = 0;
 
     this.cardDeck = new CardDeck();
+    this.fleaMarket = null;
   }
 
   // 들어온 순서대로 반영.
   // 유저의 계정 user클래스
   getAllUsers() {
     return this.userOrder.map((id) => this.users[id].user);
+  }
+
+  // 게임내에서 생존해있는 유저들 가져오기
+  getLiveUsers() {
+    return this.userOrder
+      .filter((id) => this.users[id].character.hp > 0)
+      .map((id) => this.users[id].user);
   }
 
   // 유저의 데이터 캐릭터데이터를 포함.
@@ -154,6 +163,7 @@ class Game {
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [];
+      //{ type: CARD_TYPE.FLEA_MARKET, count: 1 }
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.

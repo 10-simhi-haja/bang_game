@@ -142,7 +142,7 @@ const handlers = {
     protoType: 'game.S2CFleaMarketNotification',
   },
   [packetType.FLEA_MARKET_PICK_REQUEST]: {
-    handler: handleFleaMarketPick,
+    handler: undefined,
     protoType: 'game.C2SFleaMarketPickRequest',
   },
   [packetType.FLEA_MARKET_PICK_RESPONSE]: {

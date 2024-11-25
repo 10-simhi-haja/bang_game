@@ -7,6 +7,7 @@ import equipNotification from '../../utils/notification/equipCardNotification.js
 import useCardNotification from '../../utils/notification/useCardNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
+import fleaMarketNotification from '../../utils/notification/fleaMarketNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -65,6 +66,9 @@ const useCardHandler = ({ socket, payload }) => {
       // case CARD_TYPE.HALLUCINATION:
       case CARD_TYPE.ABSORB:
       case CARD_TYPE.FLEA_MARKET:
+        // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
+        fleaMarketNotification(room);
+        break;
       case CARD_TYPE.MATURED_SAVINGS:
       case CARD_TYPE.WIN_LOTTERY:
         break;
