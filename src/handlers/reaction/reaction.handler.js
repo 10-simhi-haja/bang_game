@@ -40,36 +40,41 @@ const handleReactionRequest = async ({ socket, payload }) => {
       throw new Error(`User with id ${user.id} not found in room users.`);
     }
 
-    let defenseUsed = false;
-    let timer = null;
+    // 클라이언트에서 낫 유즈 카드 타입을 보내는 조건을 모르겠음
+    // 임시 수정 사항 - 쉴드를 사용하면 쉴드 카드 한장을 줄이고 공격 전 상태로 돌림
+    // 쉴드가 없거나 피해받기를 누르면 클라이언트에서는 논 리액션 타입으로 보냄
+    // 기능은 정상 작동하나 의문점이 많음
 
-    // 방어 반응 시 이벤트 핸들러 등록
-    console.log('Registering defenseResponse event listener for socket:', socket.id);
-
-    socket.once('defenseResponse', (reactionType) => {
-      console.log('defenseResponse event received:', reactionType);
-      clearTimeout(timer); // 타이머 멈춤
-
-      if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
-        console.log(`Defense card used by user ${user.id}`);
-        if (room.users && room.users[user.id]) {
-          room.resetStateInfoAllUsers();
-          userUpdateNotification(room);
-          defenseUsed = true;
-        } else {
-          console.error(`User with id ${user.id} not found in room users.`);
-        }
-      } else {
-        console.log(`No defense card used by user ${user.id}`);
-        if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
-          room.users[user.id].character.hp -= 1;
-        } else {
-          console.error(`User with id ${user.id} not found in room users or already dead.`);
-        }
-        room.resetStateInfoAllUsers();
-        userUpdateNotification(room);
-      }
-    });
+    // let defenseUsed = false;
+    // let timer = null;
+    //
+    // // 방어 반응 시 이벤트 핸들러 등록
+    // console.log('Registering defenseResponse event listener for socket:', socket.id);
+    //
+    // socket.once('defenseResponse', (reactionType) => {
+    //   console.log('defenseResponse event received:', reactionType);
+    //   clearTimeout(timer); // 타이머 멈춤
+    //
+    //   if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
+    //     console.log(`Defense card used by user ${user.id}`);
+    //     if (room.users && room.users[user.id]) {
+    //       room.resetStateInfoAllUsers();
+    //       userUpdateNotification(room);
+    //       defenseUsed = true;
+    //     } else {
+    //       console.error(`User with id ${user.id} not found in room users.`);
+    //     }
+    //   } else {
+    //     console.log(`No defense card used by user ${user.id}`);
+    //     if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
+    //       room.users[user.id].character.hp -= 1;
+    //     } else {
+    //       console.error(`User with id ${user.id} not found in room users or already dead.`);
+    //     }
+    //     room.resetStateInfoAllUsers();
+    //     userUpdateNotification(room);
+    //   }
+    // });
 
     // `reactionType`가 NONE_REACTION이거나 아무 반응이 없는 경우 즉시 피해 적용
     if (reactionType === REACTION_TYPE.NONE_REACTION) {

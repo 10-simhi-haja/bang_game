@@ -155,7 +155,7 @@ class Game {
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         { type: 1, count: 1 },
-        { type: 3, count: 1 },
+        // { type: 3, count: 1 },
       ];
       // const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       // userEntry.character.handCards.push(...drawCard);
