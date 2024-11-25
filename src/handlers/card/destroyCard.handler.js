@@ -1,10 +1,12 @@
-import { getGameSessionBySocket, getGameSessionByUser } from '../../sessions/game.session.js';
+import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { PACKET_TYPE } from '../../constants/header.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import config from '../../config/config.js';
 
-const packetType = PACKET_TYPE;
+const {
+  packet: { packetType: PACKET_TYPE },
+} = config;
 
 // message C2SDestroyCardRequest {
 //   repeated CardData destroyCards = 1;
@@ -16,23 +18,40 @@ const packetType = PACKET_TYPE;
 // }
 
 // 카드 버리기 요청 핸들러
-const destroyCardRequest = (socket, payload) => {
+const destroyCardRequestHandler = ({ socket, payload }) => {
   try {
-    //const { destroyCards } = payload;
-    console.log(`카드버리기 ${payload}`);
+    const { destroyCards } = payload;
 
-    //const user = getUserBySocket(socket);
+    const user = getUserBySocket(socket);
 
-    //const game = getGameSessionByUser(user);
+    const game = getGameSessionByUser(user);
 
-    // const destroyCardResponse = createResponse(packetType.DESTROY_CARD_RESPONSE, socket.sequence, {
-    //   handCards: remainingHandCards,
-    // });
+    // 요청온 카드의 숫자만큼 반복제거
+    destroyCards.forEach((card) => {
+      for (let i = 0; i < card.count; i++) {
+        game.removeCard(user.id, card.type);
+      }
+    });
 
-    // socket.write(destroyCardResponse);
+    // 여기까지 오면 요청받은 카드는 제거 당한 상태.
+
+    const userCharacter = game.getCharacter(user.id);
+
+    const destroyCardResponseData = {
+      handCards: userCharacter.handCards,
+    };
+
+    // 응답 패킷 생성
+    const destroyCardResponse = createResponse(
+      PACKET_TYPE.DESTROY_CARD_RESPONSE,
+      socket.sequence,
+      destroyCardResponseData,
+    );
+
+    socket.write(destroyCardResponse);
   } catch (error) {
     handleError(socket, error);
   }
 };
 
-export default destroyCardRequest;
+export default destroyCardRequestHandler;
