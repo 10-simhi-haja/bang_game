@@ -1,7 +1,9 @@
-import { getGameSessionBySocket } from '../../sessions/game.session.js';
+import { getGameSessionBySocket, getGameSessionByUser } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import { PACKET_TYPE } from '../../constants/header.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
+import { getUserBySocket } from '../../sessions/user.session.js';
 
 const packetType = PACKET_TYPE;
 
@@ -35,6 +37,7 @@ const handleReactionRequest = async ({ socket, payload }) => {
       console.log('handleReactionRequest - NOT_USE_CARD 처리');
       console.log('handleReactionRequest - After processNotUseCard');
     } else if (reactionType === REACTION_TYPE.NONE_REACTION) {
+      // 피해받기 선택 시 동작 & 실드가 없어서 빵야 맞을 때도 동작...
       console.log('handleReactionRequest - NONE_REACTION 처리');
     }
 
@@ -51,6 +54,23 @@ const handleReactionRequest = async ({ socket, payload }) => {
 
     if (typeof socket.write === 'function') {
       socket.write(reactionResponse);
+      const user = getUserBySocket(socket);
+      const room = getGameSessionByUser(user);
+      console.log(
+        'StateInfo for User 1:',
+        JSON.stringify(room.users['1'].character.stateInfo, null, 2),
+      );
+      room.users['1'].character.stateInfo.state = 0;
+      console.log(
+        'StateInfo for User 2:',
+        JSON.stringify(room.users['2'].character.stateInfo, null, 2),
+      );
+      room.users['2'].character.stateInfo.state = 0;
+
+      // console.log(`${room.users}의 상태: ${room.users.character}`);
+
+      // room.minusHp(user.id);
+      userUpdateNotification(room);
     } else {
       throw new Error('socket.write is not a function');
     }

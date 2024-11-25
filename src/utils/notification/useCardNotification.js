@@ -12,6 +12,9 @@ const {
 const useCardNotification = (socket, userId, room, payload) => {
   try {
     const { cardType, targetUserId } = payload;
+    console.log('useCardNotification: cardType: ', cardType);
+    console.log('useCardNotification: userId: ', userId.toString());
+    console.log('useCardNotification: targetUserId: ', targetUserId.toString());
 
     const responseData = {
       cardType,
