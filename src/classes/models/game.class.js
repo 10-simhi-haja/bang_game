@@ -365,10 +365,39 @@ class Game {
       INTERVAL_TYPE.GAME_UPDATE,
     );
   }
+
+  ///////////////// 리엑션 관련 로직 /////////////////////////
+
+  // 왜 리엑션 리퀘스트가 안넘어 오는지?
+  // 누군가가 빵야를 사용했을때 x
+  // 빵야를 사용했다고 모든 유저에게 알렸을때 x
+
+  // 캐릭터 스테이트 타입 참고
+  // 빵야 시전자가 빵야 타켓에게 빵야 카드를 사용 시 리엑션 리퀘스트가 들어간다.
+  // 쉴드가 없으면 클라이언트가 알아서 패킷을 보내준다
+
+  // 유저 업데이트 - 특정 조건이 걸리면 그때마다 하나씩 보내기
+
+  // 쉴드 사용시 남은시간 - 10이라고 나옴 (미구현 상태)
+
+  // 카드 상호작용 팝업 창
+  // 빵야를 맞으면 쉴드 카드가 없을 때 한대 맞기(또는 피하기)
+  // 쉴드가 있으면 쓸지 말지 선택하고 막거나 맞기(또는 피하기)
+  // (만약에?) 한대 맞았는데 상대가 장착한 무기가 데저트 이글이면 체력 두배 감소
+  // 나머지 룰은 클라이언트에서 처리
+
+  resetStateInfoAllUsers() {
+    Object.values(this.users).forEach((roomUser) => {
+      roomUser.character.stateInfo.state = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+      roomUser.character.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
+      roomUser.character.stateInfo.stateTargetUserId = null;
+      roomUser.character.stateInfo.nextStateAt = null;
+    });
+    console.log("All users' state info have been reset.");
+  }
 }
 
 export default Game;
-
 ///// 필요하면 살림.
 // 해당 아이디 유저에게 주기 셋팅
 //              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들

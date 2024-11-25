@@ -1,7 +1,6 @@
 import config from '../../config/config.js';
 import handleError from '../errors/errorHandler.js';
 import { createResponse } from '../packet/response/createResponse.js';
-import userUpdateNotification from './userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -12,6 +11,9 @@ const {
 const useCardNotification = (socket, userId, room, payload) => {
   try {
     const { cardType, targetUserId } = payload;
+    console.log('useCardNotification: cardType: ', cardType);
+    console.log('useCardNotification: userId: ', userId.toString());
+    console.log('useCardNotification: targetUserId: ', targetUserId.toString());
 
     const responseData = {
       cardType,
@@ -31,9 +33,6 @@ const useCardNotification = (socket, userId, room, payload) => {
     room.getAllUsers().forEach((user) => {
       user.socket.write(responsePayload);
     });
-
-    // 유저 업데이트 노티피케이션 전송
-    userUpdateNotification(room);
   } catch (err) {
     handleError(socket, err);
   }
