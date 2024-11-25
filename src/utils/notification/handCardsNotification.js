@@ -6,9 +6,9 @@ const {
 } = config;
 
 // 현재 손패 알림
-const handCardNotification = (user) => {
+const handCardNotification = (user, game) => {
   const userCharacter = game.getCharacter(user.id);
-
+  userCharacter.handCardsCount = userCharacter.handCards.length;
   const destroyCardResponseData = {
     handCards: userCharacter.handCards,
   };
@@ -16,11 +16,11 @@ const handCardNotification = (user) => {
   // 응답 패킷 생성
   const destroyCardResponse = createResponse(
     PACKET_TYPE.DESTROY_CARD_RESPONSE,
-    socket.sequence,
+    user.socket.sequence,
     destroyCardResponseData,
   );
 
-  socket.write(destroyCardResponse);
+  user.socket.write(destroyCardResponse);
 };
 
 export default handCardNotification;

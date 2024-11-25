@@ -43,16 +43,28 @@ const phaseUpdateNotification = (game) => {
 
       if (userCharacter.handCardsCount > userCharacter.hp) {
         const count = userCharacter.handCardsCount - userCharacter.hp;
+        console.log(`버릴 카드 갯수 ${count} 캐릭터 현재 손패`);
+        console.dir(userCharacter.handCards, null);
+
         for (let i = 0; i < count; i++) {
           const card = userCharacter.handCards.pop();
-          game.removeCard(notiUser.id, card.type);
+          game.cardDeck.addUseCard(card.type);
+          console.log(`버릴 카드 ${card.type}`);
+
+          //game.removeCard(notiUser.id, card.type);
         }
       }
 
-      handCardNotification(notiUser);
+      console.log(`드로우 전 버린 후`);
+      console.dir(userCharacter.handCards, null);
 
       const drawCard = game.cardDeck.drawMultipleCards(2);
       userCharacter.handCards.push(...drawCard);
+
+      console.log(`드로우 후`);
+      console.dir(userCharacter.handCards, null);
+
+      handCardNotification(notiUser, game);
     }
   });
 

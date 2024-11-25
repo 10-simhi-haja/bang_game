@@ -35,7 +35,7 @@ const destroyCardRequestHandler = ({ socket, payload }) => {
     });
 
     // 여기까지 오면 요청받은 카드는 제거 당한 상태.
-    handCardNotification(user);
+    handCardNotification(user, game);
   } catch (error) {
     handleError(socket, error);
   }
