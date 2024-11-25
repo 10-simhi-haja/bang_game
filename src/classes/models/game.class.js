@@ -337,6 +337,10 @@ class Game {
 
     this.winnerUpdate(gameEndNotiData);
 
+    // // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
+    // // users 노티보낼유저배열, payload 보낼데이터
+    // userUpdateNotification(this);
+
     if (gameEndNotiData.winners !== null) {
       gameEndNotification(this.getAllUsers(), gameEndNotiData);
       removeGameSessionById(this.id);
