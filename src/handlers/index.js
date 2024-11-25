@@ -8,7 +8,7 @@ import roomListHandler from './room/roomList.handler.js';
 import createRoomHandler from './room/createRoom.handler.js';
 import joinRoomHandler from './room/joinRoom.handler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
-import destroyCardRequest from './card/destroyCard.handler.js';
+import destroyCardRequestHandler from './card/destroyCard.handler.js';
 import handleFleaMarketPick from './fleaMarket/fleaMarket.handler.js';
 import handleReactionRequest from './reaction/reaction.handler.js';
 import leaveRoomHandler from './room/leaveRoom.handler.js';
@@ -166,7 +166,7 @@ const handlers = {
     protoType: 'game.S2CReactionResponse',
   },
   [packetType.DESTROY_CARD_REQUEST]: {
-    handler: destroyCardRequest,
+    handler: destroyCardRequestHandler,
     protoType: 'game.C2SDestroyCardRequest',
   },
   [packetType.DESTROY_CARD_RESPONSE]: {

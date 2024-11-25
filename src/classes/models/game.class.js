@@ -154,7 +154,7 @@ class Game {
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [];
-      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
+      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 6);
       userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
@@ -206,6 +206,7 @@ class Game {
     return --this.getCharacter(userId).handCardsCount;
   }
 
+  // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {
     const handCards = this.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
@@ -213,6 +214,7 @@ class Game {
     if (index !== -1) {
       handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
     }
+    this.getCharacter(userId).handCardsCount = handCards.length;
   }
 
   BbangShooterStateInfo(userId, targeId) {
