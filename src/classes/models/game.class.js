@@ -157,7 +157,7 @@ class Game {
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [];
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
-      userEntry.character.handCards.push(...drawCard);
+      userEntry.character.handCards.push(...drawCard, { type: 4, count: 2 }, { type: 5, count: 2 });
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
@@ -178,7 +178,6 @@ class Game {
   // userId로 user찾기
   getUser(userId) {
     const user = this.users[userId].user;
-    console.log('getUser: ', user);
     return user;
   }
 
@@ -202,6 +201,13 @@ class Game {
 
   plusHp(userId) {
     return ++this.getCharacter(userId).hp;
+  }
+
+  // ^ 119 호출
+  plusAllUsersHp(userId, users) {
+    users.forEach((user) => {
+      if (user.id !== userId) this.users[user.id].character.hp += 1;
+    });
   }
 
   minusHandCardsCount(userId) {

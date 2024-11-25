@@ -21,6 +21,7 @@ const useCardHandler = ({ socket, payload }) => {
     const targeId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
+    const users = room.getAllUserDatas();
 
     const responsePayload = {
       success: true,
@@ -56,7 +57,11 @@ const useCardHandler = ({ socket, payload }) => {
         room.minusHp(user.id); // 테스트를 위해 체력이 깎이게 해놓음
         break;
       case CARD_TYPE.CALL_119:
-        //? 나에게, 모두에게 선택하는데 어떻게 받아와서 처리하는지?
+        if (targeId !== 0) {
+          room.plusHp(targeId);
+        } else {
+          room.plusAllUsersHp(user.id, users);
+        }
         break;
 
       //^ 유틸
