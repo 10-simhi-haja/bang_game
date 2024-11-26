@@ -44,8 +44,16 @@ const useCardHandler = ({ socket, payload }) => {
         // room.BbangShooterStateInfo(user.id, targetId, 10000);
         // room.BbangTargetStateInfo(targetId, 10000);
         room.bbangStateInfo(user.id, targetId, 10000, room);
+        room.shooterPushArr(user.id, targetId);
         break;
       case CARD_TYPE.BIG_BBANG:
+        const userId = user.id;
+        const usersId = [];
+        users.forEach((user) => {
+          if (user.id !== userId) usersId.push(user.id);
+        });
+        room.bigBbangStateInfo(user.id, usersId, 10000, room);
+        room.shooterPushArr(user.id, usersId);
         break;
       case CARD_TYPE.GUERRILLA:
         break;
@@ -56,13 +64,22 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.SHIELD:
         console.log('방어 카드 사용');
         console.log(`쉴드카드사용시 payload: ${JSON.stringify(payload, null, 2)}`);
-        const bbangShooter =
-          users.find(
-            (user) =>
-              user.character.stateInfo.stateTargetUserId === targetId &&
-              user.character.stateInfo.state === 1,
-          )?.id || null; // find값이 undifined 일 경우 null 반환
-        room.shieldUserStateInfo(bbangShooter, targetId); // (빵을 쏜사람과, 빵을 맞은사람)
+        //^ find로 하나만 받기
+        // const bbangShooter =
+        //   users.find(
+        //     (user) =>
+        //       user.character.stateInfo.stateTargetUserId === targetId &&
+        //       user.character.stateInfo.state === 1,
+        //   )?.id || null; // find값이 undifined 일 경우 null 반환
+        //^ map으로 배열로 받기
+        // const bbangShooter = users
+        //   .filter(
+        //     (user) =>
+        //       user.character.stateInfo.stateTargetUserId === targetId &&
+        //       user.character.stateInfo.state === 1,
+        //   )
+        //   .map((user) => user.id);
+        room.shieldUserStateInfo(targetId); // (빵을 쏜사람과, 빵을 맞은사람)
         break;
       case CARD_TYPE.VACCINE:
         room.minusHp(user.id); // 테스트를 위해 체력이 깎이게 해놓음

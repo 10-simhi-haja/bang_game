@@ -40,22 +40,32 @@ const handleReactionRequest = async ({ socket, payload }) => {
       throw new Error(`User with id ${user.id} not found in room users.`);
     }
 
-    // `reactionType`가 NONE_REACTION이거나 아무 반응이 없는 경우 즉시 피해 적용
+    // `reactionType`가 NONE_REACTION일시 피해 적용
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
-      console.log(`피해입기를 선택하거나 10초동안 반응이 없어서 ${user.id} 에게 피해를 입힘`);
+      console.log('피해받기 선택');
       if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
         room.users[user.id].character.hp -= 1;
+        shooterArr.shift();
       } else {
         console.error(`User with id ${user.id} not found in room users or already dead.`);
       }
       const userId = user.id;
-      const bbangShooter =
-        users.find(
-          (user) =>
-            user.character.stateInfo.stateTargetUserId === userId &&
-            user.character.stateInfo.state === 1,
-        )?.id || null;
-      room.shieldUserStateInfo(bbangShooter, user.id);
+      // ^ find로 하나만 받기
+      // const bbangShooter =
+      //   users.find(
+      //     (user) =>
+      //       user.character.stateInfo.stateTargetUserId === userId &&
+      //       user.character.stateInfo.state === 1,
+      //   )?.id || null;
+      //^ map으로 배열로 받기(한 사람에게 여러명이 빵을 쏠 경우 대비)
+      // const bbangShooter = users
+      //   .filter(
+      //     (user) =>
+      //       user.character.stateInfo.stateTargetUserId === userId &&
+      //       user.character.stateInfo.state === 1,
+      //   )
+      //   .map((user) => user.id);
+      room.shieldUserStateInfo(user.id);
       userUpdateNotification(room);
     }
 
@@ -69,7 +79,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
       socket.sequence,
       reactionResponseData,
     );
-    console.log('handleReactionRequest - Sending response:', reactionResponse);
 
     if (typeof socket.write === 'function') {
       socket.write(reactionResponse);
