@@ -4,6 +4,7 @@ import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotific
 import IntervalManager from '../managers/interval.manager.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
+import warningNotification from '../../utils/notification/warningNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -363,6 +364,15 @@ class Game {
       () => this.gameUpdate(),
       INTERVAL.SYNC_GAME,
       INTERVAL_TYPE.GAME_UPDATE,
+    );
+  }
+
+  setBoomUpdateInterval() {
+    this.intervalManager.addGameInterval(
+      this.id,
+      () => warningNotification(this),
+      INTERVAL.BOMB * 1000, // 5초 뒤..
+      INTERVAL_TYPE.BOMB,
     );
   }
 

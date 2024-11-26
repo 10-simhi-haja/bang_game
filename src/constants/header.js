@@ -243,12 +243,14 @@ export const INTERVAL = {
   SYNC_GAME: 1000,
   PHASE_UPDATE_DAY: 5, // 초단위
   PHASE_UPDATE_END: 5, // 초단위
+  BOMB: 5,
 };
 
 export const INTERVAL_TYPE = {
   POSITION: 0,
   PHASE_UPDATE: 1,
   GAME_UPDATE: 2,
+  BOMB: 3,
 };
 
 export const WIN_TYPE = {

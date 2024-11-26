@@ -74,6 +74,7 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.SATELLITE_TARGET:
       case CARD_TYPE.BOMB:
         room.addbuffs(targeId, cardType);
+        room.setBoomUpdateInterval();
         break;
 
       //^ 무기
