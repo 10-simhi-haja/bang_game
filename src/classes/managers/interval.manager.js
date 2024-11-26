@@ -24,7 +24,7 @@ class IntervalManager extends BaseManager {
     }
 
     // 새로운 Interval 추가
-    Intervals.set(type, setInterval(callback, interval));
+    Intervals.set(type, setInterval(callback, interval * 1000));
   }
 
   // playerId에 해당하는 type무관 전부
@@ -62,7 +62,7 @@ class IntervalManager extends BaseManager {
     }
 
     // 새로운 Interval 추가
-    gameIntervals.set(type, setInterval(callback, interval));
+    gameIntervals.set(type, setInterval(callback, interval * 1000));
   }
 
   // gameId에 해당하는 type무관 전부

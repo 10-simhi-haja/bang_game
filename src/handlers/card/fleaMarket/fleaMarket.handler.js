@@ -29,19 +29,8 @@ const fleaMarketPickRequestHandler = ({ socket, payload }) => {
 
     const user = getUserBySocket(socket);
     const game = getGameSessionByUser(user);
-    console.log(`플리마켓`);
-    console.dir(game.fleaMarket, null);
-    const character = game.getCharacter(user.id);
-    const pickCard = {
-      type: game.fleaMarket.cards[pickIndex],
-      count: 1,
-    };
-    game.fleaMarket.cards.splice(pickIndex, 1);
-    console.log(`플리마켓 후`);
 
-    console.dir(game.fleaMarket, null);
-
-    character.handCards.push(pickCard);
+    game.fleaMarket.pickCard(user, pickIndex);
 
     //~ 여기까지 고른 카드를 핸드에 추가함.
     //^ 이제부터 캐릭터 상태 변경. 나는 논으로 넘기고 내 다음유저를 플리마켓 선택으로.
@@ -69,7 +58,6 @@ const fleaMarketPickRequestHandler = ({ socket, payload }) => {
     if (game.fleaMarket.cards.length > 0) {
       const nextUser = game.getNextUser(user.id);
       fleaMarketNotification(game, nextUser);
-    } else {
     }
   } catch (error) {
     handleError(socket, error);

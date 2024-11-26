@@ -8,6 +8,8 @@ const {
   winType: WIN_TYPE,
   role: { roleType: ROLE_TYPE },
   character: { characterStateType: CHARACTER_STATE_TYPE },
+  interval: INTERVAL,
+  intervalType: INTERVAL_TYPE,
 } = config;
 
 // 1, 플리마켓 노티 쫙 쏘고
@@ -34,6 +36,28 @@ const {
 //     int64 stateTargetUserId = 4; // state에 target이 있을 경우
 // }
 
+//! 문제점 : 1. 플리마켓이 발동되면 다른사람들 행동이 어떻든 발동되고있음.
+//! 문제점 : 2. 인터버매니저에 등록하고 삭제를 안해서 다음 IntervalType이 중복되는게 등록되지 않은이상 계속 호출됨.
+// 선택안하면 자동으로 플리마켓 고르고 userUpdate하는 곳
+const setFleaMarketPickInterval = (game, user) => {
+  if (game.getCharacter(user.id).stateInfo.state !== CHARACTER_STATE_TYPE.FLEA_MARKET_TURN) {
+    return;
+  }
+
+  console.log(`플리마켓 선택안했어`);
+
+  game.fleaMarket.randomPickCard(user);
+
+  game.setAllUserNone();
+
+  if (game.fleaMarket.cards.length > 0) {
+    const nextUser = game.getNextUser(user.id);
+    fleaMarketNotification(game, nextUser);
+  }
+
+  game.intervalManager.removeIntervalByType(user.id, INTERVAL_TYPE.CHARACTER_STATE);
+};
+
 // 플리마켓 시작됨을 알림
 // user는 플리마켓을 선택해야할 유저.
 const fleaMarketNotification = (game, user) => {
@@ -55,20 +79,30 @@ const fleaMarketNotification = (game, user) => {
       fleaMarketNotiData,
     );
 
+    // 플리마켓 선택자.
     if (user.id === notiUser.id) {
       game.setCharacterState(
         notiUser.id,
         CHARACTER_STATE_TYPE.FLEA_MARKET_TURN,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        10,
+        INTERVAL.FLEA_MARKET_PICK,
         notiUser.id,
       );
+
+      // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
+      game.intervalManager.addInterval(
+        notiUser.id,
+        () => setFleaMarketPickInterval(game, notiUser),
+        INTERVAL.FLEA_MARKET_PICK,
+        INTERVAL_TYPE.CHARACTER_STATE,
+      );
     } else {
+      // 선택자이외의 플레이어들
       game.setCharacterState(
         notiUser.id,
         CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        10,
+        INTERVAL.FLEA_MARKET_PICK,
         notiUser.id,
       );
     }

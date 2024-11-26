@@ -56,14 +56,22 @@ class Game {
       .map((id) => this.users[id].user);
   }
 
-  // 해당 유저의 다음번 유저
+  // 해당 유저의 다음번 살아있는 유저
   getNextUser(userId) {
     const curUserIndex = this.userOrder.findIndex((id) => id === userId);
     if (curUserIndex === -1) {
       throw new Error('현재 게임에 해당 유저가 없습니다.');
     }
-    const nextUserIndex = (curUserIndex + 1) % this.userOrder.length;
-    return this.users[this.userOrder[nextUserIndex]].user;
+    let nextUserIndex = curUserIndex;
+
+    do {
+      nextUserIndex = (nextUserIndex + 1) % this.userOrder.length;
+      if (this.users[this.userOrder[nextUserIndex]].character.hp > 0) {
+        return this.users[this.userOrder[nextUserIndex]].user;
+      }
+    } while (nextUserIndex !== curUserIndex);
+
+    throw new Error('살아있는 유저가 없습니다.');
   }
 
   // 유저의 데이터 캐릭터데이터를 포함.
@@ -115,7 +123,7 @@ class Game {
   }
 
   setAllUserNone() {
-    const allUsers = this.getAllUserDatas();
+    const allUsers = this.getLiveUsers();
     allUsers.forEach((curUser) => {
       this.setCharacterState(
         curUser.id,
