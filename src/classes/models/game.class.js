@@ -96,14 +96,13 @@ class Game {
    */
   setCharacterState(curUserId, curState, nextState, time, targetId) {
     const character = this.getCharacter(curUserId);
-    const stateInfo = {
-      state: curState,
-      nextState: nextState,
-      nextStateAt: Date() + time * 1000,
-      stateTargetUserId: targetId,
-    };
-    character.stateInfo = stateInfo;
-    console.log(`캐릭터 상태 ${character.stateInfo}`);
+
+    character.stateInfo.state = curState;
+    character.stateInfo.nextState = nextState;
+    character.stateInfo.nextStateAt = Date.now() + time * 1000;
+    character.stateInfo.stateTargetUserId = targetId;
+
+    console.log(`캐릭터 상태 ${character.stateInfo.nextStateAt}`);
   }
 
   // 유저 추가
@@ -123,7 +122,7 @@ class Game {
       stateInfo: {
         curState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        nextStateAt: Date.now(),
+        nextStateAt: 0,
         targetId: 0,
       }, // 캐릭터 스테이트 타입
       equips: [],
@@ -182,12 +181,16 @@ class Game {
       userEntry.character.stateInfo = {
         state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        nextStateAt: Date.now(),
+        nextStateAt: 0,
         stateTargetUserId: 0,
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [{ type: CARD_TYPE.FLEA_MARKET, count: 1 }];
+      userEntry.character.handCards = [
+        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
+        { type: CARD_TYPE.BBANG, count: 1 },
+        { type: CARD_TYPE.SHIELD, count: 1 },
+      ];
 
       // const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       // userEntry.character.handCards.push(...drawCard);

@@ -13,7 +13,7 @@ class FleaMarket {
     const drawCards = game.cardDeck.drawMultipleCards(count);
     for (let i = 0; i < count; i++) {
       this.cards.push(drawCards[i].type);
-      this.indexs.push(i);
+      //this.indexs.push(i);
     }
   }
 }

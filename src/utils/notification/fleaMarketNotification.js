@@ -1,6 +1,7 @@
 import config from '../../config/config.js';
 import { createResponse } from '../packet/response/createResponse.js';
 import FleaMarket from '../../classes/models/fleaMarket.js';
+import userUpdateNotification from './userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -65,9 +66,9 @@ const fleaMarketNotification = (game, user) => {
     if (user.id === notiUser.id) {
       game.setCharacterState(
         notiUser.id,
-        CHARACTER_STATE_TYPE.CONTAINED,
+        CHARACTER_STATE_TYPE.FLEA_MARKET_TURN,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        100,
+        10,
         notiUser.id,
       );
     } else {
@@ -75,13 +76,13 @@ const fleaMarketNotification = (game, user) => {
         notiUser.id,
         CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        100,
+        10,
         notiUser.id,
       );
     }
-
     notiUser.socket.write(noti);
   });
+  userUpdateNotification(game);
 };
 
 export default fleaMarketNotification;
