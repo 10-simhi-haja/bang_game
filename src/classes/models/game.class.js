@@ -4,6 +4,7 @@ import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotific
 import IntervalManager from '../managers/interval.manager.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
+import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -111,6 +112,20 @@ class Game {
     character.stateInfo.nextState = nextState;
     character.stateInfo.nextStateAt = Date.now() + time * 1000;
     character.stateInfo.stateTargetUserId = targetId;
+  }
+
+  setAllUserNone() {
+    const allUsers = this.getAllUserDatas();
+    allUsers.forEach((curUser) => {
+      this.setCharacterState(
+        curUser.id,
+        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        0,
+        0,
+      );
+    });
+    userUpdateNotification(this);
   }
 
   // 유저 추가

@@ -64,17 +64,7 @@ const fleaMarketPickRequestHandler = ({ socket, payload }) => {
     // 다른 사람의 화면이 갱신되지 않음.
     // 때문에 NONE을 반드시 거친 다음에 플리마켓 선택 상태로 진입해서 해결.
 
-    const allUsers = game.getAllUserDatas();
-    allUsers.forEach((curUser) => {
-      game.setCharacterState(
-        curUser.id,
-        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        0,
-        0,
-      );
-    });
-    userUpdateNotification(game);
+    game.setAllUserNone();
 
     if (game.fleaMarket.cards.length > 0) {
       const nextUser = game.getNextUser(user.id);
