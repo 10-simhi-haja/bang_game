@@ -241,8 +241,8 @@ export const PHASE_TYPE = {
 export const INTERVAL = {
   SYNC_POSITION: 1000,
   SYNC_GAME: 1000,
-  PHASE_UPDATE_DAY: 5, // 초단위
-  PHASE_UPDATE_END: 5, // 초단위
+  PHASE_UPDATE_DAY: 30, // 초단위
+  PHASE_UPDATE_END: 30, // 초단위
 };
 
 export const INTERVAL_TYPE = {
@@ -282,4 +282,11 @@ export const CARD_POOL = {
   [CARD_TYPE.CONTAINMENT_UNIT]: 3,
   [CARD_TYPE.SATELLITE_TARGET]: 1,
   [CARD_TYPE.BOMB]: 1,
+};
+
+export const ANIMATION_TYPE = {
+  NO_ANIMATION: 0,
+  SATELLITE_TARGET_ANIMATION: 1,
+  BOMB_ANIMATION: 2,
+  SHIELD_ANIMATION: 3,
 };
