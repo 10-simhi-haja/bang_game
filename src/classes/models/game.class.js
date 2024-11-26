@@ -151,11 +151,11 @@ class Game {
         nextStateAt: 0,
         stateTargetUserId: 0,
       }; // 캐릭터 스테이트 타입
-      userEntry.character.equips = [18, 20];
+      userEntry.character.equips = [19];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [];
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
-      userEntry.character.handCards.push(...drawCard);
+      userEntry.character.handCards.push(...drawCard, { type: 1, count: 2 }, { type: 3, count: 1 });
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
