@@ -55,6 +55,16 @@ class Game {
       .map((id) => this.users[id].user);
   }
 
+  // 해당 유저의 다음번 유저
+  getNextUser(userId) {
+    const curUserIndex = this.userOrder.findIndex((id) => id === userId);
+    if (curUserIndex === -1) {
+      throw new Error('현재 게임에 해당 유저가 없습니다.');
+    }
+    const nextUserIndex = (curUserIndex + 1) % this.userOrder.length;
+    return this.users[this.userOrder[nextUserIndex]].user;
+  }
+
   // 유저의 데이터 캐릭터데이터를 포함.
   getAllUserDatas() {
     const userDatas = this.userOrder.map((id) => ({
@@ -101,8 +111,6 @@ class Game {
     character.stateInfo.nextState = nextState;
     character.stateInfo.nextStateAt = Date.now() + time * 1000;
     character.stateInfo.stateTargetUserId = targetId;
-
-    console.log(`캐릭터 상태 ${character.stateInfo.nextStateAt}`);
   }
 
   // 유저 추가

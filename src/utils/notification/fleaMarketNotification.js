@@ -35,14 +35,11 @@ const {
 // }
 
 // 플리마켓 시작됨을 알림
+// user는 플리마켓을 선택해야할 유저.
 const fleaMarketNotification = (game, user) => {
   const liveUsers = game.getLiveUsers();
-  const fleaMarket = new FleaMarket(game, liveUsers.length);
 
-  console.log(`플리마켓 카드들`);
-  console.dir(fleaMarket.cards, null);
-  console.log(`플리마켓 인덱스`);
-  console.dir(fleaMarket.indexs, null);
+  const fleaMarket = game.fleaMarket;
 
   game.fleaMarket = fleaMarket;
 
@@ -50,11 +47,6 @@ const fleaMarketNotification = (game, user) => {
     cardTypes: game.fleaMarket.cards,
     pickIndex: game.fleaMarket.indexs,
   };
-
-  console.log(`플리마켓 카드들`);
-  console.dir(game.fleaMarket.cards, null);
-  console.log(`플리마켓 인덱스`);
-  console.dir(game.fleaMarket.indexs, null);
 
   liveUsers.forEach((notiUser) => {
     const noti = createResponse(
