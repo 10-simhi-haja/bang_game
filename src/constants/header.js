@@ -241,7 +241,7 @@ export const PHASE_TYPE = {
 export const INTERVAL = {
   SYNC_POSITION: 1000,
   SYNC_GAME: 1000,
-  PHASE_UPDATE_DAY: 5, // 초단위
+  PHASE_UPDATE_DAY: 500, // 초단위
   PHASE_UPDATE_END: 10, // 초단위
 };
 

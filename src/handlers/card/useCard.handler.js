@@ -17,8 +17,9 @@ const {
 
 const useCardHandler = ({ socket, payload }) => {
   try {
-    console.log('useCard 실행');
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
+    console.log(`useCard 실행 ${cardType}`);
+
     const targeId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
@@ -67,7 +68,7 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.ABSORB:
       case CARD_TYPE.FLEA_MARKET:
         // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
-        fleaMarketNotification(room);
+        fleaMarketNotification(room, user);
         break;
       case CARD_TYPE.MATURED_SAVINGS:
       case CARD_TYPE.WIN_LOTTERY:

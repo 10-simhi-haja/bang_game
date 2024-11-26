@@ -86,6 +86,26 @@ class Game {
     this.state = newState;
   }
 
+  /**
+   *
+   * @param {현재유저id} curUserId
+   * @param {현재상태} curState
+   * @param {현재상태 종료시 상태} nextState
+   * @param {현재상태 지속시간 sec} time
+   * @param {타겟 id 없으면 본인} targetId
+   */
+  setCharacterState(curUserId, curState, nextState, time, targetId) {
+    const character = this.getCharacter(curUserId);
+    const stateInfo = {
+      state: curState,
+      nextState: nextState,
+      nextStateAt: Date() + time * 1000,
+      stateTargetUserId: targetId,
+    };
+    character.stateInfo = stateInfo;
+    console.log(`캐릭터 상태 ${character.stateInfo}`);
+  }
+
   // 유저 추가
   addUser(user) {
     if (this.getUserLength() >= this.maxUserNum) {
@@ -100,7 +120,12 @@ class Game {
       roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
       hp: 0,
       weapon: 0,
-      stateInfo: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE, // 캐릭터 스테이트 타입
+      stateInfo: {
+        curState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        nextStateAt: Date.now(),
+        targetId: 0,
+      }, // 캐릭터 스테이트 타입
       equips: [],
       debuffs: [],
       handCards: [],
@@ -157,15 +182,15 @@ class Game {
       userEntry.character.stateInfo = {
         state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        nextStateAt: 0,
+        nextStateAt: Date.now(),
         stateTargetUserId: 0,
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [];
-      //{ type: CARD_TYPE.FLEA_MARKET, count: 1 }
-      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
-      userEntry.character.handCards.push(...drawCard);
+      userEntry.character.handCards = [{ type: CARD_TYPE.FLEA_MARKET, count: 1 }];
+
+      // const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
+      // userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
