@@ -1,10 +1,10 @@
 import { getGameSessionBySocket } from '../../sessions/game.session.js';
-import { createResponse } from '../../utils/packet/response/createResponse.js';
-import config from '../../config/config.js';
+import { createResponse } from '../packet/response/createResponse.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
+import { PACKET_TYPE } from '../../constants/header.js';
 
-const packetType = config.packet.packetType;
+const packetType = PACKET_TYPE;
 
 const handleAnimationNotification = async ({ socket, payload }) => {
   try {
