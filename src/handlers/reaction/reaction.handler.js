@@ -4,7 +4,6 @@ import { CARD_TYPE, PACKET_TYPE } from '../../constants/header.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
-import handleAnimationNotification from '../../utils/notification/animation.notification.js';
 
 const packetType = PACKET_TYPE;
 const cardType = CARD_TYPE;
@@ -74,27 +73,27 @@ const handleReactionRequest = async ({ socket, payload }) => {
         if (hasAutoShield) {
           console.log('AUTO_SHIELD equipped, calculating defense chance...');
           const defenseChance = Math.random();
-          if (defenseChance <= 1) {
-            // 초기화 시켜보자
+          if (defenseChance <= 0.25) {
+            // 다시 0을 줘보자
             // 안된다
-            await handleAnimationNotification({
-              socket,
-              payload: {
-                userId: user.id,
-                animationType: 3,
-              },
-            });
-            setTimeout(async () => {
-              await handleAnimationNotification({
-                socket,
-                payload: {
-                  userId: user.id,
-                  animationType: 0,
-                },
-              });
-              room.resetStateInfoAllUsers();
-              userUpdateNotification(room);
-            }, 3000);
+            // await handleAnimationNotification({
+            //   socket,
+            //   payload: {
+            //     userId: user.id,
+            //     animationType: 3,
+            //   },
+            // });
+            // setTimeout(() => {
+            //   handleAnimationNotification({
+            //     socket,
+            //     payload: {
+            //       userId: user.id,
+            //       animationType: 0,
+            //     },
+            //   });
+            room.resetStateInfoAllUsers();
+            userUpdateNotification(room);
+            // }, 3000);
             return;
           }
         }
@@ -110,7 +109,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
       room.resetStateInfoAllUsers();
       userUpdateNotification(room);
     }
-
     // 리액션 처리 완료 후 응답 전송
     const reactionResponseData = {
       success: true,
