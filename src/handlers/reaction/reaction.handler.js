@@ -4,6 +4,7 @@ import { CARD_TYPE, PACKET_TYPE } from '../../constants/header.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import handleAnimationNotification from '../../utils/notification/animation.notification.js';
 
 const packetType = PACKET_TYPE;
 const cardType = CARD_TYPE;
@@ -41,26 +42,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
       throw new Error(`User with id ${user.id} not found in room users.`);
     }
 
-    // 클라이언트에서 낫 유즈 카드 타입을 보내는 조건을 모르겠음
-    // 임시 수정 사항 - 쉴드를 사용하면 쉴드 카드 한장을 줄이고 공격 전 상태로 돌림
-    // 쉴드가 없거나 피해받기를 누르면 클라이언트에서는 논 리액션 타입으로 보냄
-    // 기능은 정상 작동하나 의문점이 많음
-
-    // 추측 - 공격을 받으면 25퍼센트 확률로 자동으로 방어가 가능한 캐릭터가 있는데 자동 방어가 활성화 되면
-    // 그때 페이로드로 낫 유즈 카드 타입이 오지 않을까
-    // 진행 방향 - 특정 캐릭터가 공격을 받았을때 확률로 방어를 자동으로 사용 (핸드에서 방어카드 삭제 x)
-    // 방어 카드를 사용했을때와 똑같이 진행을 하면 되지 않을까?
-    // if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
-    //   console.log('handleReactionRequest - Not use card');
-    //   room.resetStateInfoAllUsers();
-    //   userUpdateNotification(room);
-    //   return;
-    // }
-
-    // `reactionType`가 NONE_REACTION이거나 아무 반응이 없는 경우 즉시 피해 적용
-    // 쉴드가 없는 유저에게 공격했을때, 쉴드가 있는 유저에게 공격을 했는데 피해 받기를 눌렀을때 클라이언트에게 받는 페이로드
-    // 자동방어 장비시 25퍼 확률로
-
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
       console.log(`Immediate damage processing for user ${user.id}`);
 
@@ -74,26 +55,16 @@ const handleReactionRequest = async ({ socket, payload }) => {
           console.log('AUTO_SHIELD equipped, calculating defense chance...');
           const defenseChance = Math.random();
           if (defenseChance <= 0.25) {
-            // 다시 0을 줘보자
-            // 안된다
-            // await handleAnimationNotification({
-            //   socket,
-            //   payload: {
-            //     userId: user.id,
-            //     animationType: 3,
-            //   },
-            // });
-            // setTimeout(() => {
-            //   handleAnimationNotification({
-            //     socket,
-            //     payload: {
-            //       userId: user.id,
-            //       animationType: 0,
-            //     },
-            //   });
+            await handleAnimationNotification({
+              socket,
+              payload: {
+                userId: user.id,
+                animationType: 3,
+              },
+            });
             room.resetStateInfoAllUsers();
             userUpdateNotification(room);
-            // }, 3000);
+
             return;
           }
         }
