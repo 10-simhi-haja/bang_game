@@ -97,6 +97,13 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.LASER_POINTER:
       case CARD_TYPE.RADAR:
       case CARD_TYPE.AUTO_SHIELD:
+      // 공격 피격시 25퍼센트 확률로 방어
+      // 쉴드가 있을 경우 누가먼저?
+      // 쉴드가 있는 경우와 없는 경우가 클라이언트에서 검증과정을 먼저 거치고 리액션으로 패킷을 보내주기에
+      // 리액션 패킷을 받을 때 25퍼센트 확률을 계산 - 쉴드가 있는데 안 쓴경우, 쉴드가 없는 경우
+      // 어떤 방식으로? 리액션 타입 논 리액션을 페이로드로 받고 체력이 까일때 25퍼센트 확률로 체력 감소 x
+      // 패킷을 받을 때 확률을 계산하기에 쉴드가 먼저 사용이 되고 쉴드가 없거나 피해받기를 하면 확률 적용
+
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
         // console.log('전', responsePayload);

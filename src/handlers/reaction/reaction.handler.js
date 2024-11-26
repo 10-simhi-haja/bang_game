@@ -1,11 +1,13 @@
 import { getGameSessionBySocket, getGameSessionByUser } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { PACKET_TYPE } from '../../constants/header.js';
+import { CARD_TYPE, PACKET_TYPE } from '../../constants/header.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import handleAnimationNotification from '../../utils/notification/animation.notification.js';
 
 const packetType = PACKET_TYPE;
+const cardType = CARD_TYPE;
 
 const REACTION_TYPE = {
   NONE_REACTION: 0,
@@ -45,45 +47,66 @@ const handleReactionRequest = async ({ socket, payload }) => {
     // 쉴드가 없거나 피해받기를 누르면 클라이언트에서는 논 리액션 타입으로 보냄
     // 기능은 정상 작동하나 의문점이 많음
 
-    // let defenseUsed = false;
-    // let timer = null;
-    //
-    // // 방어 반응 시 이벤트 핸들러 등록
-    // console.log('Registering defenseResponse event listener for socket:', socket.id);
-    //
-    // socket.once('defenseResponse', (reactionType) => {
-    //   console.log('defenseResponse event received:', reactionType);
-    //   clearTimeout(timer); // 타이머 멈춤
-    //
-    //   if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
-    //     console.log(`Defense card used by user ${user.id}`);
-    //     if (room.users && room.users[user.id]) {
-    //       room.resetStateInfoAllUsers();
-    //       userUpdateNotification(room);
-    //       defenseUsed = true;
-    //     } else {
-    //       console.error(`User with id ${user.id} not found in room users.`);
-    //     }
-    //   } else {
-    //     console.log(`No defense card used by user ${user.id}`);
-    //     if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
-    //       room.users[user.id].character.hp -= 1;
-    //     } else {
-    //       console.error(`User with id ${user.id} not found in room users or already dead.`);
-    //     }
-    //     room.resetStateInfoAllUsers();
-    //     userUpdateNotification(room);
-    //   }
-    // });
+    // 추측 - 공격을 받으면 25퍼센트 확률로 자동으로 방어가 가능한 캐릭터가 있는데 자동 방어가 활성화 되면
+    // 그때 페이로드로 낫 유즈 카드 타입이 오지 않을까
+    // 진행 방향 - 특정 캐릭터가 공격을 받았을때 확률로 방어를 자동으로 사용 (핸드에서 방어카드 삭제 x)
+    // 방어 카드를 사용했을때와 똑같이 진행을 하면 되지 않을까?
+    // if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
+    //   console.log('handleReactionRequest - Not use card');
+    //   room.resetStateInfoAllUsers();
+    //   userUpdateNotification(room);
+    //   return;
+    // }
 
     // `reactionType`가 NONE_REACTION이거나 아무 반응이 없는 경우 즉시 피해 적용
+    // 쉴드가 없는 유저에게 공격했을때, 쉴드가 있는 유저에게 공격을 했는데 피해 받기를 눌렀을때 클라이언트에게 받는 페이로드
+    // 자동방어 장비시 25퍼 확률로
+
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
-      console.log(`Immediate damage applied to user ${user.id}`);
-      if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
-        room.users[user.id].character.hp -= 1;
+      console.log(`Immediate damage processing for user ${user.id}`);
+
+      const character = room.users[user.id]?.character;
+
+      if (character && character.hp > 0) {
+        // 방어 장비 AUTO_SHIELD가 장착되어 있는지 확인
+        const hasAutoShield = character.equips.includes(CARD_TYPE.AUTO_SHIELD);
+
+        if (hasAutoShield) {
+          console.log('AUTO_SHIELD equipped, calculating defense chance...');
+          const defenseChance = Math.random();
+          if (defenseChance <= 1) {
+            // 초기화 시켜보자
+            // 안된다
+            await handleAnimationNotification({
+              socket,
+              payload: {
+                userId: user.id,
+                animationType: 3,
+              },
+            });
+            setTimeout(async () => {
+              await handleAnimationNotification({
+                socket,
+                payload: {
+                  userId: user.id,
+                  animationType: 0,
+                },
+              });
+              room.resetStateInfoAllUsers();
+              userUpdateNotification(room);
+            }, 3000);
+            return;
+          }
+        }
+
+        // 방어 실패 또는 AUTO_SHIELD 미장착 - 체력 감소
+        character.hp -= 1;
+        console.log(`Damage applied. New HP for user ${user.id}: ${character.hp}`);
       } else {
         console.error(`User with id ${user.id} not found in room users or already dead.`);
       }
+
+      // 상태 초기화 및 업데이트 알림
       room.resetStateInfoAllUsers();
       userUpdateNotification(room);
     }

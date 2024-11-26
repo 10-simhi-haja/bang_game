@@ -15,7 +15,6 @@ import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 import { gameStartRequestHandler } from './game/gameStart.handler.js';
 import useCardHandler from './card/useCard.handler.js';
-import handleAnimationNotification from './reaction/animation.handler.js';
 import cardSelectHandler from './card/cardSelect.handler.js';
 
 const { packetType } = config.packet;
@@ -198,7 +197,7 @@ const handlers = {
     protoType: 'game.S2CWarningNotification',
   },
   [packetType.ANIMATION_NOTIFICATION]: {
-    handler: handleAnimationNotification,
+    handler: undefined,
     protoType: 'game.S2CAnimationNotification',
   },
 };
