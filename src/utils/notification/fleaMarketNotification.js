@@ -81,6 +81,7 @@ const fleaMarketNotification = (game, user) => {
 
     // 플리마켓 선택자.
     if (user.id === notiUser.id) {
+      // 스테이트 변경.
       game.setCharacterState(
         notiUser.id,
         CHARACTER_STATE_TYPE.FLEA_MARKET_TURN,
@@ -89,15 +90,25 @@ const fleaMarketNotification = (game, user) => {
         notiUser.id,
       );
 
-      // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
-      game.intervalManager.addInterval(
-        notiUser.id,
-        () => setFleaMarketPickInterval(game, notiUser),
-        INTERVAL.FLEA_MARKET_PICK,
-        INTERVAL_TYPE.CHARACTER_STATE,
-      );
+      //! 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
+      // game.intervalManager.addInterval(
+      //   notiUser.id,
+      //   () => setFleaMarketPickInterval(game, notiUser),
+      //   INTERVAL.FLEA_MARKET_PICK,
+      //   INTERVAL_TYPE.CHARACTER_STATE,
+      // );
     } else {
-      // 선택자이외의 플레이어들
+      // 선택자이외의 플레이어들 스테이트 변경
+      // 만약 None상태가 아니라면
+      // 해당 스테이트와 atTime을 저장.
+      const notiCharacter = game.getCharacter(notiUser.id);
+      if (notiCharacter.stateInfo.state !== CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE) {
+        game.users[notiUser.id].prevStateInfo = { ...notiCharacter.stateInfo };
+        console.log(
+          `none이 아닌 유저다. 이전상태 저장 ${game.users[notiUser.id].prevStateInfo.state}`,
+        );
+      }
+
       game.setCharacterState(
         notiUser.id,
         CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT,
