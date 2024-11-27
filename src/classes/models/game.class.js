@@ -6,6 +6,7 @@ import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
+import handleAnimationNotification from '../../utils/notification/animation.notification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -274,7 +275,13 @@ class Game {
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [];
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
-      userEntry.character.handCards.push(...drawCard, { type: 1, count: 2 }, { type: 3, count: 1 });
+      userEntry.character.handCards.push(
+        ...drawCard,
+        { type: 1, count: 2 },
+        { type: 3, count: 1 },
+        { type: 21, count: 1 },
+        { type: 22, count: 1 },
+      );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
@@ -417,21 +424,22 @@ class Game {
         if (character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT)) {
           // 25% 확률로 효과가 발동하지 않음 (75% 확률로 감옥으로 이동)
           if (Math.random() >= 0.01) {
-            user.setAllUserPos(0, 0);
+            user.setPos(0, 0);
             console.log(`${user.id} is moved to jail (0, 0) due to CONTAINMENT_UNIT effect.`);
           }
 
-          // 디버프 칸에서 감금장치 제거
-          character.debuffs = character.debuffs.filter(
-            (debuff) => debuff !== CARD_TYPE.CONTAINMENT_UNIT,
-          );
-          console.log('CONTAINMENT_UNIT removed from debuffs.');
+          // 디버프 칸에서 가장 앞에 있는 CONTAINMENT_UNIT 제거
+          const index = character.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
+          if (index !== -1) {
+            character.debuffs.splice(index, 1);
+          }
+          console.log('One CONTAINMENT_UNIT removed from debuffs.');
         }
 
         // 만약에 캐릭터의 디버프 칸에 위성 타겟이 있을 경우
         if (character.debuffs.includes(CARD_TYPE.SATELLITE_TARGET)) {
           if (Math.random() < 1) {
-            character.hp -= 3;
+            character.hp -= 1;
             await handleAnimationNotification({
               socket: user.socket,
               payload: {
@@ -439,28 +447,28 @@ class Game {
                 animationType: 1,
               },
             });
-            character.debuffs = character.debuffs.filter(
-              (debuff) => debuff !== CARD_TYPE.SATELLITE_TARGET,
-            );
             console.log(`${user.id}'s hp is decreased by 2 due to SATELLITE_TARGET effect.`);
-            console.log('SATELLITE_TARGET removed from debuffs after animation.');
           } else {
             try {
               const nextUser = this.getNextUser(user.id);
               nextUser.character.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
               console.log(`${user.id} transferred SATELLITE_TARGET to ${nextUser.id}.`);
-              character.debuffs = character.debuffs.filter(
-                (debuff) => debuff !== CARD_TYPE.SATELLITE_TARGET,
-              );
-              console.log('SATELLITE_TARGET removed from debuffs after transfer.');
             } catch (error) {
               console.error('No living user found to transfer SATELLITE_TARGET:', error);
             }
           }
+          // 디버프 칸에서 가장 앞에 있는 SATELLITE_TARGET 제거
+          const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+          if (index !== -1) {
+            character.debuffs.splice(index, 1);
+          }
+          console.log('One SATELLITE_TARGET removed from debuffs.');
         }
       });
 
-      // // 페이즈 변경
+      // 상태 초기화 및 업데이트 알림
+      userUpdateNotification(this);
+      // 페이즈 변경
       this.phase = PHASE_TYPE.DAY;
     } else if (this.phase === PHASE_TYPE.DAY) {
       this.phase = PHASE_TYPE.END;
