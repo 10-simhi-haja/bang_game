@@ -1,8 +1,13 @@
-import { getGameSessionBySocket } from '../../sessions/game.session.js';
+import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { PACKET_TYPE } from '../../constants/header.js';
+import handleError from '../../utils/errors/errorHandler.js';
+import { getUserBySocket } from '../../sessions/user.session.js';
+import config from '../../config/config.js';
+import handCardNotification from '../../utils/notification/handCardsNotification.js';
 
-const packetType = PACKET_TYPE;
+const {
+  packet: { packetType: PACKET_TYPE },
+} = config;
 
 // message C2SDestroyCardRequest {
 //   repeated CardData destroyCards = 1;
@@ -14,59 +19,26 @@ const packetType = PACKET_TYPE;
 // }
 
 // 카드 버리기 요청 핸들러
-const destroyCardRequest = async (socket, payload) => {
+const destroyCardRequestHandler = ({ socket, payload }) => {
   try {
     const { destroyCards } = payload;
 
-    const gameSession = getGameSessionBySocket(socket);
-    if (!gameSession) {
-      throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
-    }
+    const user = getUserBySocket(socket);
 
-    const currentUser = gameSession.users.find((user) => user.socket === socket);
-    if (!currentUser) {
-      throw new Error('현재 유저가 존재하지 않습니다.');
-    }
+    const game = getGameSessionByUser(user);
 
-    // 버릴 카드 목록에서 카드들을 제거
-    destroyCards.forEach((destroyCard) => {
-      for (let i = 0; i < destroyCard.count; i++) {
-        const cardIndex = currentUser.character.handCards.findIndex(
-          (card) => card.type === destroyCard.type,
-        );
-        if (cardIndex !== -1) {
-          currentUser.character.handCards.splice(cardIndex, 1);
-        } else {
-          throw new Error(
-            `유저의 핸드에 ${destroyCard.type} 타입의 카드가 충분히 존재하지 않습니다.`,
-          );
-        }
+    // 요청온 카드의 숫자만큼 반복제거
+    destroyCards.forEach((card) => {
+      for (let i = 0; i < card.count; i++) {
+        game.removeCard(user.id, card.type);
       }
     });
 
-    // 현재 유저의 남은 카드 목록을 응답
-    const remainingHandCards = currentUser.character.handCards.map((card) => ({
-      type: card.type,
-      count: card.count,
-    }));
-
-    const destroyCardResponse = createResponse(packetType.DESTROY_CARD_RESPONSE, socket.sequence, {
-      handCards: remainingHandCards,
-    });
-
-    socket.write(destroyCardResponse);
+    // 여기까지 오면 요청받은 카드는 제거 당한 상태.
+    handCardNotification(user, game);
   } catch (error) {
-    console.error('카드 버리기 중 에러 발생:', error.message);
-
-    // 요청을 보낸 소켓에 실패 여부 보내기
-    const errorResponse = createResponse(packetType.DESTROY_CARD_RESPONSE, socket.sequence, {
-      handCards: currentUser.character.handCards.map((card) => ({
-        type: card.type,
-        count: card.count,
-      })),
-    });
-    socket.write(errorResponse);
+    handleError(socket, error);
   }
 };
 
-export default destroyCardRequest;
+export default destroyCardRequestHandler;

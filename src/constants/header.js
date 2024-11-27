@@ -238,17 +238,24 @@ export const PHASE_TYPE = {
 
 // 인터벌 주기
 // 필요한 주기가 있으면 추가해서 사용.
+// 전부 초단위
 export const INTERVAL = {
-  SYNC_POSITION: 1000,
-  SYNC_GAME: 1000,
-  PHASE_UPDATE_DAY: 300, // 초단위, 테스트를 위해 수정
-  PHASE_UPDATE_END: 5, // 초단위
+  SYNC_POSITION: 1,
+  SYNC_GAME: 1,
+  PHASE_UPDATE_DAY: 5,
+  PHASE_UPDATE_END: 10,
+  FLEA_MARKET_PICK: 10,
+  BOMB: 5,
+  BOMB_ANIMATION: 5,
 };
 
 export const INTERVAL_TYPE = {
   POSITION: 0,
   PHASE_UPDATE: 1,
   GAME_UPDATE: 2,
+  CHARACTER_STATE: 3,
+  BOMB: 4,
+  BOMB_ANIMATION: 5,
 };
 
 export const WIN_TYPE = {
@@ -282,4 +289,11 @@ export const CARD_POOL = {
   [CARD_TYPE.CONTAINMENT_UNIT]: 3,
   [CARD_TYPE.SATELLITE_TARGET]: 1,
   [CARD_TYPE.BOMB]: 1,
+};
+
+export const ANIMATION_TYPE = {
+  NO_ANIMATION: 0,
+  SATELLITE_TARGET_ANIMATION: 1,
+  BOMB_ANIMATION: 2,
+  SHIELD_ANIMATION: 3,
 };

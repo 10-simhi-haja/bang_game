@@ -4,7 +4,9 @@ import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotific
 import IntervalManager from '../managers/interval.manager.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
+import warningNotification from '../../utils/notification/warningNotification.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
+import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -16,6 +18,7 @@ const {
   intervalType: INTERVAL_TYPE,
   phaseType: PHASE_TYPE,
   winType: WIN_TYPE,
+  card: { cardType: CARD_TYPE },
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -39,6 +42,7 @@ class Game {
     this.psychopathCount = 0;
 
     this.cardDeck = new CardDeck();
+    this.fleaMarket = null;
   }
 
   // 들어온 순서대로 반영.
@@ -47,7 +51,33 @@ class Game {
     return this.userOrder.map((id) => this.users[id].user);
   }
 
+  // 게임내에서 생존해있는 유저들 가져오기
+  getLiveUsers() {
+    return this.userOrder
+      .filter((id) => this.users[id].character.hp > 0)
+      .map((id) => this.users[id].user);
+  }
+
+  // 해당 유저의 다음번 살아있는 유저
+  getNextUser(userId) {
+    const curUserIndex = this.userOrder.findIndex((id) => id === userId);
+    if (curUserIndex === -1) {
+      throw new Error('현재 게임에 해당 유저가 없습니다.');
+    }
+    let nextUserIndex = curUserIndex;
+
+    do {
+      nextUserIndex = (nextUserIndex + 1) % this.userOrder.length;
+      if (this.users[this.userOrder[nextUserIndex]].character.hp > 0) {
+        return this.users[this.userOrder[nextUserIndex]].user;
+      }
+    } while (nextUserIndex !== curUserIndex);
+
+    throw new Error('살아있는 유저가 없습니다.');
+  }
+
   // 유저의 데이터 캐릭터데이터를 포함.
+  // 참조가 아닌 깊은 복사.
   getAllUserDatas() {
     const userDatas = this.userOrder.map((id) => ({
       id: this.users[id].user.id,
@@ -73,9 +103,86 @@ class Game {
     return this.userOrder.length;
   }
 
-  // 게임 상태 변경
+  // 게임 캐릭터의 상태 변경
   changeState(newState) {
     this.state = newState;
+  }
+
+  /**
+   * 스테이트 변경. 해당하는 인터버 함수 추가.
+   * @param {현재유저id} curUserId
+   * @param {현재상태} curState
+   * @param {현재상태 종료시 상태} nextState
+   * @param {현재상태 지속시간 sec} time
+   * @param {타겟 id 없으면 본인} targetId
+   */
+  setCharacterState(curUserId, curState, nextState, time, targetId) {
+    const character = this.getCharacter(curUserId);
+
+    character.stateInfo.state = curState;
+    character.stateInfo.nextState = nextState;
+    character.stateInfo.nextStateAt = Date.now() + time * 1000;
+    character.stateInfo.stateTargetUserId = targetId;
+
+    switch (curState) {
+      case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
+        this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
+        break;
+      case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
+        break;
+      case CHARACTER_STATE_TYPE.BBANG_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.DEATH_MATCH_STATE:
+        break;
+      case CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE:
+        break;
+      case CHARACTER_STATE_TYPE.FLEA_MARKET_TURN:
+        // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
+        this.intervalManager.addInterval(
+          curUserId,
+          () => setFleaMarketPickInterval(this, this.users[curUserId].user),
+          time,
+          INTERVAL_TYPE.CHARACTER_STATE,
+        );
+        break;
+      case CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT:
+        break;
+      case CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER:
+        break;
+      case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER:
+        break;
+      case CHARACTER_STATE_TYPE.BIG_BBANG_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.ABSORBING:
+        break;
+      case CHARACTER_STATE_TYPE.ABSORB_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.HALLUCINATING:
+        break;
+      case CHARACTER_STATE_TYPE.HALLUCINATION_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.CONTAINED:
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  setAllUserNone() {
+    const allUsers = this.getLiveUsers();
+    allUsers.forEach((curUser) => {
+      this.setCharacterState(
+        curUser.id,
+        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        0,
+        0,
+      );
+    });
+    userUpdateNotification(this);
   }
 
   // 유저 추가
@@ -85,6 +192,13 @@ class Game {
         `방이 가득 찼습니다. 현재인원 : ${this.getUserLength()}, 최대 인원 : ${this.maxUserNum}`,
       );
     }
+    // 캐릭터 스테이트 인포
+    const defaultStateInfo = {
+      state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+      nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+      nextStateAt: 0,
+      targetId: 0,
+    };
 
     // 캐릭터 데이터
     const defaultCharacter = {
@@ -92,7 +206,9 @@ class Game {
       roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
       hp: 0,
       weapon: 0,
-      stateInfo: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE, // 캐릭터 스테이트 타입
+      stateInfo: {
+        ...defaultStateInfo,
+      },
       equips: [],
       debuffs: [],
       handCards: [],
@@ -104,6 +220,9 @@ class Game {
     this.users[user.id] = {
       user, // 유저
       character: { ...defaultCharacter },
+      prevStateInfo: {
+        ...defaultStateInfo,
+      },
     };
     this.userOrder.push(user.id);
   }
@@ -155,7 +274,12 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [];
+      userEntry.character.handCards = [
+        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
+        { type: CARD_TYPE.BBANG, count: 1 },
+        { type: CARD_TYPE.SHIELD, count: 1 },
+      ];
+
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(
         { type: 1, count: 4 },
@@ -219,6 +343,23 @@ class Game {
   //   return --this.getCharacter(userId).handCardsCount;
   // }
 
+  MaturedSavings(userId) {
+    const giveCard = this.cardDeck.drawMultipleCards(2);
+    const handCard = this.getCharacter(userId).handCards;
+    const newHandCard = [...handCard, ...giveCard];
+    // console.log('새로운카드'+giveCard)
+    // console.log('보유중이던 카드'+handCard)
+    // console.log('새롭게 추가된 카드'+newHandCard)
+    return (this.getCharacter(userId).handCards = newHandCard);
+  }
+  winLottery(userId) {
+    const giveCard = this.cardDeck.drawMultipleCards(3);
+    const handCard = this.getCharacter(userId).handCards;
+    const newHandCard = [...handCard, ...giveCard];
+    return (this.getCharacter(userId).handCards = newHandCard);
+  }
+
+  // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {
     const handCards = this.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
@@ -226,6 +367,7 @@ class Game {
     if (index !== -1) {
       handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
     }
+    this.getCharacter(userId).handCardsCount = handCards.length;
   }
 
   // BbangShooterStateInfo(userId, targetId, duration) {
@@ -605,6 +747,16 @@ class Game {
       () => this.gameUpdate(),
       INTERVAL.SYNC_GAME,
       INTERVAL_TYPE.GAME_UPDATE,
+    );
+  }
+
+  setBoomUpdateInterval() {
+    console.log('폭탄 인터벌!!!');
+    this.intervalManager.addGameInterval(
+      this.id,
+      () => warningNotification(this),
+      INTERVAL.BOMB, // 5초 뒤..
+      INTERVAL_TYPE.BOMB,
     );
   }
 
