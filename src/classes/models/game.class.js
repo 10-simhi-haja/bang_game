@@ -355,10 +355,60 @@ class Game {
   }
 
   nextPhase() {
-    if (this.phase === PHASE_TYPE.DAY) {
-      this.phase = PHASE_TYPE.END;
-    } else if (this.phase === PHASE_TYPE.END) {
+    if (this.phase === PHASE_TYPE.END) {
+      // 현재 페이즈가 END에서 DAY로 전환될 때 로직 실행
+      Object.values(this.users).forEach(async ({ user, character }) => {
+        // 만약에 캐릭터의 디버프 칸에 감금장치가 있을 경우
+        if (character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT)) {
+          // 25% 확률로 효과가 발동하지 않음 (75% 확률로 감옥으로 이동)
+          if (Math.random() >= 0.01) {
+            user.setAllUserPos(0, 0);
+            console.log(`${user.id} is moved to jail (0, 0) due to CONTAINMENT_UNIT effect.`);
+          }
+
+          // 디버프 칸에서 감금장치 제거
+          character.debuffs = character.debuffs.filter(
+            (debuff) => debuff !== CARD_TYPE.CONTAINMENT_UNIT,
+          );
+          console.log('CONTAINMENT_UNIT removed from debuffs.');
+        }
+
+        // 만약에 캐릭터의 디버프 칸에 위성 타겟이 있을 경우
+        if (character.debuffs.includes(CARD_TYPE.SATELLITE_TARGET)) {
+          if (Math.random() < 1) {
+            character.hp -= 3;
+            await handleAnimationNotification({
+              socket: user.socket,
+              payload: {
+                userId: user.id,
+                animationType: 1,
+              },
+            });
+            character.debuffs = character.debuffs.filter(
+              (debuff) => debuff !== CARD_TYPE.SATELLITE_TARGET,
+            );
+            console.log(`${user.id}'s hp is decreased by 2 due to SATELLITE_TARGET effect.`);
+            console.log('SATELLITE_TARGET removed from debuffs after animation.');
+          } else {
+            try {
+              const nextUser = this.getNextUser(user.id);
+              nextUser.character.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
+              console.log(`${user.id} transferred SATELLITE_TARGET to ${nextUser.id}.`);
+              character.debuffs = character.debuffs.filter(
+                (debuff) => debuff !== CARD_TYPE.SATELLITE_TARGET,
+              );
+              console.log('SATELLITE_TARGET removed from debuffs after transfer.');
+            } catch (error) {
+              console.error('No living user found to transfer SATELLITE_TARGET:', error);
+            }
+          }
+        }
+      });
+
+      // // 페이즈 변경
       this.phase = PHASE_TYPE.DAY;
+    } else if (this.phase === PHASE_TYPE.DAY) {
+      this.phase = PHASE_TYPE.END;
     }
   }
 
