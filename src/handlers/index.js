@@ -8,14 +8,15 @@ import roomListHandler from './room/roomList.handler.js';
 import createRoomHandler from './room/createRoom.handler.js';
 import joinRoomHandler from './room/joinRoom.handler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
-import destroyCardRequest from './card/destroyCard.handler.js';
-import handleFleaMarketPick from './fleaMarket/fleaMarket.handler.js';
+import destroyCardRequestHandler from './card/destroyCard.handler.js';
 import handleReactionRequest from './reaction/reaction.handler.js';
 import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
 import { gameStartRequestHandler } from './game/gameStart.handler.js';
 import useCardHandler from './card/useCard.handler.js';
 import cardSelectHandler from './card/cardSelect.handler.js';
+import handlePassDebuffRequest from './debuff/debuff.handler.js';
+import fleaMarketPickRequestHandler from './card/fleaMarket/fleaMarket.handler.js';
 
 const { packetType } = config.packet;
 
@@ -141,7 +142,7 @@ const handlers = {
     protoType: 'game.S2CFleaMarketNotification',
   },
   [packetType.FLEA_MARKET_PICK_REQUEST]: {
-    handler: handleFleaMarketPick,
+    handler: fleaMarketPickRequestHandler,
     protoType: 'game.C2SFleaMarketPickRequest',
   },
   [packetType.FLEA_MARKET_PICK_RESPONSE]: {
@@ -165,7 +166,7 @@ const handlers = {
     protoType: 'game.S2CReactionResponse',
   },
   [packetType.DESTROY_CARD_REQUEST]: {
-    handler: destroyCardRequest,
+    handler: destroyCardRequestHandler,
     protoType: 'game.C2SDestroyCardRequest',
   },
   [packetType.DESTROY_CARD_RESPONSE]: {
@@ -185,7 +186,7 @@ const handlers = {
     protoType: 'game.S2CCardSelectResponse',
   },
   [packetType.PASS_DEBUFF_REQUEST]: {
-    handler: undefined,
+    handler: handlePassDebuffRequest,
     protoType: 'game.C2SPassDebuffRequest',
   },
   [packetType.PASS_DEBUFF_RESPONSE]: {

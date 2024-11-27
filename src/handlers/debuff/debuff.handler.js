@@ -1,59 +1,69 @@
-import { getGameSessionBySocket } from '../../sessions/game.session.js';
+import { getGameSessionBySocket, getGameSessionByUser } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import { PACKET_TYPE, WARNING_TYPE } from '../../constants/header.js';
+import { getUserBySocket } from '../../sessions/user.session.js';
+import config from '../../config/config.js';
+import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const packetType = PACKET_TYPE;
 
 // 디버프 전달 요청 핸들러
-const handlePassDebuffRequest = async (socket, payload) => {
+const handlePassDebuffRequest = async ({ socket, payload }) => {
   try {
     const { targetUserId, debuffCardType } = payload;
 
-    const gameSession = getGameSessionBySocket(socket);
-    if (!gameSession) {
+    const user = getUserBySocket(socket);
+    if (!user) {
+      throw new Error('현재 유저가 존재하지 않습니다.');
+    }
+    const room = getGameSessionByUser(user);
+    if (!room) {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
     }
 
-    const currentUser = gameSession.users.find((user) => user.socket === socket);
-    if (!currentUser) {
-      throw new Error('현재 유저가 존재하지 않습니다.');
-    }
+    console.log(room);
+    // console.log(room.users[1].character.debuffs); // 룸에 있는 유저들 정보
 
-    const targetUser = gameSession.users.find((user) => user.id === targetUserId);
-    if (!targetUser) {
-      throw new Error('타겟 유저가 존재하지 않습니다.');
-    }
-
-    // 디버프 카드를 전달 로직 추가 (현재 유저의 핸드에서 제거 후 타겟 유저에게 추가)
-    const debuffCardIndex = currentUser.character.handCards.findIndex(
-      (card) => card.type === debuffCardType,
+    const debuffs = room.users[user.id].character.debuffs.find(
+      (debuff) => debuff === debuffCardType,
     );
-    if (debuffCardIndex === -1) {
+    const debuffCardIndex = room.users[user.id].character.debuffs.indexOf(debuffs);
+    console.log('debuffCardIndex: ', debuffCardIndex);
+    if (debuffCardIndex === undefined) {
       throw new Error('유저의 핸드에 해당 디버프 카드가 존재하지 않습니다.');
     }
 
-    const [debuffCard] = currentUser.character.handCards.splice(debuffCardIndex, 1);
-    targetUser.character.debuffs.push(debuffCard.type);
+    // 유저에게 있던 디버프 제거
+    room.users[user.id].character.debuffs.splice(debuffCardIndex, 1);
+    // 타겟이 된 유저에게 디버프 전달
+    room.users[targetUserId].character.debuffs.push(debuffs);
 
-    // 요청을 보낸 소켓에 성공 여부 보내기
-    const passDebuffResponse = createResponse(packetType.PASS_DEBUFF_RESPONSE, socket.sequence, {
+    const responseData = {
       success: true,
       failCode: 0,
-    });
-    socket.write(passDebuffResponse);
-
-    // 노티피케이션 생성 및 전송
-    const notificationData = {
-      warningType: WARNING_TYPE,
-      expectedAt: Date.now(),
     };
 
-    const notificationResponse = createResponse(
-      packetType.WARNING_NOTIFICATION,
-      targetUser.socket.sequence,
-      notificationData,
+    const passDebuff = createResponse(
+      config.packet.packetType.PASS_DEBUFF_RESPONSE,
+      socket.sequence,
+      responseData,
     );
-    targetUser.socket.write(notificationResponse);
+
+    socket.write(passDebuff);
+    userUpdateNotification(room);
+
+    // // 노티피케이션 생성 및 전송
+    // const notificationData = {
+    //   warningType: WARNING_TYPE,
+    //   expectedAt: Date.now(),
+    // };
+
+    // const notificationResponse = createResponse(
+    //   packetType.WARNING_NOTIFICATION,
+    //   targetUser.socket.sequence,
+    //   notificationData,
+    // );
+    // targetUser.socket.write(notificationResponse);
   } catch (error) {
     console.error('디버프 전달 중 에러 발생:', error.message);
 
