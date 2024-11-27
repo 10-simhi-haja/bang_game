@@ -47,10 +47,10 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     const characterPosData = game.getAllUserPos();
 
     // phase 전환시간 밀리초. // 상수화 필요함.
-    const time = INTERVAL.PHASE_UPDATE_DAY * 1000;
+    const time = INTERVAL.PHASE_UPDATE_DAY;
     const gameStateData = {
       phaseType: 1,
-      nextPhaseAt: Date.now() + time, // 단위  1초
+      nextPhaseAt: Date.now() + time * 1000, // 단위  1초
     };
 
     // 게임 시작 알림 데이터

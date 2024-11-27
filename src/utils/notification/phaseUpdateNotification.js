@@ -14,16 +14,16 @@ const phaseUpdateNotification = (game) => {
   let time = 0;
 
   if (game.phase === PHASE_TYPE.DAY) {
-    time = INTERVAL.PHASE_UPDATE_DAY * 1000;
+    time = INTERVAL.PHASE_UPDATE_DAY;
   } else if (game.phase === PHASE_TYPE.END) {
-    time = INTERVAL.PHASE_UPDATE_END * 1000;
+    time = INTERVAL.PHASE_UPDATE_END;
   }
 
   const characterPosData = game.getAllUserPos();
 
   const phaseUpdateNotiData = {
     phaseType: game.phase,
-    nextPhaseAt: Date.now() + time,
+    nextPhaseAt: Date.now() + time * 1000,
     characterPositions: characterPosData,
   };
 
