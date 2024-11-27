@@ -223,7 +223,7 @@ class Game {
         { type: CARD_TYPE.SHIELD, count: 1 },
       ];
 
-      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 10);
+      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
@@ -279,9 +279,9 @@ class Game {
     const giveCard = this.cardDeck.drawMultipleCards(2);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
-    console.log('새로운카드'+giveCard)
-    console.log('보유중이던 카드'+handCard)
-    console.log('새롭게 추가된 카드'+newHandCard)
+    // console.log('새로운카드'+giveCard)
+    // console.log('보유중이던 카드'+handCard)
+    // console.log('새롭게 추가된 카드'+newHandCard)
     return this.getCharacter(userId).handCards = newHandCard
   }
   winLottery(userId) {
