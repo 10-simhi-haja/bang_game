@@ -75,6 +75,7 @@ const fleaMarketPickRequestHandler = ({ socket, payload }) => {
         if (game.users[user.id].prevStateInfo.state !== CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE) {
           console.log(`none이 아닌 유저다. 이전상태 ${user.character.stateInfo.state}`);
           const prevState = game.users[user.id].prevStateInfo;
+
           game.setCharacterState(
             user.id,
             prevState.state,
@@ -82,8 +83,7 @@ const fleaMarketPickRequestHandler = ({ socket, payload }) => {
             Date.now() + 5 * 1000,
             prevState.stateTargetUserId,
           );
-          //user.character.stateInfo = { ...game.users[user.id].prevStateInfo };
-          //user.character.stateInfo.nextStateAt = Date.now() + 5 * 1000; // 이전상태를 다시 받고 현재시간의 5초를 더 준다.
+
           console.log(`none이 아닌 유저다. 이전상태 실행 ${user.character.stateInfo.state}`);
 
           game.users[user.id].prevStateInfo = { ...defaultStateInfo };

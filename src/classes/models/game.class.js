@@ -5,6 +5,7 @@ import IntervalManager from '../managers/interval.manager.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
+import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -101,17 +102,13 @@ class Game {
     return this.userOrder.length;
   }
 
-  // 게임 상태 변경
+  // 게임 캐릭터의 상태 변경
   changeState(newState) {
     this.state = newState;
   }
 
   /**
-   * 스테이트 변경. 빵을 맞은상태일때, 게릴라, 현피, 폭발, 등 None이 아닌 상태에서 set을 변경하려 할때
-   * prevState를 두고 none일때 state바꾸면 prev는 none
-   * bbang일때 state바꾸면 prev는 none이고 현재는 bbang이니까
-   * 이걸 바꿔야하면 prev를 bbang으로 보내고 현재를 변경함.
-   * 이후에 현재상태에서 이전상태로 갈려면
+   * 스테이트 변경. 해당하는 인터버 함수 추가.
    * @param {현재유저id} curUserId
    * @param {현재상태} curState
    * @param {현재상태 종료시 상태} nextState
@@ -126,8 +123,9 @@ class Game {
     character.stateInfo.nextStateAt = Date.now() + time * 1000;
     character.stateInfo.stateTargetUserId = targetId;
 
-    switch (CHARACTER_STATE_TYPE) {
+    switch (curState) {
       case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
+        this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
         break;
       case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
         break;
@@ -138,6 +136,13 @@ class Game {
       case CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE:
         break;
       case CHARACTER_STATE_TYPE.FLEA_MARKET_TURN:
+        // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
+        this.intervalManager.addInterval(
+          curUserId,
+          () => setFleaMarketPickInterval(this, this.users[curUserId].user),
+          time,
+          INTERVAL_TYPE.CHARACTER_STATE,
+        );
         break;
       case CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT:
         break;
@@ -163,14 +168,6 @@ class Game {
       default:
         break;
     }
-
-    // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
-    this.intervalManager.addInterval(
-      curUserId,
-      () => setFleaMarketPickInterval(this, this.users[curUserId].user),
-      INTERVAL.FLEA_MARKET_PICK,
-      INTERVAL_TYPE.CHARACTER_STATE,
-    );
   }
 
   setAllUserNone() {

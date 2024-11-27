@@ -44,12 +44,14 @@ const phaseUpdateNotification = (game) => {
       if (userCharacter.handCardsCount > userCharacter.hp) {
         const count = userCharacter.handCardsCount - userCharacter.hp;
 
+        // 카드 버리는 부분
         for (let i = 0; i < count; i++) {
           const card = userCharacter.handCards.pop();
-          game.cardDeck.addUseCard(card.type);
+          game.cardDeck.addUseCard(card.type); // 버린카드는 사용한 카드더미에 추가
         }
       }
 
+      // 낮이 되어서 카드 뽑는 부분.
       const drawCard = game.cardDeck.drawMultipleCards(2);
       userCharacter.handCards.push(...drawCard);
 
