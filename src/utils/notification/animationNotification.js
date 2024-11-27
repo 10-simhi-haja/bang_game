@@ -17,23 +17,29 @@ const animationNotification = (game, animationType) => {
       };
 
       const userCharacter = game.getCharacter(debuffUserId[0]);
-      console.log(userCharacter.hp);
-      userCharacter.hp -= 2;
-      console.log(userCharacter.hp);
 
-      const users = game.getAllUsers();
-      users.forEach((notiUser) => {
-        const animationNotification = createResponse(
-          config.packet.packetType.ANIMATION_NOTIFICATION,
-          notiUser.socket.sequence,
-          responseDate,
-        );
+      if (userCharacter.stateInfo.state === 0) {
+        console.log('애니메이션 동작!!!');
+        console.log(userCharacter.hp);
+        userCharacter.hp -= 2;
+        console.log(userCharacter.hp);
 
-        notiUser.socket.write(animationNotification);
-      });
+        const users = game.getAllUsers();
+        users.forEach((notiUser) => {
+          const animationNotification = createResponse(
+            config.packet.packetType.ANIMATION_NOTIFICATION,
+            notiUser.socket.sequence,
+            responseDate,
+          );
 
-      game.intervalManager.removeGameIntervalByType(game.id, config.intervalType.BOMB_ANIMATION);
-      userUpdateNotification(game);
+          notiUser.socket.write(animationNotification);
+        });
+
+        game.intervalManager.removeGameIntervalByType(game.id, config.intervalType.BOMB_ANIMATION);
+        userUpdateNotification(game);
+      } else {
+        console.log('아직 애니메이션 동작 안 하는 중...');
+      }
       break;
   }
 };
