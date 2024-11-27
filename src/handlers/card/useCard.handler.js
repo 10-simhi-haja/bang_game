@@ -19,7 +19,7 @@ const {
 const useCardHandler = ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
-    console.log(`useCard 실행 ${cardType}`);
+    console.log(`useCard 실행 ${cardType}, tartgetId: ${targetUserId.low}`);
 
     const targeId = targetUserId.low;
     const user = getUserBySocket(socket);
@@ -106,6 +106,11 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.LASER_POINTER:
       case CARD_TYPE.RADAR:
       case CARD_TYPE.AUTO_SHIELD:
+        console.log('자동 실드 장착!');
+        const test = room.getAllUserDatas().find((user) => user.id === targeId).character;
+        test.autoShield = true;
+        console.log(test);
+        break;
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
         // console.log('전', responsePayload);

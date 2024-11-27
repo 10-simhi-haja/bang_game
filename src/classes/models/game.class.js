@@ -214,6 +214,7 @@ class Game {
       handCards: [],
       bbangCount: 0,
       handCardsCount: 0,
+      autoShield: false,
     };
 
     this.users[user.id] = {
@@ -275,7 +276,8 @@ class Game {
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         { type: CARD_TYPE.FLEA_MARKET, count: 1 },
-        { type: CARD_TYPE.BBANG, count: 1 },
+        { type: CARD_TYPE.BBANG, count: 5 },
+        { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
         { type: CARD_TYPE.SHIELD, count: 1 },
       ];
 
@@ -283,6 +285,7 @@ class Game {
       // userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
+      userEntry.character.autoShield = false;
     });
   }
 
@@ -492,6 +495,7 @@ class Game {
   }
 
   setBoomUpdateInterval() {
+    // dk!!!!!
     console.log('폭탄 인터벌!!!');
     this.intervalManager.addGameInterval(
       this.id,
