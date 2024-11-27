@@ -4,7 +4,6 @@ import { CARD_TYPE, PACKET_TYPE } from '../../constants/header.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
-import handleAnimationNotification from '../../utils/notification/animation.notification.js';
 
 const packetType = PACKET_TYPE;
 const cardType = CARD_TYPE;
@@ -55,13 +54,14 @@ const handleReactionRequest = async ({ socket, payload }) => {
           console.log('AUTO_SHIELD equipped, calculating defense chance...');
           const defenseChance = Math.random();
           if (defenseChance <= 0.25) {
-            await handleAnimationNotification({
-              socket,
-              payload: {
-                userId: user.id,
-                animationType: 3,
-              },
-            });
+            // 이펙트 문제 해결 못하면 클라이언트 코드 수정 필요
+            // await handleAnimationNotification({
+            //   socket,
+            //   payload: {
+            //     userId: user.id,
+            //     animationType: 3,
+            //   },
+            // });
             room.resetStateInfoAllUsers();
             userUpdateNotification(room);
 
