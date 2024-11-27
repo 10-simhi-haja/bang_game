@@ -416,59 +416,75 @@ class Game {
     });
   }
 
+  findRandomSurvivingUser(currentUserId) {
+    const survivingUsers = Object.values(this.users).filter(({ user }) => {
+      // 현재 자신은 목록에서 제외
+      return user.id !== currentUserId;
+    });
+
+    if (survivingUsers.length === 0) {
+      return null;
+    }
+
+    // 다음 디버프를 받은 유저는 랜덤으로 결정
+    const randomIndex = Math.floor(Math.random() * survivingUsers.length);
+    return survivingUsers[randomIndex].user.id;
+  }
+
   nextPhase() {
     if (this.phase === PHASE_TYPE.END) {
-      // 현재 페이즈가 END에서 DAY로 전환될 때 로직 실행
-      Object.values(this.users).forEach(async ({ user, character }) => {
-        // 만약에 캐릭터의 디버프 칸에 감금장치가 있을 경우
+      // 페이즈가 시작할 때 모든 유저의 정보 조회
+      Object.values(this.users).forEach(({ user, character }) => {
+        // 만약에 유저가 디버프로 감금장치 장착 시 75퍼센트 확률로 특정 죄표로 이동
         if (character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT)) {
-          // 25% 확률로 효과가 발동하지 않음 (75% 확률로 감옥으로 이동)
-          if (Math.random() >= 0.01) {
+          if (Math.random() >= 0.75) {
             user.setPos(0, 0);
-            console.log(`${user.id} is moved to jail (0, 0) due to CONTAINMENT_UNIT effect.`);
           }
-
-          // 디버프 칸에서 가장 앞에 있는 CONTAINMENT_UNIT 제거
+          // 발동 후 제거
           const index = character.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
           if (index !== -1) {
             character.debuffs.splice(index, 1);
           }
-          console.log('One CONTAINMENT_UNIT removed from debuffs.');
         }
 
-        // 만약에 캐릭터의 디버프 칸에 위성 타겟이 있을 경우
+        // 만약에 디버프 칸에 위성 타겟이 있을 경우
         if (character.debuffs.includes(CARD_TYPE.SATELLITE_TARGET)) {
-          if (Math.random() < 1) {
+          const triggerChance = Math.random() < 0.3;
+
+          if (triggerChance) {
+            // 효과가 발동되었을 때
             character.hp -= 1;
-            await handleAnimationNotification({
+            handleAnimationNotification({
               socket: user.socket,
               payload: {
                 userId: user.id,
                 animationType: 1,
               },
             });
-            console.log(`${user.id}'s hp is decreased by 2 due to SATELLITE_TARGET effect.`);
+            // 디버프 제거
+            const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+            if (index !== -1) {
+              character.debuffs.splice(index, 1);
+            }
           } else {
-            try {
-              const nextUser = this.getNextUser(user.id);
-              nextUser.character.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
-              console.log(`${user.id} transferred SATELLITE_TARGET to ${nextUser.id}.`);
-            } catch (error) {
-              console.error('No living user found to transfer SATELLITE_TARGET:', error);
+            // 효과가 발동하지 않았을 때 전이
+            // 자신의 디버프 제거
+            const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+            if (index !== -1) {
+              character.debuffs.splice(index, 1);
+            }
+
+            // 전이된 유저의 디버프 칸에 위성 타겟 추가
+            const nextUserId = this.findRandomSurvivingUser(user.id);
+            if (nextUserId !== null) {
+              this.users[nextUserId].character.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
             }
           }
-          // 디버프 칸에서 가장 앞에 있는 SATELLITE_TARGET 제거
-          const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
-          if (index !== -1) {
-            character.debuffs.splice(index, 1);
-          }
-          console.log('One SATELLITE_TARGET removed from debuffs.');
         }
       });
 
-      // 상태 초기화 및 업데이트 알림
+      // 모든 로직 종료 후 유저 정보 업데이트
       userUpdateNotification(this);
-      // 페이즈 변경
       this.phase = PHASE_TYPE.DAY;
     } else if (this.phase === PHASE_TYPE.DAY) {
       this.phase = PHASE_TYPE.END;
