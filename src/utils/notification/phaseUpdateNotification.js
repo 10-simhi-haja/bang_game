@@ -14,16 +14,16 @@ const phaseUpdateNotification = (game) => {
   let time = 0;
 
   if (game.phase === PHASE_TYPE.DAY) {
-    time = INTERVAL.PHASE_UPDATE_DAY * 1000;
+    time = INTERVAL.PHASE_UPDATE_DAY;
   } else if (game.phase === PHASE_TYPE.END) {
-    time = INTERVAL.PHASE_UPDATE_END * 1000;
+    time = INTERVAL.PHASE_UPDATE_END;
   }
 
   const characterPosData = game.getAllUserPos();
 
   const phaseUpdateNotiData = {
     phaseType: game.phase,
-    nextPhaseAt: Date.now() + time,
+    nextPhaseAt: Date.now() + time * 1000,
     characterPositions: characterPosData,
   };
 
@@ -44,12 +44,14 @@ const phaseUpdateNotification = (game) => {
       if (userCharacter.handCardsCount > userCharacter.hp) {
         const count = userCharacter.handCardsCount - userCharacter.hp;
 
+        // 카드 버리는 부분
         for (let i = 0; i < count; i++) {
           const card = userCharacter.handCards.pop();
-          game.cardDeck.addUseCard(card.type);
+          game.cardDeck.addUseCard(card.type); // 버린카드는 사용한 카드더미에 추가
         }
       }
 
+      // 낮이 되어서 카드 뽑는 부분.
       const drawCard = game.cardDeck.drawMultipleCards(2);
       userCharacter.handCards.push(...drawCard);
 
