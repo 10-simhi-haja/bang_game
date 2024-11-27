@@ -22,6 +22,14 @@ const {
 //     GlobalFailCode failCode = 2;
 // }
 
+// 캐릭터 스테이트 인포
+const defaultStateInfo = {
+  state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+  nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+  nextStateAt: 0,
+  targetId: 0,
+};
+
 // 카드 버리기 요청 핸들러
 const fleaMarketPickRequestHandler = ({ socket, payload }) => {
   try {
@@ -58,6 +66,31 @@ const fleaMarketPickRequestHandler = ({ socket, payload }) => {
     if (game.fleaMarket.cards.length > 0) {
       const nextUser = game.getNextUser(user.id);
       fleaMarketNotification(game, nextUser);
+    } else {
+      // 플리마켓 전부 다하면 이쪽으로
+      // 저장해두었던 이전상태와 이전시간바탕으로 계산된 상태를 현재로 돌리고 userUpdate 실행.
+      const users = game.getAllUserDatas();
+      users.forEach((user) => {
+        console.log(`이전상태 실행 ${game.users[user.id].prevStateInfo.state}`);
+        if (game.users[user.id].prevStateInfo.state !== CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE) {
+          console.log(`none이 아닌 유저다. 이전상태 ${user.character.stateInfo.state}`);
+          const prevState = game.users[user.id].prevStateInfo;
+
+          game.setCharacterState(
+            user.id,
+            prevState.state,
+            prevState.nextState,
+            Date.now() + 5 * 1000,
+            prevState.stateTargetUserId,
+          );
+
+          console.log(`none이 아닌 유저다. 이전상태 실행 ${user.character.stateInfo.state}`);
+
+          game.users[user.id].prevStateInfo = { ...defaultStateInfo };
+        }
+      });
+
+      userUpdateNotification(game);
     }
   } catch (error) {
     handleError(socket, error);

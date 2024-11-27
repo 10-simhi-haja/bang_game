@@ -6,6 +6,7 @@ import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 import warningNotification from '../../utils/notification/warningNotification.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
+import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -76,6 +77,7 @@ class Game {
   }
 
   // 유저의 데이터 캐릭터데이터를 포함.
+  // 참조가 아닌 깊은 복사.
   getAllUserDatas() {
     const userDatas = this.userOrder.map((id) => ({
       id: this.users[id].user.id,
@@ -101,13 +103,13 @@ class Game {
     return this.userOrder.length;
   }
 
-  // 게임 상태 변경
+  // 게임 캐릭터의 상태 변경
   changeState(newState) {
     this.state = newState;
   }
 
   /**
-   *
+   * 스테이트 변경. 해당하는 인터버 함수 추가.
    * @param {현재유저id} curUserId
    * @param {현재상태} curState
    * @param {현재상태 종료시 상태} nextState
@@ -121,6 +123,52 @@ class Game {
     character.stateInfo.nextState = nextState;
     character.stateInfo.nextStateAt = Date.now() + time * 1000;
     character.stateInfo.stateTargetUserId = targetId;
+
+    switch (curState) {
+      case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
+        this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
+        break;
+      case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
+        break;
+      case CHARACTER_STATE_TYPE.BBANG_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.DEATH_MATCH_STATE:
+        break;
+      case CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE:
+        break;
+      case CHARACTER_STATE_TYPE.FLEA_MARKET_TURN:
+        // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
+        this.intervalManager.addInterval(
+          curUserId,
+          () => setFleaMarketPickInterval(this, this.users[curUserId].user),
+          time,
+          INTERVAL_TYPE.CHARACTER_STATE,
+        );
+        break;
+      case CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT:
+        break;
+      case CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER:
+        break;
+      case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER:
+        break;
+      case CHARACTER_STATE_TYPE.BIG_BBANG_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.ABSORBING:
+        break;
+      case CHARACTER_STATE_TYPE.ABSORB_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.HALLUCINATING:
+        break;
+      case CHARACTER_STATE_TYPE.HALLUCINATION_TARGET:
+        break;
+      case CHARACTER_STATE_TYPE.CONTAINED:
+        break;
+
+      default:
+        break;
+    }
   }
 
   setAllUserNone() {
@@ -144,6 +192,13 @@ class Game {
         `방이 가득 찼습니다. 현재인원 : ${this.getUserLength()}, 최대 인원 : ${this.maxUserNum}`,
       );
     }
+    // 캐릭터 스테이트 인포
+    const defaultStateInfo = {
+      state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+      nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+      nextStateAt: 0,
+      targetId: 0,
+    };
 
     // 캐릭터 데이터
     const defaultCharacter = {
@@ -152,11 +207,8 @@ class Game {
       hp: 0,
       weapon: 0,
       stateInfo: {
-        curState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        nextStateAt: 0,
-        targetId: 0,
-      }, // 캐릭터 스테이트 타입
+        ...defaultStateInfo,
+      },
       equips: [],
       debuffs: [],
       handCards: [],
@@ -167,6 +219,9 @@ class Game {
     this.users[user.id] = {
       user, // 유저
       character: { ...defaultCharacter },
+      prevStateInfo: {
+        ...defaultStateInfo,
+      },
     };
     this.userOrder.push(user.id);
   }
