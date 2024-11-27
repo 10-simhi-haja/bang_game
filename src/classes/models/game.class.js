@@ -437,10 +437,11 @@ class Game {
   }
 
   setBoomUpdateInterval() {
+    console.log('폭탄 인터벌!!!');
     this.intervalManager.addGameInterval(
       this.id,
       () => warningNotification(this),
-      INTERVAL.BOMB * 1000, // 5초 뒤..
+      INTERVAL.BOMB, // 5초 뒤..
       INTERVAL_TYPE.BOMB,
     );
   }

@@ -4,7 +4,6 @@ import animationNotification from './animationNotification.js';
 
 const warningNotification = (game) => {
   const users = game.getAllUsers();
-  const bombAnimation = 2;
 
   const responseData = {
     warningType: config.warningType.BOMB_WARNING,
@@ -12,6 +11,7 @@ const warningNotification = (game) => {
   };
 
   console.log('터지나????');
+  // 경고 보내주는 알림
   users.forEach((notiUser) => {
     const warningNotification = createResponse(
       config.packet.packetType.WARNING_NOTIFICATION,
@@ -23,11 +23,13 @@ const warningNotification = (game) => {
   });
 
   game.intervalManager.removeGameIntervalByType(game.id, config.intervalType.BOMB);
+
+  // 폭발 터지는 애니 & 실제 HP 닳기...
   game.intervalManager.addGameInterval(
     game.id,
-    () => animationNotification(game, bombAnimation),
-    5 * 1000,
-    10,
+    () => animationNotification(game, config.animationType.BOMB_ANIMATION),
+    config.interval.BOMB_ANIMATION,
+    config.intervalType.BOMB_ANIMATION,
   );
 };
 
