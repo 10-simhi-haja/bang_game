@@ -4,6 +4,7 @@ import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotific
 import IntervalManager from '../managers/interval.manager.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
+import warningNotification from '../../utils/notification/warningNotification.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
 import handleAnimationNotification from '../../utils/notification/animation.notification.js';
@@ -556,6 +557,16 @@ class Game {
       () => this.gameUpdate(),
       INTERVAL.SYNC_GAME,
       INTERVAL_TYPE.GAME_UPDATE,
+    );
+  }
+
+  setBoomUpdateInterval() {
+    console.log('폭탄 인터벌!!!');
+    this.intervalManager.addGameInterval(
+      this.id,
+      () => warningNotification(this),
+      INTERVAL.BOMB, // 5초 뒤..
+      INTERVAL_TYPE.BOMB,
     );
   }
 

@@ -245,6 +245,8 @@ export const INTERVAL = {
   PHASE_UPDATE_DAY: 10,
   PHASE_UPDATE_END: 1,
   FLEA_MARKET_PICK: 10,
+  BOMB: 5,
+  BOMB_ANIMATION: 5,
 };
 
 export const INTERVAL_TYPE = {
@@ -252,6 +254,8 @@ export const INTERVAL_TYPE = {
   PHASE_UPDATE: 1,
   GAME_UPDATE: 2,
   CHARACTER_STATE: 3,
+  BOMB: 4,
+  BOMB_ANIMATION: 5,
 };
 
 export const WIN_TYPE = {
