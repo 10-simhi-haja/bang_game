@@ -9,7 +9,6 @@ import createRoomHandler from './room/createRoom.handler.js';
 import joinRoomHandler from './room/joinRoom.handler.js';
 import { gamePrepareRequestHandler } from './game/gamePrepare.handler.js';
 import destroyCardRequestHandler from './card/destroyCard.handler.js';
-import handleFleaMarketPick from './fleaMarket/fleaMarket.handler.js';
 import handleReactionRequest from './reaction/reaction.handler.js';
 import leaveRoomHandler from './room/leaveRoom.handler.js';
 import joinRandomRoomHandler from './room/joinRandomRoom.handler.js';
@@ -18,6 +17,7 @@ import useCardHandler from './card/useCard.handler.js';
 import handleAnimationNotification from './reaction/animation.handler.js';
 import cardSelectHandler from './card/cardSelect.handler.js';
 import handlePassDebuffRequest from './debuff/debuff.handler.js';
+import fleaMarketPickRequestHandler from './card/fleaMarket/fleaMarket.handler.js';
 
 const { packetType } = config.packet;
 
@@ -143,7 +143,7 @@ const handlers = {
     protoType: 'game.S2CFleaMarketNotification',
   },
   [packetType.FLEA_MARKET_PICK_REQUEST]: {
-    handler: handleFleaMarketPick,
+    handler: fleaMarketPickRequestHandler,
     protoType: 'game.C2SFleaMarketPickRequest',
   },
   [packetType.FLEA_MARKET_PICK_RESPONSE]: {

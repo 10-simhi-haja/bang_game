@@ -238,19 +238,21 @@ export const PHASE_TYPE = {
 
 // 인터벌 주기
 // 필요한 주기가 있으면 추가해서 사용.
+// 전부 초단위
 export const INTERVAL = {
-  SYNC_POSITION: 1000,
-  SYNC_GAME: 1000,
-  PHASE_UPDATE_DAY: 5, // 초단위
-  PHASE_UPDATE_END: 5, // 초단위
-  BOMB: 5,
+  SYNC_POSITION: 1,
+  SYNC_GAME: 1,
+  PHASE_UPDATE_DAY: 500,
+  PHASE_UPDATE_END: 10,
+  FLEA_MARKET_PICK: 10,
 };
 
 export const INTERVAL_TYPE = {
   POSITION: 0,
   PHASE_UPDATE: 1,
   GAME_UPDATE: 2,
-  BOMB: 3,
+  CHARACTER_STATE: 3,
+  BOMB: 4,
 };
 
 export const WIN_TYPE = {

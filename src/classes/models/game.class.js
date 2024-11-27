@@ -5,6 +5,7 @@ import IntervalManager from '../managers/interval.manager.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 import warningNotification from '../../utils/notification/warningNotification.js';
+import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -16,6 +17,7 @@ const {
   intervalType: INTERVAL_TYPE,
   phaseType: PHASE_TYPE,
   winType: WIN_TYPE,
+  card: { cardType: CARD_TYPE },
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -39,12 +41,38 @@ class Game {
     this.psychopathCount = 0;
 
     this.cardDeck = new CardDeck();
+    this.fleaMarket = null;
   }
 
   // 들어온 순서대로 반영.
   // 유저의 계정 user클래스
   getAllUsers() {
     return this.userOrder.map((id) => this.users[id].user);
+  }
+
+  // 게임내에서 생존해있는 유저들 가져오기
+  getLiveUsers() {
+    return this.userOrder
+      .filter((id) => this.users[id].character.hp > 0)
+      .map((id) => this.users[id].user);
+  }
+
+  // 해당 유저의 다음번 살아있는 유저
+  getNextUser(userId) {
+    const curUserIndex = this.userOrder.findIndex((id) => id === userId);
+    if (curUserIndex === -1) {
+      throw new Error('현재 게임에 해당 유저가 없습니다.');
+    }
+    let nextUserIndex = curUserIndex;
+
+    do {
+      nextUserIndex = (nextUserIndex + 1) % this.userOrder.length;
+      if (this.users[this.userOrder[nextUserIndex]].character.hp > 0) {
+        return this.users[this.userOrder[nextUserIndex]].user;
+      }
+    } while (nextUserIndex !== curUserIndex);
+
+    throw new Error('살아있는 유저가 없습니다.');
   }
 
   // 유저의 데이터 캐릭터데이터를 포함.
@@ -78,6 +106,37 @@ class Game {
     this.state = newState;
   }
 
+  /**
+   *
+   * @param {현재유저id} curUserId
+   * @param {현재상태} curState
+   * @param {현재상태 종료시 상태} nextState
+   * @param {현재상태 지속시간 sec} time
+   * @param {타겟 id 없으면 본인} targetId
+   */
+  setCharacterState(curUserId, curState, nextState, time, targetId) {
+    const character = this.getCharacter(curUserId);
+
+    character.stateInfo.state = curState;
+    character.stateInfo.nextState = nextState;
+    character.stateInfo.nextStateAt = Date.now() + time * 1000;
+    character.stateInfo.stateTargetUserId = targetId;
+  }
+
+  setAllUserNone() {
+    const allUsers = this.getLiveUsers();
+    allUsers.forEach((curUser) => {
+      this.setCharacterState(
+        curUser.id,
+        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        0,
+        0,
+      );
+    });
+    userUpdateNotification(this);
+  }
+
   // 유저 추가
   addUser(user) {
     if (this.getUserLength() >= this.maxUserNum) {
@@ -92,7 +151,12 @@ class Game {
       roleType: ROLE_TYPE.NONE_ROLE, // 역할 종류
       hp: 0,
       weapon: 0,
-      stateInfo: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE, // 캐릭터 스테이트 타입
+      stateInfo: {
+        curState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        nextStateAt: 0,
+        targetId: 0,
+      }, // 캐릭터 스테이트 타입
       equips: [],
       debuffs: [],
       handCards: [],
@@ -154,9 +218,14 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [];
-      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 6);
-      userEntry.character.handCards.push(...drawCard);
+      userEntry.character.handCards = [
+        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
+        { type: CARD_TYPE.BBANG, count: 1 },
+        { type: CARD_TYPE.SHIELD, count: 1 },
+      ];
+
+      // const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
+      // userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
     });
