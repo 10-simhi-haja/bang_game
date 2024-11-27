@@ -45,7 +45,7 @@ const handleReactionRequest = async ({ socket, payload }) => {
       console.log('피해받기 선택');
       if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
         room.users[user.id].character.hp -= 1;
-        shooterArr.shift();
+        room.users[user.id].character.shooterArr.shift();
       } else {
         console.error(`User with id ${user.id} not found in room users or already dead.`);
       }

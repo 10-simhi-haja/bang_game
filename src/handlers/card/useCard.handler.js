@@ -56,8 +56,10 @@ const useCardHandler = ({ socket, payload }) => {
         room.shooterPushArr(user.id, usersId);
         break;
       case CARD_TYPE.GUERRILLA:
+        room.GuerrillaStateInfo(user.id, usersId, 10000, room);
         break;
       case CARD_TYPE.DEATH_MATCH:
+        room.DeathMatchStateInfo(user.id, targetId, 10000, room);
         break;
 
       //^ 방어
