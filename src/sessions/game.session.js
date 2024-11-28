@@ -11,7 +11,11 @@ export const addGameSession = async (data) => {
 export const removeGameSessionById = (id) => {
   const index = gameSessions.findIndex((session) => session.id === id);
   if (index !== -1) {
+    // 게임이 본인 지울걸 다 지우고 배열에서 잘라내기
+    gameSessions[index].remove();
     return gameSessions.splice(index, 1)[0];
+  } else {
+    console.log(`지울 게임이 없습니다.`);
   }
 };
 
