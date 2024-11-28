@@ -14,6 +14,7 @@ const {
   packet: { packetType: PACKET_TYPE },
   card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
+  character: { characterStateType: CHARACTER_STATE_TYPE },
 } = config;
 
 const useCardHandler = ({ socket, payload }) => {
@@ -21,7 +22,7 @@ const useCardHandler = ({ socket, payload }) => {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
     console.log(`useCard 실행 ${cardType}`);
 
-    const targeId = targetUserId.low;
+    const targetId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
 
@@ -38,12 +39,30 @@ const useCardHandler = ({ socket, payload }) => {
      * 선택 여부를 결정하는데 주어진 시간을 카드별로 3~5초)
      */
 
+    const userStateInfo = room.getCharacter(user.id).stateInfo;
+
     switch (cardType) {
       //^ 공격
       case CARD_TYPE.BBANG:
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.BBANG_SHOOTER,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        room.setCharacterState(
+          targetId,
+          CHARACTER_STATE_TYPE.BBANG_TARGET,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        // 나를 쏜사람을 기억해두었다가 리액션하면 나를 쏜쪽도 스테이를 변경해주기위함.
+        room.users[targetId].attackerId = user.id;
         room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
-        room.BbangShooterStateInfo(user.id, targeId);
-        room.BbangTargetStateInfo(targeId);
+        // room.BbangShooterStateInfo(user.id, targetId);
+        // room.BbangTargetStateInfo(targetId);
         break;
       case CARD_TYPE.BIG_BBANG:
         break;
@@ -86,7 +105,7 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.CONTAINMENT_UNIT:
       case CARD_TYPE.SATELLITE_TARGET:
       case CARD_TYPE.BOMB:
-        room.addbuffs(targeId, cardType);
+        room.addbuffs(targetId, cardType);
         room.setBoomUpdateInterval();
         break;
 
@@ -133,7 +152,7 @@ const useCardHandler = ({ socket, payload }) => {
     }
 
     // 유저 업데이트 노티피케이션 발송
-    userUpdateNotification(room);
+    // userUpdateNotification(room);
 
     // 카드 사용 노티피케이션 발송
     useCardNotification(socket, user.id, room, payload);
