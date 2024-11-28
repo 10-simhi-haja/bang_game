@@ -82,6 +82,30 @@ class Game {
     throw new Error('살아있는 유저가 없습니다.');
   }
 
+  getPrevUser(userId) {
+    const curUserIndex = this.userOrder.findIndex((id) => id === userId);
+    if (curUserIndex === -1) {
+      throw new Error('현재 게임에 해당 유저가 없습니다.');
+    }
+    let prevUserIndex = curUserIndex;
+
+    // 순환적으로 이전 유저를 찾는다.
+    while (true) {
+      prevUserIndex = (prevUserIndex - 1 + this.userOrder.length) % this.userOrder.length;
+
+      // 현재 유저로 다시 돌아오면 중단
+      if (prevUserIndex === curUserIndex) {
+        throw new Error('살아있는 유저가 없습니다.');
+      }
+
+      // 살아있는 유저를 발견하면 반환
+      if (this.users[this.userOrder[prevUserIndex]].character.hp > 0) {
+        console.log(`이전 유저 : ${this.users[this.userOrder[prevUserIndex]].user.nickname}`);
+        return this.users[this.userOrder[prevUserIndex]].user;
+      }
+    }
+  }
+
   // 유저의 데이터 캐릭터데이터를 포함.
   // 참조가 아닌 깊은 복사.
   getAllUserDatas() {
@@ -556,45 +580,41 @@ class Game {
     return userCharacter.debuffs.includes(debuff);
   }
 
-  debuffUpdate(userId) {
-    const character = this.getCharacter(userId);
-    const curUser = this.users[userId].user;
-    console.log(`디버프 업데이트 시작`);
-
-    // 위성타겟 체크
-    if (this.debuffCheck(character, CARD_TYPE.SATELLITE_TARGET)) {
-      // 디버프에 위성타겟있는 놈
-      // 위성타겟 터질때
-
-      // 디버프 제거
-      const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
-      if (index !== -1) {
-        character.debuffs.splice(index, 1);
+  // 디버프 들고 있는 유저를 찾는 방식.
+  getDebuffUser(debuff) {
+    const users = this.getAllUserDatas();
+    let debuffUser = 0;
+    users.forEach((user) => {
+      const character = this.getCharacter(user.id);
+      if (this.debuffCheck(character, debuff)) {
+        console.dir(user, null);
+        debuffUser = user;
       }
+    });
+    return debuffUser;
+  }
 
-      if (Math.random() < 0) {
-        console.log(`위성 터졌다!`);
+  // 위성타겟 디버프 가졌는지 확인하고 다음유저에게 넘기기까지
+  debuffUpdate() {
+    const satelliteTargetUser = this.getDebuffUser(CARD_TYPE.SATELLITE_TARGET);
+    console.dir(satelliteTargetUser, null);
+    const character = this.getCharacter(satelliteTargetUser.id);
 
-        // 효과가 발동되었을 때
-        character.hp -= 1;
+    const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+    if (index !== -1) {
+      character.debuffs.splice(index, 1);
+    }
 
-        //animationNotification = (game, animationType, targetUser = null)
-        animationNotification(this, ANIMATION_TYPE.SATELLITE_TARGET_ANIMATION, curUser);
-      } else {
-        // 안터졌으면
+    if (Math.random() < 0) {
+      console.log(`위성 터졌다!`);
 
-        const nextUser = this.getNextUser(curUser.id);
-        console.log(`위성 안터졌다 다음유저 ${nextUser.nickname}에게 주자`);
-
-        // 다음 유저가 현재 유저와 다르면 디버프를 전달
-        if (nextUser.id === curUser.id) {
-          console.log(`다음유저가 나? 게임내에 유저가 나뿐인 상황.`);
-          return;
-        } else {
-          // 다음유저가 내가아니니깐 진짜 다음유저임
-          this.getCharacter(nextUser.id).debuffs.push(CARD_TYPE.SATELLITE_TARGET);
-        }
-      }
+      // 효과가 발동되었을 때
+      character.hp -= 1;
+      animationNotification(this, ANIMATION_TYPE.SATELLITE_TARGET_ANIMATION, curUser);
+    } else {
+      const nextUser = this.getNextUser(satelliteTargetUser.id);
+      const nextUserCharacter = this.getCharacter(nextUser.id);
+      nextUserCharacter.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
     }
 
     // 감옥체크

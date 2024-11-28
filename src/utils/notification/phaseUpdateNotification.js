@@ -59,11 +59,11 @@ const phaseUpdateNotification = (game) => {
       const drawCard = game.cardDeck.drawMultipleCards(2);
       userCharacter.handCards.push(...drawCard);
       handCardNotification(notiUser, game);
-
-      game.debuffUpdate(notiUser.id);
     }
-
-    game.setPhaseUpdateInterval(time);
   });
+
+  game.debuffUpdate();
+
+  game.setPhaseUpdateInterval(time);
 };
 export default phaseUpdateNotification;
