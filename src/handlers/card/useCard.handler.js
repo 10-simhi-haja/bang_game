@@ -9,6 +9,7 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import fleaMarketNotification from '../../utils/notification/fleaMarketNotification.js';
 import FleaMarket from '../../classes/models/fleaMarket.js';
+import animationNotification from '../../utils/notification/animationNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -38,9 +39,17 @@ const useCardHandler = ({ socket, payload }) => {
      * 선택 여부를 결정하는데 주어진 시간을 카드별로 3~5초)
      */
 
+    const targetUser = room.getAllUserDatas().find((user) => user.id === targeId);
     switch (cardType) {
       //^ 공격
       case CARD_TYPE.BBANG:
+        const isOutoShield = targetUser.character.equips.includes(19);
+        if (isOutoShield) {
+          console.log('자동 실드가 방어해줌!');
+          animationNotification(room, config.animationType.SHIELD_ANIMATION, targetUser);
+          break;
+        }
+
         room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
         room.BbangShooterStateInfo(user.id, targeId);
         room.BbangTargetStateInfo(targeId);
@@ -112,9 +121,7 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.RADAR:
       case CARD_TYPE.AUTO_SHIELD:
         console.log('자동 실드 장착!');
-        const test = room.getAllUserDatas().find((user) => user.id === targeId).character;
-        test.autoShield = true;
-        console.log(test);
+        room.addEquip(targeId, cardType);
         break;
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함

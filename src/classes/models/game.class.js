@@ -276,6 +276,7 @@ class Game {
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         { type: CARD_TYPE.FLEA_MARKET, count: 1 },
+        { type: CARD_TYPE.BOMB, count: 1 },
         { type: CARD_TYPE.BBANG, count: 5 },
         { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
         { type: CARD_TYPE.SHIELD, count: 1 },
@@ -341,15 +342,14 @@ class Game {
     // console.log('새로운카드'+giveCard)
     // console.log('보유중이던 카드'+handCard)
     // console.log('새롭게 추가된 카드'+newHandCard)
-    return this.getCharacter(userId).handCards = newHandCard
+    return (this.getCharacter(userId).handCards = newHandCard);
   }
   winLottery(userId) {
     const giveCard = this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
-    return this.getCharacter(userId).handCards = newHandCard
+    return (his.getCharacter(userId).handCards = newHandCard);
   }
-
 
   // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {

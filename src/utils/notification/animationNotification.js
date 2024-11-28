@@ -2,8 +2,12 @@ import config from '../../config/config.js';
 import { createResponse } from '../packet/response/createResponse.js';
 import userUpdateNotification from './userUpdateNotification.js';
 
-const animationNotification = (game, animationType) => {
+const animationNotification = (game, animationType, targetUser = null) => {
   switch (animationType) {
+    case config.animationType.SHIELD_ANIMATION:
+      console.log('자동 실드 애니메이션 동작!');
+      console.log(targetUser);
+      break;
     case config.animationType.BOMB_ANIMATION:
       // 폭탄 디버프 가지고 있는 유저 찾기
       const userDatas = game.getAllUserDatas();
@@ -13,7 +17,7 @@ const animationNotification = (game, animationType) => {
 
       const responseDate = {
         userId: debuffUserId[0],
-        animationType: animationType,
+        animationType: animationType, // 3
       };
 
       const userCharacter = game.getCharacter(debuffUserId[0]);
