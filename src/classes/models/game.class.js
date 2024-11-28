@@ -8,6 +8,7 @@ import warningNotification from '../../utils/notification/warningNotification.js
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
 import updateNotification from '../../utils/notification/updateNotification.js';
+import animationNotification from '../../utils/notification/animationNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -20,6 +21,7 @@ const {
   phaseType: PHASE_TYPE,
   winType: WIN_TYPE,
   card: { cardType: CARD_TYPE },
+  animationType: ANIMATION_TYPE,
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -549,6 +551,57 @@ class Game {
     userUpdateNotification(this);
   }
 
+  // debuff가 있는지 체크
+  debuffCheck(userCharacter, debuff) {
+    return userCharacter.debuffs.includes(debuff);
+  }
+
+  debuffUpdate(userId) {
+    const character = this.getCharacter(userId);
+    const curUser = this.users[userId].user;
+    console.log(`디버프 업데이트 시작`);
+
+    // 위성타겟 체크
+    if (this.debuffCheck(character, CARD_TYPE.SATELLITE_TARGET)) {
+      // 디버프에 위성타겟있는 놈
+      // 위성타겟 터질때
+
+      // 디버프 제거
+      const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+      if (index !== -1) {
+        character.debuffs.splice(index, 1);
+      }
+
+      if (Math.random() < 0) {
+        console.log(`위성 터졌다!`);
+
+        // 효과가 발동되었을 때
+        character.hp -= 1;
+
+        //animationNotification = (game, animationType, targetUser = null)
+        animationNotification(this, ANIMATION_TYPE.SATELLITE_TARGET_ANIMATION, curUser);
+      } else {
+        // 안터졌으면
+
+        const nextUser = this.getNextUser(curUser.id);
+        console.log(`위성 안터졌다 다음유저 ${nextUser.nickname}에게 주자`);
+
+        // 다음 유저가 현재 유저와 다르면 디버프를 전달
+        if (nextUser.id === curUser.id) {
+          console.log(`다음유저가 나? 게임내에 유저가 나뿐인 상황.`);
+          return;
+        } else {
+          // 다음유저가 내가아니니깐 진짜 다음유저임
+          this.getCharacter(nextUser.id).debuffs.push(CARD_TYPE.SATELLITE_TARGET);
+        }
+      }
+    }
+
+    // 감옥체크
+    if (this.debuffCheck(character, CARD_TYPE.CONTAINMENT_UNIT)) {
+    }
+  }
+
   ///////////////////// intervalManager 관련.
 
   setPhaseUpdateInterval(time) {
@@ -577,36 +630,6 @@ class Game {
       INTERVAL.BOMB, // 5초 뒤..
       INTERVAL_TYPE.BOMB,
     );
-  }
-
-  ///////////////// 리엑션 관련 로직 /////////////////////////
-
-  // 왜 리엑션 리퀘스트가 안넘어 오는지?
-  // 누군가가 빵야를 사용했을때 x
-  // 빵야를 사용했다고 모든 유저에게 알렸을때 x
-
-  // 캐릭터 스테이트 타입 참고
-  // 빵야 시전자가 빵야 타켓에게 빵야 카드를 사용 시 리엑션 리퀘스트가 들어간다.
-  // 쉴드가 없으면 클라이언트가 알아서 패킷을 보내준다
-
-  // 유저 업데이트 - 특정 조건이 걸리면 그때마다 하나씩 보내기
-
-  // 쉴드 사용시 남은시간 - 10이라고 나옴 (미구현 상태)
-
-  // 카드 상호작용 팝업 창
-  // 빵야를 맞으면 쉴드 카드가 없을 때 한대 맞기(또는 피하기)
-  // 쉴드가 있으면 쓸지 말지 선택하고 막거나 맞기(또는 피하기)
-  // (만약에?) 한대 맞았는데 상대가 장착한 무기가 데저트 이글이면 체력 두배 감소
-  // 나머지 룰은 클라이언트에서 처리
-
-  resetStateInfoAllUsers() {
-    Object.values(this.users).forEach((roomUser) => {
-      roomUser.character.stateInfo.state = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-      roomUser.character.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-      roomUser.character.stateInfo.stateTargetUserId = null;
-      roomUser.character.stateInfo.nextStateAt = null;
-    });
-    console.log("All users' state info have been reset.");
   }
 }
 
