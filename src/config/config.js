@@ -39,6 +39,8 @@ import {
   PHASE_TYPE,
   WIN_TYPE,
   CARD_POOL,
+  WARNING_TYPE,
+  ANIMATION_TYPE,
 } from '../constants/header.js';
 
 const config = {
@@ -92,6 +94,8 @@ const config = {
   intervalType: INTERVAL_TYPE,
   phaseType: PHASE_TYPE,
   winType: WIN_TYPE,
+  warningType: WARNING_TYPE,
+  animationType: ANIMATION_TYPE,
 };
 
 export default config;

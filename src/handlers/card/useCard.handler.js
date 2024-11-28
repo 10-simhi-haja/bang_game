@@ -84,8 +84,10 @@ const useCardHandler = ({ socket, payload }) => {
         break;
 
       //^ 유틸
-      // case CARD_TYPE.HALLUCINATION:
       case CARD_TYPE.ABSORB:
+        break;
+      case CARD_TYPE.HALLUCINATION:
+        break;
       case CARD_TYPE.FLEA_MARKET:
         // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
         const fleaMarket = new FleaMarket(room);
@@ -93,7 +95,10 @@ const useCardHandler = ({ socket, payload }) => {
         fleaMarketNotification(room, user);
         break;
       case CARD_TYPE.MATURED_SAVINGS:
+        room.MaturedSavings(user.id);
+        break;
       case CARD_TYPE.WIN_LOTTERY:
+        room.winLottery(user.id);
         break;
 
       //^ 디버프
@@ -101,6 +106,7 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.SATELLITE_TARGET:
       case CARD_TYPE.BOMB:
         room.addbuffs(targetId, cardType);
+        room.setBoomUpdateInterval();
         break;
 
       //^ 무기
