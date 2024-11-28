@@ -46,6 +46,9 @@ class Game {
     this.fleaMarket = null;
   }
 
+  remove() {
+    this.intervalManager.clearAll();
+  }
   // 들어온 순서대로 반영.
   // 유저의 계정 user클래스
   getAllUsers() {
@@ -257,9 +260,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 2;
+        userEntry.character.hp = 1;
       } else {
-        userEntry.character.hp = 2;
+        userEntry.character.hp = 1;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -344,15 +347,14 @@ class Game {
     // console.log('새로운카드'+giveCard)
     // console.log('보유중이던 카드'+handCard)
     // console.log('새롭게 추가된 카드'+newHandCard)
-    return this.getCharacter(userId).handCards = newHandCard
+    return (this.getCharacter(userId).handCards = newHandCard);
   }
   winLottery(userId) {
     const giveCard = this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
-    return this.getCharacter(userId).handCards = newHandCard
+    return (this.getCharacter(userId).handCards = newHandCard);
   }
-
 
   // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {
@@ -517,12 +519,9 @@ class Game {
 
     this.winnerUpdate(gameEndNotiData);
     if (gameEndNotiData.winners !== null) {
-      gameEndNotification(this.getAllUsers(), gameEndNotiData);
-      removeGameSessionById(this.id);
+      gameEndNotification(this.getAllUsers(), this.id, gameEndNotiData);
+      return;
     }
-
-    // // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
-    // // users 노티보낼유저배열, payload 보낼데이터
     userUpdateNotification(this);
   }
 
