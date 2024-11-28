@@ -41,6 +41,7 @@ import {
   CARD_POOL,
   WARNING_TYPE,
   ANIMATION_TYPE,
+  PROBABILITY,
 } from '../constants/header.js';
 
 const config = {
@@ -96,6 +97,7 @@ const config = {
   winType: WIN_TYPE,
   warningType: WARNING_TYPE,
   animationType: ANIMATION_TYPE,
+  probability: PROBABILITY,
 };
 
 export default config;

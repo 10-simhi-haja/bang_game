@@ -297,3 +297,7 @@ export const ANIMATION_TYPE = {
   BOMB_ANIMATION: 2,
   SHIELD_ANIMATION: 3,
 };
+
+export const PROBABILITY = {
+  AUTO_SHIELD: 100,
+};
