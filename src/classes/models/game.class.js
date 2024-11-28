@@ -549,12 +549,11 @@ class Game {
     );
   }
 
-  setBoomUpdateInterval() {
-    // dk!!!!!
+  setBoomUpdateInterval(targetUser) {
     console.log('폭탄 인터벌!!!');
     this.intervalManager.addGameInterval(
       this.id,
-      () => warningNotification(this),
+      () => warningNotification(this, targetUser),
       INTERVAL.BOMB, // 5초 뒤..
       INTERVAL_TYPE.BOMB,
     );

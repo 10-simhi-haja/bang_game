@@ -46,9 +46,11 @@ const useCardHandler = ({ socket, payload }) => {
     switch (cardType) {
       //^ 공격
       case CARD_TYPE.BBANG:
-        const isOutoShield = targetUser.character.equips.includes(19);
-        if (isOutoShield) {
+        const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
+        const isOutoShield = targetUser.character.equips.includes(config.card.cardType.AUTO_SHIELD);
+        if (isOutoShield && range <= config.probability.AUTO_SHIELD) {
           console.log('자동 실드가 방어해줌!');
+          // 아래 noti가 실행되면 빵야 사용한 사람의 카드가 안 줄어든다.
           animationNotification(room, config.animationType.SHIELD_ANIMATION, targetUser);
           break;
         }
@@ -114,7 +116,7 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.SATELLITE_TARGET:
       case CARD_TYPE.BOMB:
         room.addbuffs(targetId, cardType);
-        room.setBoomUpdateInterval();
+        room.setBoomUpdateInterval(targetUser);
         break;
 
       //^ 무기
@@ -139,7 +141,7 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.RADAR:
       case CARD_TYPE.AUTO_SHIELD:
         console.log('자동 실드 장착!');
-        room.addEquip(targeId, cardType);
+        room.addEquip(targetId, cardType);
         break;
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함

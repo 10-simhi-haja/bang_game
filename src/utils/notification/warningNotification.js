@@ -2,7 +2,7 @@ import config from '../../config/config.js';
 import { createResponse } from '../packet/response/createResponse.js';
 import animationNotification from './animationNotification.js';
 
-const warningNotification = (game) => {
+const warningNotification = (game, targetUser) => {
   const users = game.getAllUsers();
 
   const responseData = {
@@ -27,7 +27,7 @@ const warningNotification = (game) => {
   // 폭발 터지는 애니 & 실제 HP 닳기...
   game.intervalManager.addGameInterval(
     game.id,
-    () => animationNotification(game, config.animationType.BOMB_ANIMATION),
+    () => animationNotification(game, config.animationType.BOMB_ANIMATION, targetUser),
     config.interval.BOMB_ANIMATION,
     config.intervalType.BOMB_ANIMATION,
   );
