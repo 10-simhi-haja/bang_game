@@ -7,7 +7,6 @@ import CardDeck from './cardDeck.class.js';
 import warningNotification from '../../utils/notification/warningNotification.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
-import handleAnimationNotification from '../../utils/notification/animation.notification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -434,58 +433,6 @@ class Game {
 
   nextPhase() {
     if (this.phase === PHASE_TYPE.END) {
-      // 페이즈가 시작할 때 모든 유저의 정보 조회
-      Object.values(this.users).forEach(({ user, character }) => {
-        // 만약에 유저가 디버프로 감금장치 장착 시 75퍼센트 확률로 특정 죄표로 이동
-        if (character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT)) {
-          if (Math.random() >= 0.75) {
-            user.setPos(0, 0);
-          }
-          // 발동 후 제거
-          const index = character.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
-          if (index !== -1) {
-            character.debuffs.splice(index, 1);
-          }
-        }
-
-        // 만약에 디버프 칸에 위성 타겟이 있을 경우
-        if (character.debuffs.includes(CARD_TYPE.SATELLITE_TARGET)) {
-          const triggerChance = Math.random() < 0.3;
-
-          if (triggerChance) {
-            // 효과가 발동되었을 때
-            character.hp -= 1;
-            handleAnimationNotification({
-              socket: user.socket,
-              payload: {
-                userId: user.id,
-                animationType: 1,
-              },
-            });
-            // 디버프 제거
-            const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
-            if (index !== -1) {
-              character.debuffs.splice(index, 1);
-            }
-          } else {
-            // 효과가 발동하지 않았을 때 전이
-            // 자신의 디버프 제거
-            const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
-            if (index !== -1) {
-              character.debuffs.splice(index, 1);
-            }
-
-            // 전이된 유저의 디버프 칸에 위성 타겟 추가
-            const nextUserId = this.findRandomSurvivingUser(user.id);
-            if (nextUserId !== null) {
-              this.users[nextUserId].character.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
-            }
-          }
-        }
-      });
-
-      // 모든 로직 종료 후 유저 정보 업데이트
-      userUpdateNotification(this);
       this.phase = PHASE_TYPE.DAY;
     } else if (this.phase === PHASE_TYPE.DAY) {
       this.phase = PHASE_TYPE.END;

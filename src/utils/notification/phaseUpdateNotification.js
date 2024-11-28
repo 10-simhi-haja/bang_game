@@ -1,7 +1,9 @@
 import config from '../../config/config.js';
-import { PHASE_TYPE } from '../../constants/header.js';
+import { CARD_TYPE, PHASE_TYPE } from '../../constants/header.js';
 import { createResponse } from '../packet/response/createResponse.js';
 import handCardNotification from './handCardsNotification.js';
+import handleAnimationNotification from './animation.notification.js';
+import userUpdateNotification from './userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -56,6 +58,72 @@ const phaseUpdateNotification = (game) => {
       userCharacter.handCards.push(...drawCard);
 
       handCardNotification(notiUser, game);
+
+      ////////////////////////////////////////////
+      // 페이즈가 시작할 때 모든 유저의 정보 조회
+      // 방에 들어온 순서대로 유저의 정보 조회
+      const userDatas = game.getAllUserDatas();
+      userDatas.forEach(({ id, nickname, character }) => {
+        const originalUser = game.users[id];
+
+        // 유저가 디버프로 감금장치 장착 시 75퍼센트 확률로 특정 좌표로 이동
+        if (character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT)) {
+          if (Math.random() >= 0.75) {
+            originalUser.user.setPos(0, 0);
+          }
+          // 발동 후 제거
+          const index = character.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
+          if (index !== -1) {
+            character.debuffs.splice(index, 1);
+          }
+        }
+
+        // 디버프 칸에 위성 타겟이 있을 경우
+        if (character.debuffs.includes(CARD_TYPE.SATELLITE_TARGET)) {
+          const triggerChance = Math.random() < 0.3;
+
+          if (triggerChance) {
+            // 효과가 발동되었을 때
+            character.hp -= 1;
+
+            handleAnimationNotification({
+              socket: originalUser.user.socket,
+              payload: {
+                userId: originalUser.user.id,
+                animationType: 1,
+              },
+            });
+            // 디버프 제거
+            const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+            if (index !== -1) {
+              character.debuffs.splice(index, 1);
+            }
+          } else {
+            // 효과가 발동하지 않았을 때 전이
+            // 자신의 디버프 제거
+            const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+            if (index !== -1) {
+              character.debuffs.splice(index, 1);
+            }
+
+            // 다음 살아있는 유저에게 디버프 전이
+            try {
+              const nextUser = game.getNextUser(id);
+              const nextUserId = nextUser.id;
+              game.users[nextUserId].character.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
+            } catch (err) {
+              // 만약 생존 유저가 없으면 로그 출력
+              console.error('No surviving users available to transfer the debuff.');
+            }
+          }
+        }
+
+        // 업데이트된 유저 데이터 반영 (필요에 따라)
+        game.users[id].character = { ...character };
+      });
+
+      // 모든 로직 종료 후 유저 정보 업데이트
+      userUpdateNotification(game);
     }
   });
 
