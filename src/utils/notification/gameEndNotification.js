@@ -1,4 +1,5 @@
 import config from '../../config/config.js';
+import { removeGameSessionById } from '../../sessions/game.session.js';
 import { createResponse } from '../packet/response/createResponse.js';
 
 const {
@@ -8,7 +9,7 @@ const {
 } = config;
 
 // 게임시작 알림
-const gameEndNotification = (users, payload) => {
+const gameEndNotification = (users, gameId, payload) => {
   users.forEach((notiUser) => {
     const noti = createResponse(
       PACKET_TYPE.GAME_END_NOTIFICATION,
@@ -17,6 +18,7 @@ const gameEndNotification = (users, payload) => {
     );
     notiUser.socket.write(noti);
   });
+  removeGameSessionById(gameId);
 };
 
 export default gameEndNotification;

@@ -46,6 +46,9 @@ class Game {
     this.fleaMarket = null;
   }
 
+  remove() {
+    this.intervalManager.clearAll();
+  }
   // 들어온 순서대로 반영.
   // 유저의 계정 user클래스
   getAllUsers() {
@@ -219,6 +222,7 @@ class Game {
       handCards: [],
       bbangCount: 0,
       handCardsCount: 0,
+      autoShield: false,
     };
 
     this.users[user.id] = {
@@ -257,9 +261,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 2;
+        userEntry.character.hp = 1;
       } else {
-        userEntry.character.hp = 2;
+        userEntry.character.hp = 1;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -279,7 +283,13 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [19];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [];
+      userEntry.character.handCards = [
+        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
+        { type: CARD_TYPE.BOMB, count: 1 },
+        { type: CARD_TYPE.BBANG, count: 5 },
+        { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
+        { type: CARD_TYPE.SHIELD, count: 1 },
+      ];
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(
         ...drawCard,
@@ -290,6 +300,7 @@ class Game {
       );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
+      userEntry.character.autoShield = false;
     });
   }
 
@@ -532,12 +543,9 @@ class Game {
 
     this.winnerUpdate(gameEndNotiData);
     if (gameEndNotiData.winners !== null) {
-      gameEndNotification(this.getAllUsers(), gameEndNotiData);
-      removeGameSessionById(this.id);
+      gameEndNotification(this.getAllUsers(), this.id, gameEndNotiData);
+      return;
     }
-
-    // // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
-    // // users 노티보낼유저배열, payload 보낼데이터
     userUpdateNotification(this);
   }
 
@@ -561,11 +569,11 @@ class Game {
     );
   }
 
-  setBoomUpdateInterval() {
+  setBoomUpdateInterval(targetUser) {
     console.log('폭탄 인터벌!!!');
     this.intervalManager.addGameInterval(
       this.id,
-      () => warningNotification(this),
+      () => warningNotification(this, targetUser),
       INTERVAL.BOMB, // 5초 뒤..
       INTERVAL_TYPE.BOMB,
     );

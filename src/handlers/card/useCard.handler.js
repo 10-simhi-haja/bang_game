@@ -8,6 +8,7 @@ import useCardNotification from '../../utils/notification/useCardNotification.js
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import fleaMarketNotification from '../../utils/notification/fleaMarketNotification.js';
 import FleaMarket from '../../classes/models/fleaMarket.js';
+import animationNotification from '../../utils/notification/animationNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -19,7 +20,7 @@ const {
 const useCardHandler = ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
-    console.log(`useCard 실행 ${cardType}`);
+    console.log(`useCard 실행 ${cardType}, tartgetId: ${targetUserId.low}`);
 
     const targetId = targetUserId.low;
     const user = getUserBySocket(socket);
@@ -38,11 +39,20 @@ const useCardHandler = ({ socket, payload }) => {
      * 선택 여부를 결정하는데 주어진 시간을 카드별로 3~5초)
      */
 
+    const targetUser = room.getAllUserDatas().find((user) => user.id === targetId);
     const userStateInfo = room.getCharacter(user.id).stateInfo;
 
     switch (cardType) {
       //^ 공격
       case CARD_TYPE.BBANG:
+        const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
+        const isOutoShield = targetUser.character.equips.includes(config.card.cardType.AUTO_SHIELD);
+        if (isOutoShield && range <= config.probability.AUTO_SHIELD) {
+          console.log('자동 실드가 방어해줌!');
+          // 아래 noti가 실행되면 빵야 사용한 사람의 카드가 안 줄어든다.
+          animationNotification(room, config.animationType.SHIELD_ANIMATION, targetUser);
+          break;
+        }
         room.setCharacterState(
           user.id,
           CHARACTER_STATE_TYPE.BBANG_SHOOTER,
@@ -110,7 +120,7 @@ const useCardHandler = ({ socket, payload }) => {
         break;
       case CARD_TYPE.BOMB:
         room.addbuffs(targetId, cardType);
-        room.setBoomUpdateInterval();
+        room.setBoomUpdateInterval(targetUser);
         break;
 
       //^ 무기
@@ -139,8 +149,9 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.RADAR:
         break;
       case CARD_TYPE.AUTO_SHIELD:
+        console.log('자동 실드 장착!');
+        room.addEquip(targetId, cardType);
         break;
-
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
         // console.log('전', responsePayload);
