@@ -28,7 +28,7 @@ const userUpdateNotification = (game) => {
       user: userData,
     };
 
-    const allUser = game.getLiveUsers();
+    const allUser = game.getAllUsers();
 
     allUser.forEach((notiUser) => {
       if (
