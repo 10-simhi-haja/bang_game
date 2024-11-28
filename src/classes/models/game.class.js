@@ -114,7 +114,7 @@ class Game {
    * @param {현재상태} curState
    * @param {현재상태 종료시 상태} nextState
    * @param {현재상태 지속시간 sec} time
-   * @param {타겟 id 없으면 본인} targetId
+   * @param {타겟 id 없으면 0} targetId
    */
   setCharacterState(curUserId, curState, nextState, time, targetId) {
     const character = this.getCharacter(curUserId);
@@ -124,51 +124,52 @@ class Game {
     character.stateInfo.nextStateAt = Date.now() + time * 1000;
     character.stateInfo.stateTargetUserId = targetId;
 
-    switch (curState) {
-      case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
-        this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
-        break;
-      case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
-        break;
-      case CHARACTER_STATE_TYPE.BBANG_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.DEATH_MATCH_STATE:
-        break;
-      case CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE:
-        break;
-      case CHARACTER_STATE_TYPE.FLEA_MARKET_TURN:
-        // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
-        this.intervalManager.addInterval(
-          curUserId,
-          () => setFleaMarketPickInterval(this, this.users[curUserId].user),
-          time,
-          INTERVAL_TYPE.CHARACTER_STATE,
-        );
-        break;
-      case CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT:
-        break;
-      case CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER:
-        break;
-      case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER:
-        break;
-      case CHARACTER_STATE_TYPE.BIG_BBANG_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.ABSORBING:
-        break;
-      case CHARACTER_STATE_TYPE.ABSORB_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.HALLUCINATING:
-        break;
-      case CHARACTER_STATE_TYPE.HALLUCINATION_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.CONTAINED:
-        break;
+    if (targetId)
+      switch (curState) {
+        case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
+          this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
+          break;
+        case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
+          break;
+        case CHARACTER_STATE_TYPE.BBANG_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.DEATH_MATCH_STATE:
+          break;
+        case CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE:
+          break;
+        case CHARACTER_STATE_TYPE.FLEA_MARKET_TURN:
+          // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
+          this.intervalManager.addInterval(
+            curUserId,
+            () => setFleaMarketPickInterval(this, this.users[curUserId].user),
+            time,
+            INTERVAL_TYPE.CHARACTER_STATE,
+          );
+          break;
+        case CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT:
+          break;
+        case CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER:
+          break;
+        case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER:
+          break;
+        case CHARACTER_STATE_TYPE.BIG_BBANG_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.ABSORBING:
+          break;
+        case CHARACTER_STATE_TYPE.ABSORB_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.HALLUCINATING:
+          break;
+        case CHARACTER_STATE_TYPE.HALLUCINATION_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.CONTAINED:
+          break;
 
-      default:
-        break;
-    }
+        default:
+          break;
+      }
 
     updateNotification(this, this.users[curUserId].user);
   }
@@ -225,7 +226,7 @@ class Game {
       prevStateInfo: {
         ...defaultStateInfo,
       },
-      isDeath: false,
+      isDeath: false, // 본인이 죽었는지를 몰라서 추가했던 변수, 반영되는거 없음.
     };
     this.userOrder.push(user.id);
   }

@@ -89,10 +89,18 @@ const handleReactionRequest = async ({ socket, payload }) => {
         console.error(`User with id ${user.id} not found in room users or already dead.`);
       }
       // 리셋을 전체유저에게 하는게 아니라
-      // 나만 리셋을 해야함.
+      // 나랑 나를 공격한 사람을 리셋해야함.
       // room.resetStateInfoAllUsers();
       room.setCharacterState(
         user.id,
+        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        0,
+        0,
+      );
+      const attackerId = room.users[user.id].attackerId;
+      room.setCharacterState(
+        room.users[attackerId].user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         0,
