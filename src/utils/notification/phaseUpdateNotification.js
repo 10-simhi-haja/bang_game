@@ -63,7 +63,8 @@ const phaseUpdateNotification = (game) => {
       // 페이즈가 시작할 때 모든 유저의 정보 조회
       // 방에 들어온 순서대로 유저의 정보 조회
       const userDatas = game.getAllUserDatas();
-      userDatas.forEach(({ id, nickname, character }) => {
+
+      userDatas.forEach(({ id, character }) => {
         const originalUser = game.users[id];
 
         // 유저가 디버프로 감금장치 장착 시 75퍼센트 확률로 특정 좌표로 이동
@@ -109,20 +110,23 @@ const phaseUpdateNotification = (game) => {
             // 다음 살아있는 유저에게 디버프 전이
             try {
               const nextUser = game.getNextUser(id);
-              const nextUserId = nextUser.id;
-              game.users[nextUserId].character.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
+              console.log('nextUser: ', nextUser);
+
+              // 다음 유저가 현재 유저와 다르면 디버프를 전달
+              if (nextUser.id !== id) {
+                game.users[nextUser.id].character.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
+                console.log(`Debuff transferred to User ${nextUser.id}`);
+              } else {
+                console.error('Next user is the same as the current user.');
+              }
             } catch (err) {
               // 만약 생존 유저가 없으면 로그 출력
               console.error('No surviving users available to transfer the debuff.');
             }
           }
         }
-
-        // 업데이트된 유저 데이터 반영 (필요에 따라)
-        game.users[id].character = { ...character };
       });
 
-      // 모든 로직 종료 후 유저 정보 업데이트
       userUpdateNotification(game);
     }
   });

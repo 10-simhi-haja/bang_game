@@ -6,7 +6,6 @@ import cardEffectNotification from '../../utils/notification/cardEffectNotificat
 import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import fleaMarketNotification from '../../utils/notification/fleaMarketNotification.js';
 import FleaMarket from '../../classes/models/fleaMarket.js';
 
@@ -104,10 +103,10 @@ const useCardHandler = ({ socket, payload }) => {
 
       //^ 디버프
       case CARD_TYPE.CONTAINMENT_UNIT:
-        room.addbuffs(targeId, cardType);
+        room.addbuffs(targetId, cardType);
         break;
       case CARD_TYPE.SATELLITE_TARGET:
-        room.addbuffs(targeId, cardType);
+        room.addbuffs(targetId, cardType);
         break;
       case CARD_TYPE.BOMB:
         room.addbuffs(targetId, cardType);
