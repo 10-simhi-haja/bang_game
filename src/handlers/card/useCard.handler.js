@@ -127,7 +127,7 @@ const useCardHandler = ({ socket, payload }) => {
     }
 
     // 유저 업데이트 노티피케이션 발송
-    userUpdateNotification(room);
+    // userUpdateNotification(room);
 
     // 카드 사용 노티피케이션 발송
     useCardNotification(socket, user.id, room, payload);

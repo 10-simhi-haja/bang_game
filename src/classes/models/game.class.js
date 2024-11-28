@@ -6,6 +6,7 @@ import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
+import updateNotification from '../../utils/notification/updateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -81,7 +82,7 @@ class Game {
     const userDatas = this.userOrder.map((id) => ({
       id: this.users[id].user.id,
       nickname: this.users[id].user.nickname,
-      character: { ...this.users[id].character },
+      character: this.users[id].character,
     }));
 
     return userDatas;
@@ -168,8 +169,11 @@ class Game {
       default:
         break;
     }
+
+    updateNotification(this, this.users[curUserId].user);
   }
 
+  // 살아있는 애들만 none으로 한번 초기화
   setAllUserNone() {
     const allUsers = this.getLiveUsers();
     allUsers.forEach((curUser) => {
@@ -221,6 +225,7 @@ class Game {
       prevStateInfo: {
         ...defaultStateInfo,
       },
+      isDeath: false,
     };
     this.userOrder.push(user.id);
   }
@@ -250,13 +255,13 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 2;
       } else {
         userEntry.character.hp = 2;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
-        userEntry.character.hp++;
+        //userEntry.character.hp++;
         this.targetCount++;
       } else if (roleType === ROLE_TYPE.HITMAN) {
         this.hitmanCount++;
@@ -453,21 +458,53 @@ class Game {
   // 주기적으로 플레이어들의 체력상태를 확인하여 어느 역할군이 몇명살아있나 확인해야 게임END 노티를 보낼수 있음.
   // 유저 업데이트 노티도 여기서 할듯
   gameUpdate() {
+    // 체력이 0이되면 죽도록 없데이트.
+    const userDatas = this.getAllUserDatas();
+    let targetCount = 0;
+    let hitmanCount = 0;
+    let psychopathCount = 0;
+
+    userDatas.forEach((user) => {
+      if (user.character.hp === 0) {
+        return;
+      }
+      // if (user.character.hp === 0 && this.users[user.id].isDeath === false) {
+      //   userUpdateNotification(this);
+      //   this.users[user.id].isDeath === true;
+      //   return;
+      // } else if (user.character.hp === 0 && this.users[user.id].isDeath === true) {
+      //   return;
+      // }
+
+      const roleType = user.character.roleType;
+
+      if (roleType === ROLE_TYPE.TARGET) {
+        targetCount++;
+      } else if (roleType === ROLE_TYPE.HITMAN) {
+        hitmanCount++;
+      } else if (roleType === ROLE_TYPE.PSYCHOPATH) {
+        psychopathCount++;
+      }
+    });
+
+    this.targetCount = targetCount;
+    this.hitmanCount = hitmanCount;
+    this.psychopathCount = psychopathCount;
+
     const gameEndNotiData = {
       winners: null,
       winType: 0,
     };
 
     this.winnerUpdate(gameEndNotiData);
-
-    // // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
-    // // users 노티보낼유저배열, payload 보낼데이터
-    // userUpdateNotification(this);
-
     if (gameEndNotiData.winners !== null) {
       gameEndNotification(this.getAllUsers(), gameEndNotiData);
       removeGameSessionById(this.id);
     }
+
+    // // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
+    // // users 노티보낼유저배열, payload 보낼데이터
+    userUpdateNotification(this);
   }
 
   ///////////////////// intervalManager 관련.
