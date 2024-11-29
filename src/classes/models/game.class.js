@@ -89,7 +89,7 @@ class Game {
   }
 
   // 유저의 데이터 캐릭터데이터를 포함.
-  // 참조가 아닌 깊은 복사.
+  // 참조형
   getAllUserDatas() {
     const userDatas = this.userOrder.map((id) => ({
       id: this.users[id].user.id,
@@ -323,6 +323,7 @@ class Game {
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
       userEntry.character.autoShield = false;
+      userEntry.character.maxBbangCount = 1;
     });
   }
 
