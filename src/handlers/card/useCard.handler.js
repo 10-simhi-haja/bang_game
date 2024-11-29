@@ -66,7 +66,7 @@ const useCardHandler = ({ socket, payload }) => {
           CHARACTER_STATE_TYPE.BBANG_TARGET,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
           3,
-          targetId,
+          user.id,
         );
         // 나를 쏜사람을 기억해두었다가 리액션하면 나를 쏜쪽도 스테이를 변경해주기위함.
         room.users[targetId].attackerId = user.id;

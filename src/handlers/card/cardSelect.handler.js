@@ -17,11 +17,6 @@ const cardSelectHandler = ({ socket, payload }) => {
     const { selectType, selectCardType } = payload;
     console.log(`selectType = ${selectType}, selectCardType = ${selectCardType}`);
 
-    // switch (selectCardType) {
-    //   case CARD_TYPE.HALLUCINATION:
-
-    // }
-
     const responsePayload = {
       success: true,
       failCode: GLOBAL_FAIL_CODE.NONE_FAILCODE,
