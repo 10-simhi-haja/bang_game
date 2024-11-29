@@ -21,7 +21,7 @@ const {
 const useCardHandler = ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
-
+    
     const targetId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
@@ -228,12 +228,6 @@ const useCardHandler = ({ socket, payload }) => {
           10,
           user.id,
         );
-
-        // ABSORBING = 11;             // 흡수 중
-        // ABSORB_TARGET = 12;         // 흡수 대상
-        // HALLUCINATING = 13;         // 신기루 중
-        // HALLUCINATION_TARGET = 14;  // 신기루 대상
-        // CONTAINED = 15;             // 감금 중
         break;
       case CARD_TYPE.FLEA_MARKET:
         // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
