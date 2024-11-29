@@ -7,6 +7,7 @@ import CardDeck from './cardDeck.class.js';
 import warningNotification from '../../utils/notification/warningNotification.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
+import updateNotification from '../../utils/notification/updateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -45,6 +46,9 @@ class Game {
     this.fleaMarket = null;
   }
 
+  remove() {
+    this.intervalManager.clearAll();
+  }
   // 들어온 순서대로 반영.
   // 유저의 계정 user클래스
   getAllUsers() {
@@ -82,7 +86,7 @@ class Game {
     const userDatas = this.userOrder.map((id) => ({
       id: this.users[id].user.id,
       nickname: this.users[id].user.nickname,
-      character: { ...this.users[id].character },
+      character: this.users[id].character,
     }));
 
     return userDatas;
@@ -114,7 +118,7 @@ class Game {
    * @param {현재상태} curState
    * @param {현재상태 종료시 상태} nextState
    * @param {현재상태 지속시간 sec} time
-   * @param {타겟 id 없으면 본인} targetId
+   * @param {타겟 id 없으면 0} targetId
    */
   setCharacterState(curUserId, curState, nextState, time, targetId) {
     const character = this.getCharacter(curUserId);
@@ -124,53 +128,57 @@ class Game {
     character.stateInfo.nextStateAt = Date.now() + time * 1000;
     character.stateInfo.stateTargetUserId = targetId;
 
-    switch (curState) {
-      case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
-        this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
-        break;
-      case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
-        break;
-      case CHARACTER_STATE_TYPE.BBANG_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.DEATH_MATCH_STATE:
-        break;
-      case CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE:
-        break;
-      case CHARACTER_STATE_TYPE.FLEA_MARKET_TURN:
-        // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
-        this.intervalManager.addInterval(
-          curUserId,
-          () => setFleaMarketPickInterval(this, this.users[curUserId].user),
-          time,
-          INTERVAL_TYPE.CHARACTER_STATE,
-        );
-        break;
-      case CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT:
-        break;
-      case CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER:
-        break;
-      case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER:
-        break;
-      case CHARACTER_STATE_TYPE.BIG_BBANG_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.ABSORBING:
-        break;
-      case CHARACTER_STATE_TYPE.ABSORB_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.HALLUCINATING:
-        break;
-      case CHARACTER_STATE_TYPE.HALLUCINATION_TARGET:
-        break;
-      case CHARACTER_STATE_TYPE.CONTAINED:
-        break;
+    if (targetId)
+      switch (curState) {
+        case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
+          this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
+          break;
+        case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
+          break;
+        case CHARACTER_STATE_TYPE.BBANG_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.DEATH_MATCH_STATE:
+          break;
+        case CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE:
+          break;
+        case CHARACTER_STATE_TYPE.FLEA_MARKET_TURN:
+          // 선택안할경우를 대비해 자동으로 카드선택후 다음 유저에게 넘기는 것.
+          this.intervalManager.addInterval(
+            curUserId,
+            () => setFleaMarketPickInterval(this, this.users[curUserId].user),
+            time,
+            INTERVAL_TYPE.CHARACTER_STATE,
+          );
+          break;
+        case CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT:
+          break;
+        case CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER:
+          break;
+        case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER:
+          break;
+        case CHARACTER_STATE_TYPE.BIG_BBANG_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.ABSORBING:
+          break;
+        case CHARACTER_STATE_TYPE.ABSORB_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.HALLUCINATING:
+          break;
+        case CHARACTER_STATE_TYPE.HALLUCINATION_TARGET:
+          break;
+        case CHARACTER_STATE_TYPE.CONTAINED:
+          break;
 
-      default:
-        break;
-    }
+        default:
+          break;
+      }
+
+    updateNotification(this, this.users[curUserId].user);
   }
 
+  // 살아있는 애들만 none으로 한번 초기화
   setAllUserNone() {
     const allUsers = this.getLiveUsers();
     allUsers.forEach((curUser) => {
@@ -214,6 +222,7 @@ class Game {
       handCards: [],
       bbangCount: 0,
       handCardsCount: 0,
+      autoShield: false,
       shooterArr: [],
     };
 
@@ -223,6 +232,7 @@ class Game {
       prevStateInfo: {
         ...defaultStateInfo,
       },
+      isDeath: false, // 본인이 죽었는지를 몰라서 추가했던 변수, 반영되는거 없음.
     };
     this.userOrder.push(user.id);
   }
@@ -254,11 +264,11 @@ class Game {
       ) {
         userEntry.character.hp = 1;
       } else {
-        userEntry.character.hp = 2;
+        userEntry.character.hp = 1;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
-        userEntry.character.hp++;
+        //userEntry.character.hp++;
         this.targetCount++;
       } else if (roleType === ROLE_TYPE.HITMAN) {
         this.hitmanCount++;
@@ -276,7 +286,9 @@ class Game {
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         { type: CARD_TYPE.FLEA_MARKET, count: 1 },
-        { type: CARD_TYPE.BBANG, count: 1 },
+        { type: CARD_TYPE.BOMB, count: 1 },
+        { type: CARD_TYPE.BBANG, count: 5 },
+        { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
         { type: CARD_TYPE.SHIELD, count: 1 },
       ];
 
@@ -291,6 +303,7 @@ class Game {
       );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
+      userEntry.character.autoShield = false;
     });
   }
 
@@ -358,6 +371,7 @@ class Game {
     const giveCard = this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
+
     return (this.getCharacter(userId).handCards = newHandCard);
   }
 
@@ -715,21 +729,50 @@ class Game {
   // 주기적으로 플레이어들의 체력상태를 확인하여 어느 역할군이 몇명살아있나 확인해야 게임END 노티를 보낼수 있음.
   // 유저 업데이트 노티도 여기서 할듯
   gameUpdate() {
+    // 체력이 0이되면 죽도록 없데이트.
+    const userDatas = this.getAllUserDatas();
+    let targetCount = 0;
+    let hitmanCount = 0;
+    let psychopathCount = 0;
+
+    userDatas.forEach((user) => {
+      if (user.character.hp === 0) {
+        return;
+      }
+      // if (user.character.hp === 0 && this.users[user.id].isDeath === false) {
+      //   userUpdateNotification(this);
+      //   this.users[user.id].isDeath === true;
+      //   return;
+      // } else if (user.character.hp === 0 && this.users[user.id].isDeath === true) {
+      //   return;
+      // }
+
+      const roleType = user.character.roleType;
+
+      if (roleType === ROLE_TYPE.TARGET) {
+        targetCount++;
+      } else if (roleType === ROLE_TYPE.HITMAN) {
+        hitmanCount++;
+      } else if (roleType === ROLE_TYPE.PSYCHOPATH) {
+        psychopathCount++;
+      }
+    });
+
+    this.targetCount = targetCount;
+    this.hitmanCount = hitmanCount;
+    this.psychopathCount = psychopathCount;
+
     const gameEndNotiData = {
       winners: null,
       winType: 0,
     };
 
     this.winnerUpdate(gameEndNotiData);
-
-    // // 데이터들을 가공해서 데이터만 보내서 안에서 createResponse하게하면
-    // // users 노티보낼유저배열, payload 보낼데이터
-    // userUpdateNotification(this);
-
     if (gameEndNotiData.winners !== null) {
-      gameEndNotification(this.getAllUsers(), gameEndNotiData);
-      removeGameSessionById(this.id);
+      gameEndNotification(this.getAllUsers(), this.id, gameEndNotiData);
+      return;
     }
+    userUpdateNotification(this);
   }
 
   ///////////////////// intervalManager 관련.
@@ -752,11 +795,11 @@ class Game {
     );
   }
 
-  setBoomUpdateInterval() {
+  setBoomUpdateInterval(targetUser) {
     console.log('폭탄 인터벌!!!');
     this.intervalManager.addGameInterval(
       this.id,
-      () => warningNotification(this),
+      () => warningNotification(this, targetUser),
       INTERVAL.BOMB, // 5초 뒤..
       INTERVAL_TYPE.BOMB,
     );

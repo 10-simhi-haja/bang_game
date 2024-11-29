@@ -89,6 +89,12 @@ class IntervalManager extends BaseManager {
     this.intervals.forEach((userIntervals) => {
       userIntervals.forEach((intervalId) => clearInterval(intervalId));
     });
+
+    this.gameIntervals.forEach((Intervals) => {
+      Intervals.forEach((intervalId) => clearInterval(intervalId));
+    });
+
+    console.log(`인터버 전체 삭제`);
     this.intervals.clear();
     this.gameIntervals.clear();
   }

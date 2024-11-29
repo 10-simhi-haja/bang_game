@@ -8,6 +8,7 @@ const leaveRoomNotification = (socket, userId, room, ownerOut) => {
     userId: userId,
   };
 
+  console.log(`q방나가기`);
   let leaveRoomNotification;
   if (ownerOut === true) {
     // 방 주인이 나갔을 경우

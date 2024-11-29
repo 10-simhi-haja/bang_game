@@ -9,16 +9,20 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import fleaMarketNotification from '../../utils/notification/fleaMarketNotification.js';
 import FleaMarket from '../../classes/models/fleaMarket.js';
+import animationNotification from '../../utils/notification/animationNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
   card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
+  character: { characterStateType: CHARACTER_STATE_TYPE },
 } = config;
 
 const useCardHandler = ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
+    console.log(`useCard 실행 ${cardType}, tartgetId: ${targetUserId.low}`);
+
     const targetId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
@@ -39,9 +43,36 @@ const useCardHandler = ({ socket, payload }) => {
      * 선택 여부를 결정하는데 주어진 시간을 카드별로 3~5초)
      */
 
+    const targetUser = room.getAllUserDatas().find((user) => user.id === targetId);
+    const userStateInfo = room.getCharacter(user.id).stateInfo;
+
     switch (cardType) {
       //^ 공격
       case CARD_TYPE.BBANG:
+        const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
+        const isOutoShield = targetUser.character.equips.includes(config.card.cardType.AUTO_SHIELD);
+        if (isOutoShield && range <= config.probability.AUTO_SHIELD) {
+          console.log('자동 실드가 방어해줌!');
+          // 아래 noti가 실행되면 빵야 사용한 사람의 카드가 안 줄어든다.
+          animationNotification(room, config.animationType.SHIELD_ANIMATION, targetUser);
+          break;
+        }
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.BBANG_SHOOTER,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        room.setCharacterState(
+          targetId,
+          CHARACTER_STATE_TYPE.BBANG_TARGET,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        // 나를 쏜사람을 기억해두었다가 리액션하면 나를 쏜쪽도 스테이를 변경해주기위함.
+        room.users[targetId].attackerId = user.id;
         console.log(`빵야카드사용시 payload: ${JSON.stringify(payload, null, 2)}`);
         room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
         // room.BbangShooterStateInfo(user.id, targetId, 10000);
@@ -123,8 +154,8 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.CONTAINMENT_UNIT:
       case CARD_TYPE.SATELLITE_TARGET:
       case CARD_TYPE.BOMB:
-        room.addbuffs(targeId, cardType);
-        room.setBoomUpdateInterval();
+        room.addbuffs(targetId, cardType);
+        room.setBoomUpdateInterval(targetUser);
         break;
 
       //^ 무기
@@ -148,6 +179,9 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.LASER_POINTER:
       case CARD_TYPE.RADAR:
       case CARD_TYPE.AUTO_SHIELD:
+        console.log('자동 실드 장착!');
+        room.addEquip(targetId, cardType);
+        break;
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
         if (room.getCharacter(user.id).equips.includes(cardType)) {
@@ -167,7 +201,7 @@ const useCardHandler = ({ socket, payload }) => {
     }
 
     // 유저 업데이트 노티피케이션 발송
-    userUpdateNotification(room);
+    // userUpdateNotification(room);
 
     // 카드 사용 노티피케이션 발송
     useCardNotification(socket, user.id, room, payload);

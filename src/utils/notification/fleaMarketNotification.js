@@ -63,10 +63,6 @@ const setFleaMarketPickInterval = (game, user) => {
 const fleaMarketNotification = (game, user) => {
   const liveUsers = game.getLiveUsers();
 
-  const fleaMarket = game.fleaMarket;
-
-  game.fleaMarket = fleaMarket;
-
   const fleaMarketNotiData = {
     cardTypes: game.fleaMarket.cards,
     pickIndex: game.fleaMarket.indexs,
