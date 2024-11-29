@@ -38,50 +38,15 @@ const handleReactionRequest = async ({ socket, payload }) => {
 
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
+    const users = room.getAllUserDatas();
 
     if (!room.users || !room.users[user.id]) {
       throw new Error(`User with id ${user.id} not found in room users.`);
     }
 
-    // 클라이언트에서 낫 유즈 카드 타입을 보내는 조건을 모르겠음
-    // 임시 수정 사항 - 쉴드를 사용하면 쉴드 카드 한장을 줄이고 공격 전 상태로 돌림
-    // 쉴드가 없거나 피해받기를 누르면 클라이언트에서는 논 리액션 타입으로 보냄
-    // 기능은 정상 작동하나 의문점이 많음
-
-    // let defenseUsed = false;
-    // let timer = null;
-    //
-    // // 방어 반응 시 이벤트 핸들러 등록
-    // console.log('Registering defenseResponse event listener for socket:', socket.id);
-    //
-    // socket.once('defenseResponse', (reactionType) => {
-    //   console.log('defenseResponse event received:', reactionType);
-    //   clearTimeout(timer); // 타이머 멈춤
-    //
-    //   if (reactionType === REACTION_TYPE.NOT_USE_CARD) {
-    //     console.log(`Defense card used by user ${user.id}`);
-    //     if (room.users && room.users[user.id]) {
-    //       room.resetStateInfoAllUsers();
-    //       userUpdateNotification(room);
-    //       defenseUsed = true;
-    //     } else {
-    //       console.error(`User with id ${user.id} not found in room users.`);
-    //     }
-    //   } else {
-    //     console.log(`No defense card used by user ${user.id}`);
-    //     if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
-    //       room.users[user.id].character.hp -= 1;
-    //     } else {
-    //       console.error(`User with id ${user.id} not found in room users or already dead.`);
-    //     }
-    //     room.resetStateInfoAllUsers();
-    //     userUpdateNotification(room);
-    //   }
-    // });
-
-    // `reactionType`가 NONE_REACTION이거나 아무 반응이 없는 경우 즉시 피해 적용
+    // `reactionType`가 NONE_REACTION일시 피해 적용
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
-      console.log(`Immediate damage applied to user ${user.id}`);
+      console.log('피해받기 선택');
       if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
         room.users[user.id].character.hp -= 1;
         console.log(`유저 체력: ${room.users[user.id].character.hp}`);
@@ -91,6 +56,8 @@ const handleReactionRequest = async ({ socket, payload }) => {
       // 리셋을 전체유저에게 하는게 아니라
       // 나랑 나를 공격한 사람을 리셋해야함.
       // room.resetStateInfoAllUsers();
+      const target = room.getCharacter(user.id);
+      const targetId = target.stateInfo.stateTargetUserId;
       room.setCharacterState(
         user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
@@ -98,15 +65,14 @@ const handleReactionRequest = async ({ socket, payload }) => {
         0,
         0,
       );
-      const attackerId = room.users[user.id].attackerId;
       room.setCharacterState(
-        room.users[attackerId].user.id,
+        room.users[targetId].user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         0,
         0,
       );
-      userUpdateNotification(room);
+      // userUpdateNotification(room);
     }
 
     // 리액션 처리 완료 후 응답 전송
@@ -119,13 +85,13 @@ const handleReactionRequest = async ({ socket, payload }) => {
       socket.sequence,
       reactionResponseData,
     );
-    console.log('handleReactionRequest - Sending response:', reactionResponse);
 
     if (typeof socket.write === 'function') {
       socket.write(reactionResponse);
     } else {
       throw new Error('socket.write is not a function');
     }
+    console.log('reaction핸들러 작동 끝');
   } catch (error) {
     console.error('리액션 처리 중 에러 발생:', error.message);
 
