@@ -38,7 +38,8 @@ const handleReactionRequest = async ({ socket, payload }) => {
     const users = game.getAllUserDatas();
     // 나
     const character = game.getCharacter(user.id);
-    const attCharacter = game.getCharacter(character.stateInfo.targetId);
+    console.dir(character, null);
+    const attCharacter = game.getCharacter(character.stateInfo.stateTargetUserId);
 
     if (!game.users || !game.users[user.id]) {
       throw new Error(`User with id ${user.id} not found in game users.`);
@@ -47,6 +48,7 @@ const handleReactionRequest = async ({ socket, payload }) => {
     // `reactionType`가 NONE_REACTION일시 피해 적용
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
       // 대미지 받는 부분
+
       if (game.users && game.users[user.id] && game.users[user.id].character.hp > 0) {
         game.users[user.id].character.hp -= 1;
         console.log(`유저 체력: ${game.users[user.id].character.hp}`);

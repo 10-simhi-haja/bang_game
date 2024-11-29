@@ -225,7 +225,7 @@ class Game {
       state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
       nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
       nextStateAt: 0,
-      targetId: 0,
+      stateTargetUserId: 0,
     };
 
     // 캐릭터 데이터
