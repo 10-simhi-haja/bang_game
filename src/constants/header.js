@@ -299,5 +299,5 @@ export const ANIMATION_TYPE = {
 };
 
 export const PROBABILITY = {
-  AUTO_SHIELD: 100,
+  AUTO_SHIELD: 25,
 };
