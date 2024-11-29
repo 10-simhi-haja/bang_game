@@ -247,6 +247,7 @@ export const INTERVAL = {
   FLEA_MARKET_PICK: 10,
   BOMB: 5,
   BOMB_ANIMATION: 5,
+  ATTACK: 3,
 };
 
 export const INTERVAL_TYPE = {

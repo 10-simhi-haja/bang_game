@@ -9,18 +9,16 @@ const {
   intervalType: INTERVAL_TYPE,
 } = config;
 
-export const bbangInterval = (game, user) => {
-  console.log('빵 인터벌 실행');
-  console.log(`${game.getCharacter(user.id).stateInfo.state}`);
-  if (game.getCharacter(user.id).stateInfo.state !== CHARACTER_STATE_TYPE.BBANG_SHOOTER) {
+export const guerrillaInterval = (game, user) => {
+  if (game.getCharacter(user.id).stateInfo.state !== CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER) {
     return;
   }
   const targetId = game.getCharacter(user.id).stateInfo.stateTargetUserId;
 
-  console.log(`쉴드나 피해입는걸 선택 안함`);
+  console.log(`빵야나 피해입는걸 선택 안함`);
 
   if (
-    game.getCharacter(targetId).stateInfo.state === CHARACTER_STATE_TYPE.BBANG_TARGET &&
+    game.getCharacter(targetId).stateInfo.state === CHARACTER_STATE_TYPE.GUERRILLA_TARGET &&
     game.users[targetId].character.hp > 0
   ) {
     console.log(`${targetId}의 hp 감소`);
@@ -41,6 +39,4 @@ export const bbangInterval = (game, user) => {
     0,
     0,
   );
-
-  game.intervalManager.removeIntervalByType(user.id, INTERVAL_TYPE.CHARACTER_STATE);
 };
