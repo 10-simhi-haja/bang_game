@@ -64,7 +64,7 @@ const useCardHandler = ({ socket, payload }) => {
             user.id,
           );
           console.log(
-            `bigbbang state: ${JSON.stringify(room.getCharacter(targetId).stateInfo, null, 2)}`,
+            `bigbbang state: ${JSON.stringify(game.getCharacter(targetId).stateInfo, null, 2)}`,
           );
         });
         break;
@@ -110,6 +110,9 @@ const useCardHandler = ({ socket, payload }) => {
       //^ 방어
       case CARD_TYPE.SHIELD:
         console.log('방어 카드 사용');
+        // 방어카드 사용
+        // 쏜사람이 상어군이나,레이저 조준기 들고 있으면
+        // 방어카드 2개 삭제;
         game.setCharacterState(
           user.id,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
@@ -139,14 +142,14 @@ const useCardHandler = ({ socket, payload }) => {
       //^ 유틸
       case CARD_TYPE.ABSORB: // 흡수
         console.log('흡수 발동!: ');
-        room.setCharacterState(
+        game.setCharacterState(
           user.id,
           CHARACTER_STATE_TYPE.ABSORBING,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
           3,
           targetId,
         );
-        room.setCharacterState(
+        game.setCharacterState(
           targetId,
           CHARACTER_STATE_TYPE.ABSORB_TARGET,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
@@ -156,14 +159,14 @@ const useCardHandler = ({ socket, payload }) => {
         break;
 
       case CARD_TYPE.HALLUCINATION: // 신기루
-        room.setCharacterState(
+        game.setCharacterState(
           user.id,
           CHARACTER_STATE_TYPE.HALLUCINATING,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
           10,
           targetId,
         );
-        room.setCharacterState(
+        game.setCharacterState(
           targetId,
           CHARACTER_STATE_TYPE.HALLUCINATION_TARGET,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
@@ -187,10 +190,10 @@ const useCardHandler = ({ socket, payload }) => {
 
       //^ 디버프
       case CARD_TYPE.CONTAINMENT_UNIT:
-        room.addbuffs(targetId, cardType);
+        game.addbuffs(targetId, cardType);
         break;
       case CARD_TYPE.SATELLITE_TARGET:
-        room.addbuffs(targetId, cardType);
+        game.addbuffs(targetId, cardType);
         break;
       case CARD_TYPE.BOMB:
         game.addbuffs(targetId, cardType);
@@ -212,8 +215,8 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.LASER_POINTER:
         break;
       case CARD_TYPE.RADAR:
-        if (!room.getCharacter(user.id).equips.includes(cardType)) {
-          room.addEquip(user.id, cardType);
+        if (!game.getCharacter(user.id).equips.includes(cardType)) {
+          game.addEquip(user.id, cardType);
         }
       case CARD_TYPE.RADAR:
         if (!game.getCharacter(user.id).equips.includes(cardType)) {

@@ -50,7 +50,9 @@ const handleReactionRequest = async ({ socket, payload }) => {
 
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
       // 대미지 받는 부분
-
+      // 데저트 이글 끼고 있으면 2배 데미지
+      // 대미지 받고 발동하는 효과 발동
+      // 핑크슬라임, 말랑이
       if (game.users && game.users[user.id] && game.users[user.id].character.hp > 0) {
         game.users[user.id].character.hp -= 1;
         console.log(`유저 체력: ${game.users[user.id].character.hp}`);
