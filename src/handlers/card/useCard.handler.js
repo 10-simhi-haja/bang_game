@@ -16,6 +16,7 @@ const {
   card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
   character: { characterStateType: CHARACTER_STATE_TYPE },
+  interval: INTERVAL,
 } = config;
 
 const useCardHandler = ({ socket, payload }) => {
@@ -53,14 +54,14 @@ const useCardHandler = ({ socket, payload }) => {
             user.id,
             CHARACTER_STATE_TYPE.DEATH_MATCH_STATE,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             targetId,
           );
           room.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             user.id,
           );
         } else if (userStateInfo.state === 8) {
@@ -80,6 +81,7 @@ const useCardHandler = ({ socket, payload }) => {
             0,
           );
         } else if (bbangCount < 1) {
+          room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
           const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
           const isOutoShield = targetUser.character.equips.includes(
             config.card.cardType.AUTO_SHIELD,
@@ -94,17 +96,16 @@ const useCardHandler = ({ socket, payload }) => {
             user.id,
             CHARACTER_STATE_TYPE.BBANG_SHOOTER,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             targetId,
           );
           room.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.BBANG_TARGET,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             user.id,
           );
-          room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
         } else {
           responsePayload.success = false;
           responsePayload.failCode = GLOBAL_FAIL_CODE.ALREADY_USED_BBANG;
@@ -115,16 +116,21 @@ const useCardHandler = ({ socket, payload }) => {
           user.id,
           CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
-          targetId,
+          INTERVAL.ATTACK,
+          targetIds,
         );
+        console.log(`targetIds: ${targetIds}`);
         targetIds.forEach((targetId) => {
+          if (targetId === user.id) return;
           room.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.BIG_BBANG_TARGET,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             user.id,
+          );
+          console.log(
+            `bigbbang state: ${JSON.stringify(room.getCharacter(targetId).stateInfo, null, 2)}`,
           );
         });
         break;
@@ -134,15 +140,17 @@ const useCardHandler = ({ socket, payload }) => {
           user.id,
           CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
-          targetId,
+          INTERVAL.ATTACK,
+          targetIds,
         );
+
         targetIds.forEach((targetId) => {
+          if (targetId === user.id) return;
           room.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.GUERRILLA_TARGET,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             user.id,
           );
         });
@@ -154,14 +162,14 @@ const useCardHandler = ({ socket, payload }) => {
           user.id,
           CHARACTER_STATE_TYPE.DEATH_MATCH_STATE,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
+          INTERVAL.ATTACK,
           targetId,
         );
         room.setCharacterState(
           targetId,
           CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
+          INTERVAL.ATTACK,
           user.id,
         );
         break;
