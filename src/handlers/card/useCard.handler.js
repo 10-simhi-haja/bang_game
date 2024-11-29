@@ -136,6 +136,7 @@ const useCardHandler = ({ socket, payload }) => {
         break;
       case CARD_TYPE.GUERRILLA:
         console.log('게릴라');
+        console.log(`게릴라 userId: ${userId} targetId: ${targetId}`);
         room.setCharacterState(
           user.id,
           CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER,

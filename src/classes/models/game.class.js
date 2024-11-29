@@ -178,14 +178,14 @@ class Game {
       case CHARACTER_STATE_TYPE.FLEA_MARKET_WAIT:
         break;
       case CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER:
+        break;
+      case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
         this.intervalManager.addInterval(
           curUserId,
           () => guerrillaInterval(this, this.users[curUserId].user),
           time,
           INTERVAL_TYPE.CHARACTER_STATE,
         );
-        break;
-      case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
         break;
       case CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER:
         break;
