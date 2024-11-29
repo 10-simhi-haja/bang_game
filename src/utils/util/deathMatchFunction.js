@@ -10,10 +10,12 @@ const {
 } = config;
 
 export const deathMatchInterval = (game, user) => {
+  console.log('현피 user:', user);
   if (game.getCharacter(user.id).stateInfo.state !== CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE) {
     return;
   }
   const targetId = game.getCharacter(user.id).stateInfo.stateTargetUserId;
+  console.log('현피 targetId:', targetId);
 
   console.log(`빵야나 피해입는걸 선택 안함`);
 
