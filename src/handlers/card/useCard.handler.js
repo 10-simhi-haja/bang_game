@@ -119,10 +119,7 @@ const useCardHandler = ({ socket, payload }) => {
           INTERVAL.ATTACK,
           targetIds,
         );
-        console.log(
-          `useCard_StateInfo: ${JSON.stringify(room.getCharacter(user.id).stateInfo, null, 2)}`,
-        );
-        console.log(`useCard_state: ${room.getCharacter(user.id).stateInfo.state}`);
+        console.log(`targetIds: ${targetIds}`);
         targetIds.forEach((targetId) => {
           if (targetId === user.id) return;
           room.setCharacterState(
@@ -131,6 +128,9 @@ const useCardHandler = ({ socket, payload }) => {
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
             INTERVAL.ATTACK,
             user.id,
+          );
+          console.log(
+            `bigbbang state: ${JSON.stringify(room.getCharacter(targetId).stateInfo, null, 2)}`,
           );
         });
         break;

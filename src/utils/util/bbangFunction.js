@@ -41,6 +41,4 @@ export const bbangInterval = (game, user) => {
     0,
     0,
   );
-
-  game.intervalManager.removeIntervalByType(user.id, INTERVAL_TYPE.CHARACTER_STATE);
 };
