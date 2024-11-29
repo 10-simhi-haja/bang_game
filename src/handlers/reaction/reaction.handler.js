@@ -50,7 +50,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
       if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
         room.users[user.id].character.hp -= 1;
         console.log(`유저 체력: ${room.users[user.id].character.hp}`);
-        room.users[user.id].character.shooterArr.shift();
       } else {
         console.error(`User with id ${user.id} not found in room users or already dead.`);
       }

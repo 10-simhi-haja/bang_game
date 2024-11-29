@@ -37,6 +37,7 @@ const useCardHandler = ({ socket, payload }) => {
 
     const targetUser = room.getAllUserDatas().find((user) => user.id === targetId);
     const userStateInfo = room.getCharacter(user.id).stateInfo;
+    const bbangCount = room.getCharacter(user.id).bbangCount;
     // console.log('살아있는 유저', room.getLiveUsersId());
 
     switch (cardType) {
@@ -78,7 +79,7 @@ const useCardHandler = ({ socket, payload }) => {
             0,
             0,
           );
-        } else {
+        } else if (bbangCount < 1) {
           const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
           const isOutoShield = targetUser.character.equips.includes(
             config.card.cardType.AUTO_SHIELD,
@@ -104,6 +105,9 @@ const useCardHandler = ({ socket, payload }) => {
             user.id,
           );
           room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
+        } else {
+          responsePayload.success = false;
+          responsePayload.failCode = GLOBAL_FAIL_CODE.ALREADY_USED_BBANG;
         }
         break;
       case CARD_TYPE.BIG_BBANG:
@@ -266,6 +270,7 @@ const useCardHandler = ({ socket, payload }) => {
       cardEffectNotification(socket, user.id, room, cardType);
     }
 
+    console.log(responsePayload);
     // 카드 사용 응답 전송
     const userCardResponse = createResponse(
       PACKET_TYPE.USE_CARD_RESPONSE,

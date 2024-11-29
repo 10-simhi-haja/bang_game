@@ -8,6 +8,7 @@ import warningNotification from '../../utils/notification/warningNotification.js
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
 import updateNotification from '../../utils/notification/updateNotification.js';
+import { bbangInterval } from '../../utils/util/bbangFunction.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -141,8 +142,20 @@ class Game {
           this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
           break;
         case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
+          // this.intervalManager.addInterval(
+          //   curUserId,
+          //   INTERVAL_TYPE.CHARACTER_STATE,
+          //   time,
+          //   INTERVAL_TYPE.CHARACTER_STATE,
+          // );
           break;
         case CHARACTER_STATE_TYPE.BBANG_TARGET:
+          // this.intervalManager.addInterval(
+          //   curUserId,
+          //   () => bbangInterval(),
+          //   time,
+          //   INTERVAL_TYPE.CHARACTER_STATE,
+          // );
           break;
         case CHARACTER_STATE_TYPE.DEATH_MATCH_STATE:
           break;
@@ -295,15 +308,15 @@ class Game {
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(
-        { type: 18, count: 2 },
-        { type: 13, count: 2 },
-        { type: 6, count: 2 },
-        { type: 7, count: 2 },
-        { type: 1, count: 4 },
-        { type: 2, count: 2 },
-        { type: 3, count: 4 },
-        { type: 4, count: 2 },
-        { type: 5, count: 2 },
+        { type: 6, count: 1 },
+        { type: 7, count: 1 },
+        { type: 1, count: 2 },
+        { type: 2, count: 1 },
+        { type: 3, count: 2 },
+        { type: 4, count: 1 },
+        { type: 5, count: 1 },
+        { type: 13, count: 1 },
+        { type: 18, count: 1 },
 
         ...drawCard,
       );
