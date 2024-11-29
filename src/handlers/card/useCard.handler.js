@@ -6,7 +6,6 @@ import cardEffectNotification from '../../utils/notification/cardEffectNotificat
 import equipNotification from '../../utils/notification/equipCardNotification.js';
 import useCardNotification from '../../utils/notification/useCardNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import fleaMarketNotification from '../../utils/notification/fleaMarketNotification.js';
 import FleaMarket from '../../classes/models/fleaMarket.js';
 import animationNotification from '../../utils/notification/animationNotification.js';
@@ -155,6 +154,7 @@ const useCardHandler = ({ socket, payload }) => {
           user.id,
         );
         break;
+
       case CARD_TYPE.HALLUCINATION: // 신기루
         room.setCharacterState(
           user.id,
@@ -170,6 +170,7 @@ const useCardHandler = ({ socket, payload }) => {
           10,
           user.id,
         );
+
         break;
       case CARD_TYPE.FLEA_MARKET:
         // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
@@ -186,7 +187,11 @@ const useCardHandler = ({ socket, payload }) => {
 
       //^ 디버프
       case CARD_TYPE.CONTAINMENT_UNIT:
+        room.addbuffs(targetId, cardType);
+        break;
       case CARD_TYPE.SATELLITE_TARGET:
+        room.addbuffs(targetId, cardType);
+        break;
       case CARD_TYPE.BOMB:
         game.addbuffs(targetId, cardType);
         game.setBoomUpdateInterval(targetUser);
@@ -194,16 +199,21 @@ const useCardHandler = ({ socket, payload }) => {
 
       //^ 무기
       case CARD_TYPE.SNIPER_GUN:
+        break;
       case CARD_TYPE.HAND_GUN:
+        break;
       case CARD_TYPE.DESERT_EAGLE:
+        break;
       case CARD_TYPE.AUTO_RIFLE:
         game.addWeapon(user.id, cardType);
         break;
 
       //^ 장비
       case CARD_TYPE.LASER_POINTER:
-        if (!game.getCharacter(user.id).equips.includes(cardType)) {
-          game.addEquip(user.id, cardType);
+        break;
+      case CARD_TYPE.RADAR:
+        if (!room.getCharacter(user.id).equips.includes(cardType)) {
+          room.addEquip(user.id, cardType);
         }
       case CARD_TYPE.RADAR:
         if (!game.getCharacter(user.id).equips.includes(cardType)) {

@@ -2,12 +2,12 @@ import config from '../../config/config.js';
 import gameEndNotification from '../../utils/notification/gameEndNotification.js';
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
 import IntervalManager from '../managers/interval.manager.js';
-import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 import warningNotification from '../../utils/notification/warningNotification.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
 import updateNotification from '../../utils/notification/updateNotification.js';
+import animationNotification from '../../utils/notification/animationNotification.js';
 import { bbangInterval } from '../../utils/util/bbangFunction.js';
 import { bigBbangInterval } from '../../utils/util/bigBbangFunction.js';
 import { guerrillaInterval } from '../../utils/util/guerrillaFunction.js';
@@ -24,6 +24,7 @@ const {
   phaseType: PHASE_TYPE,
   winType: WIN_TYPE,
   card: { cardType: CARD_TYPE },
+  animationType: ANIMATION_TYPE,
 } = config;
 
 // game.users[userId] 로 해당 유저를 찾을 수 있다.
@@ -53,6 +54,7 @@ class Game {
   remove() {
     this.intervalManager.clearAll();
   }
+
   // 들어온 순서대로 반영.
   // 유저의 계정 user클래스
   getAllUsers() {
@@ -89,6 +91,30 @@ class Game {
     } while (nextUserIndex !== curUserIndex);
 
     throw new Error('살아있는 유저가 없습니다.');
+  }
+
+  getPrevUser(userId) {
+    const curUserIndex = this.userOrder.findIndex((id) => id === userId);
+    if (curUserIndex === -1) {
+      throw new Error('현재 게임에 해당 유저가 없습니다.');
+    }
+    let prevUserIndex = curUserIndex;
+
+    // 순환적으로 이전 유저를 찾는다.
+    while (true) {
+      prevUserIndex = (prevUserIndex - 1 + this.userOrder.length) % this.userOrder.length;
+
+      // 현재 유저로 다시 돌아오면 중단
+      if (prevUserIndex === curUserIndex) {
+        throw new Error('살아있는 유저가 없습니다.');
+      }
+
+      // 살아있는 유저를 발견하면 반환
+      if (this.users[this.userOrder[prevUserIndex]].character.hp > 0) {
+        console.log(`이전 유저 : ${this.users[this.userOrder[prevUserIndex]].user.nickname}`);
+        return this.users[this.userOrder[prevUserIndex]].user;
+      }
+    }
   }
 
   // 유저의 데이터 캐릭터데이터를 포함.
@@ -318,8 +344,15 @@ class Game {
         nextStateAt: 0,
         stateTargetUserId: 0,
       }; // 캐릭터 스테이트 타입
-      userEntry.character.equips = [18, 20];
+      userEntry.character.equips = [];
       userEntry.character.debuffs = [];
+      userEntry.character.handCards = [
+        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
+        { type: CARD_TYPE.BOMB, count: 1 },
+        { type: CARD_TYPE.BBANG, count: 5 },
+        { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
+        { type: CARD_TYPE.SHIELD, count: 1 },
+      ];
       userEntry.character.handCards = [];
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
@@ -333,12 +366,12 @@ class Game {
         { type: 9, count: 3 },
         { type: 13, count: 1 },
         { type: 23, count: 1 },
-
         ...drawCard,
       );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
       userEntry.character.autoShield = false;
+      userEntry.character.isContain = false;
       userEntry.character.maxBbangCount = 1;
     });
   }
@@ -400,11 +433,11 @@ class Game {
     return (this.getCharacter(userId).handCards = newHandCard);
   }
   // 복권방
+
   winLottery(userId) {
     const giveCard = this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
-
     return (this.getCharacter(userId).handCards = newHandCard);
   }
   // 핸드카드 신기루
@@ -522,11 +555,26 @@ class Game {
     });
   }
 
+  findRandomSurvivingUser(currentUserId) {
+    const survivingUsers = Object.values(this.users).filter(({ user }) => {
+      // 현재 자신은 목록에서 제외
+      return user.id !== currentUserId;
+    });
+
+    if (survivingUsers.length === 0) {
+      return null;
+    }
+
+    // 다음 디버프를 받은 유저는 랜덤으로 결정
+    const randomIndex = Math.floor(Math.random() * survivingUsers.length);
+    return survivingUsers[randomIndex].user.id;
+  }
+
   nextPhase() {
-    if (this.phase === PHASE_TYPE.DAY) {
-      this.phase = PHASE_TYPE.END;
-    } else if (this.phase === PHASE_TYPE.END) {
+    if (this.phase === PHASE_TYPE.END) {
       this.phase = PHASE_TYPE.DAY;
+    } else if (this.phase === PHASE_TYPE.DAY) {
+      this.phase = PHASE_TYPE.END;
     }
   }
 
@@ -571,13 +619,27 @@ class Game {
       if (user.character.hp === 0) {
         return;
       }
-      // if (user.character.hp === 0 && this.users[user.id].isDeath === false) {
-      //   userUpdateNotification(this);
-      //   this.users[user.id].isDeath === true;
-      //   return;
-      // } else if (user.character.hp === 0 && this.users[user.id].isDeath === true) {
-      //   return;
-      // }
+
+      // 만약 내가 감금디버프를 가지고있으면서, is감금이 true이면 감금상태로 변환.
+      if (
+        user.character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT) &&
+        user.character.isContain === true
+      ) {
+        this.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.CONTAINED,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          INTERVAL.PHASE_UPDATE_DAY,
+          0,
+        );
+      } else if (
+        !user.character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT) &&
+        user.character.isContain === true
+      ) {
+        user.character.isContain = false;
+      }
+
+      // 이거를 주기적으로 검사.
 
       const roleType = user.character.roleType;
 
@@ -605,6 +667,67 @@ class Game {
       return;
     }
     userUpdateNotification(this);
+  }
+
+  // debuff가 있는지 체크
+  debuffCheck(userCharacter, debuff) {
+    return userCharacter.debuffs.includes(debuff);
+  }
+
+  // 디버프 들고 있는 유저를 찾는 방식.
+  getDebuffUser(debuff) {
+    const users = this.getAllUserDatas();
+    let debuffUser = 0;
+    users.forEach((user) => {
+      const character = this.getCharacter(user.id);
+      if (this.debuffCheck(character, debuff)) {
+        console.dir(user, null);
+        debuffUser = user;
+      }
+    });
+    return debuffUser;
+  }
+
+  // 위성타겟 디버프 가졌는지 확인하고 다음유저에게 넘기기까지
+  debuffUpdate() {
+    // 위성 타겟 디버프 처리
+    const satelliteTargetUser = this.getDebuffUser(CARD_TYPE.SATELLITE_TARGET);
+    if (satelliteTargetUser) {
+      const satelliteCharacter = this.getCharacter(satelliteTargetUser.id);
+
+      const satelIndex = satelliteCharacter.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+      if (satelIndex !== -1) {
+        satelliteCharacter.debuffs.splice(satelIndex, 1);
+      }
+
+      if (Math.random() < 0.03) {
+        console.log(`위성 터졌다!`);
+
+        // 효과가 발동되었을 때
+        satelliteCharacter.hp -= 3;
+        animationNotification(this, ANIMATION_TYPE.SATELLITE_TARGET_ANIMATION, satelliteTargetUser);
+      } else {
+        const nextUser = this.getNextUser(satelliteTargetUser.id);
+        const nextUserCharacter = this.getCharacter(nextUser.id);
+        nextUserCharacter.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
+      }
+    }
+
+    // 감옥 디버프 처리
+    const containmentUnitUser = this.getDebuffUser(CARD_TYPE.CONTAINMENT_UNIT);
+    if (containmentUnitUser) {
+      const containmentCharacter = this.getCharacter(containmentUnitUser.id);
+
+      if (Math.random() < 1) {
+        this.users[containmentUnitUser.id].character.isContain = true;
+      } else {
+        const containmentIndex = containmentCharacter.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
+        if (containmentIndex !== -1) {
+          containmentCharacter.debuffs.splice(containmentIndex, 1);
+        }
+        this.users[containmentUnitUser.id].character.isContain = false;
+      }
+    }
   }
 
   ///////////////////// intervalManager 관련.
@@ -636,26 +759,6 @@ class Game {
       INTERVAL_TYPE.BOMB,
     );
   }
-
-  ///////////////// 리엑션 관련 로직 /////////////////////////
-
-  // 왜 리엑션 리퀘스트가 안넘어 오는지?
-  // 누군가가 빵야를 사용했을때 x
-  // 빵야를 사용했다고 모든 유저에게 알렸을때 x
-
-  // 캐릭터 스테이트 타입 참고
-  // 빵야 시전자가 빵야 타켓에게 빵야 카드를 사용 시 리엑션 리퀘스트가 들어간다.
-  // 쉴드가 없으면 클라이언트가 알아서 패킷을 보내준다
-
-  // 유저 업데이트 - 특정 조건이 걸리면 그때마다 하나씩 보내기
-
-  // 쉴드 사용시 남은시간 - 10이라고 나옴 (미구현 상태)
-
-  // 카드 상호작용 팝업 창
-  // 빵야를 맞으면 쉴드 카드가 없을 때 한대 맞기(또는 피하기)
-  // 쉴드가 있으면 쓸지 말지 선택하고 막거나 맞기(또는 피하기)
-  // (만약에?) 한대 맞았는데 상대가 장착한 무기가 데저트 이글이면 체력 두배 감소
-  // 나머지 룰은 클라이언트에서 처리
 }
 
 export default Game;

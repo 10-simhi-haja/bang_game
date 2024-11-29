@@ -1,6 +1,5 @@
 import config from '../../config/config.js';
 import { createResponse } from '../packet/response/createResponse.js';
-import userUpdateNotification from './userUpdateNotification.js';
 
 const animationNotification = (game, animationType, targetUser = null) => {
   const users = game.getAllUsers();
@@ -41,6 +40,14 @@ const animationNotification = (game, animationType, targetUser = null) => {
       } else {
         console.log('아직 애니메이션 동작 안 하는 중...');
       }
+      break;
+    case config.animationType.SATELLITE_TARGET_ANIMATION:
+      console.log('빔!!!!!!!!!!!!!!!!!!!!!!!!!');
+
+      responseDate = {
+        userId: targetUser.id,
+        animationType: animationType,
+      };
       break;
   }
 
