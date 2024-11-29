@@ -547,7 +547,7 @@ class Game {
         user.character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT) &&
         user.character.isContain === true
       ) {
-        console.log(`나는 감옥에 있다.`);
+        console.log(`나는 감옥에 있다. ${user.id}`);
         this.setCharacterState(
           user.id,
           CHARACTER_STATE_TYPE.CONTAINED,
@@ -555,6 +555,11 @@ class Game {
           INTERVAL.PHASE_UPDATE_DAY,
           0,
         );
+      } else if (
+        !user.character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT) &&
+        user.character.isContain === true
+      ) {
+        user.character.isContain === false;
       }
 
       // 이거를 주기적으로 검사.
@@ -636,11 +641,6 @@ class Game {
     if (containmentUnitUser) {
       const containmentCharacter = this.getCharacter(containmentUnitUser.id);
 
-      const containmentIndex = containmentCharacter.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
-      if (containmentIndex !== -1) {
-        containmentCharacter.debuffs.splice(containmentIndex, 1);
-      }
-
       // 75% 확률로 감금 상태로 전환
       // 감금 상태인 유저는 스테이트 타입이 변경 된다 이로 생길 수 있는 문제는????
       // 다른 스테이트 타입으로 바뀌면 플리마켓 로직에서 사용한 이전 상태로 돌리는 기능을 사용한다면?
@@ -663,6 +663,10 @@ class Game {
         // );
         // this.maintainDetentionState(containmentUnitUser.id);
       } else {
+        const containmentIndex = containmentCharacter.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
+        if (containmentIndex !== -1) {
+          containmentCharacter.debuffs.splice(containmentIndex, 1);
+        }
         // 이거는 페이즈 변경시 자연스럽게 빠져나온경우에 false해준건데
         // 강탈이나 흡수로 감옥이 빠져나오면 그때도 false로해야함.
         this.users[containmentUnitUser.id].character.isContain = false;
