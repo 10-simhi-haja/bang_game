@@ -327,6 +327,7 @@ class Game {
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
       userEntry.character.autoShield = false;
+      userEntry.character.isContain = false;
     });
   }
 
@@ -540,13 +541,23 @@ class Game {
       if (user.character.hp === 0) {
         return;
       }
-      // if (user.character.hp === 0 && this.users[user.id].isDeath === false) {
-      //   userUpdateNotification(this);
-      //   this.users[user.id].isDeath === true;
-      //   return;
-      // } else if (user.character.hp === 0 && this.users[user.id].isDeath === true) {
-      //   return;
-      // }
+
+      // 만약 내가 감금디버프를 가지고있으면서, is감금이 true이면 감금상태로 변환.
+      if (
+        user.character.debuffs.includes(CARD_TYPE.CONTAINMENT_UNIT) &&
+        user.character.isContain === true
+      ) {
+        console.log(`나는 감옥에 있다.`);
+        this.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.CONTAINED,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          INTERVAL.PHASE_UPDATE_DAY,
+          0,
+        );
+      }
+
+      // 이거를 주기적으로 검사.
 
       const roleType = user.character.roleType;
 
@@ -642,14 +653,19 @@ class Game {
       // 3. 밤이 되면 감금이 풀리면서 자유로워지긴 하나 상대방은 캐릭터 위에 로딩이 나와 여전히 타게팅 불가
       if (Math.random() < 1) {
         console.log(`User ${containmentUnitUser.id}가 감금 상태로 전환되었습니다.`);
-        this.setCharacterState(
-          containmentUnitUser.id,
-          CHARACTER_STATE_TYPE.CONTAINED,
-          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          0,
-          containmentCharacter,
-        );
-        this.maintainDetentionState(containmentUnitUser.id);
+        this.users[containmentUnitUser.id].character.isContain = true;
+        // this.setCharacterState(
+        //   containmentUnitUser.id,
+        //   CHARACTER_STATE_TYPE.CONTAINED,
+        //   CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+        //   0,
+        //   containmentCharacter,
+        // );
+        // this.maintainDetentionState(containmentUnitUser.id);
+      } else {
+        // 이거는 페이즈 변경시 자연스럽게 빠져나온경우에 false해준건데
+        // 강탈이나 흡수로 감옥이 빠져나오면 그때도 false로해야함.
+        this.users[containmentUnitUser.id].character.isContain = false;
       }
     }
   }
