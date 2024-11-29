@@ -118,7 +118,7 @@ class Game {
   }
 
   // 유저의 데이터 캐릭터데이터를 포함.
-  // 참조가 아닌 깊은 복사.
+  // 참조형
   getAllUserDatas() {
     const userDatas = this.userOrder.map((id) => ({
       id: this.users[id].user.id,
@@ -268,7 +268,7 @@ class Game {
       state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
       nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
       nextStateAt: 0,
-      targetId: 0,
+      stateTargetUserId: 0,
     };
 
     // 캐릭터 데이터
@@ -372,6 +372,7 @@ class Game {
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
       userEntry.character.autoShield = false;
       userEntry.character.isContain = false;
+      userEntry.character.maxBbangCount = 1;
     });
   }
 
