@@ -57,6 +57,8 @@ const handleReactionRequest = async ({ socket, payload }) => {
       // 리셋을 전체유저에게 하는게 아니라
       // 나랑 나를 공격한 사람을 리셋해야함.
       // room.resetStateInfoAllUsers();
+      const target = room.getCharacter(user.id);
+      const targetId = target.stateInfo.stateTargetUserId;
       room.setCharacterState(
         user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
@@ -64,32 +66,14 @@ const handleReactionRequest = async ({ socket, payload }) => {
         0,
         0,
       );
-      const attackerId = room.users[user.id].attackerId;
       room.setCharacterState(
-        room.users[attackerId].user.id,
+        room.users[targetId].user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         0,
         0,
       );
-      const userId = user.id;
-      // ^ find로 하나만 받기
-      // const bbangShooter =
-      //   users.find(
-      //     (user) =>
-      //       user.character.stateInfo.stateTargetUserId === userId &&
-      //       user.character.stateInfo.state === 1,
-      //   )?.id || null;
-      //^ map으로 배열로 받기(한 사람에게 여러명이 빵을 쏠 경우 대비)
-      // const bbangShooter = users
-      //   .filter(
-      //     (user) =>
-      //       user.character.stateInfo.stateTargetUserId === userId &&
-      //       user.character.stateInfo.state === 1,
-      //   )
-      //   .map((user) => user.id);
-      room.shieldUserStateInfo(user.id);
-      userUpdateNotification(room);
+      // userUpdateNotification(room);
     }
 
     // 리액션 처리 완료 후 응답 전송

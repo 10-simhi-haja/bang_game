@@ -44,7 +44,6 @@ const userUpdateNotification = (game) => {
       );
       notiUser.socket.write(notificationResponse);
     });
-    console.log('userUpdateNotification 사용');
   } catch (error) {
     new Error(error);
   }

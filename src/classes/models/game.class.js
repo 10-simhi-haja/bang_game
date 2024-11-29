@@ -62,6 +62,13 @@ class Game {
       .map((id) => this.users[id].user);
   }
 
+  // 게임내 생존해있는 유저들 아이디 가져오기
+  getLiveUsersId() {
+    return this.userOrder
+      .filter((id) => this.users[id].character.hp > 0)
+      .map((id) => this.users[id].user.id);
+  }
+
   // 해당 유저의 다음번 살아있는 유저
   getNextUser(userId) {
     const curUserIndex = this.userOrder.findIndex((id) => id === userId);
@@ -262,9 +269,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 5;
       } else {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 5;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -284,21 +291,20 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [
-        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
-        { type: CARD_TYPE.BOMB, count: 1 },
-        { type: CARD_TYPE.BBANG, count: 5 },
-        { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
-        { type: CARD_TYPE.SHIELD, count: 1 },
-      ];
+      userEntry.character.handCards = [];
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(
+        { type: 18, count: 2 },
+        { type: 13, count: 2 },
         { type: 6, count: 2 },
         { type: 7, count: 2 },
         { type: 1, count: 4 },
         { type: 2, count: 2 },
         { type: 3, count: 4 },
+        { type: 4, count: 2 },
+        { type: 5, count: 2 },
+
         ...drawCard,
       );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
@@ -354,10 +360,6 @@ class Game {
     });
   }
 
-  // minusHandCardsCount(userId) {
-  //   return --this.getCharacter(userId).handCardsCount;
-  // }
-
   MaturedSavings(userId) {
     const giveCard = this.cardDeck.drawMultipleCards(2);
     const handCard = this.getCharacter(userId).handCards;
@@ -386,209 +388,6 @@ class Game {
     this.getCharacter(userId).handCardsCount = handCards.length;
   }
 
-  // BbangShooterStateInfo(userId, targetId, duration) {
-  //   const character = this.getCharacter(userId);
-
-  //   const currentTime = Date.now();
-  //   const nextStateAt = currentTime + duration;
-
-  //   character.stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
-  //   character.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-  //   character.stateInfo.nextStateAt = nextStateAt;
-  //   character.stateInfo.stateTargetUserId = targetId;
-  //   console.log(`빵슈터 current ${userId}:`, character.stateInfo);
-
-  //   setTimeout(() => {
-  //     const shooterCharacter = this.getCharacter(userId);
-  //     if (shooterCharacter.stateInfo.nextStateAt === nextStateAt) {
-  //       shooterCharacter.stateInfo.state = character.stateInfo.nextState;
-  //       shooterCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-  //       shooterCharacter.nextStateAt = 0;
-  //       this.minusHp(targetId);
-  //       console.log(`빵슈터 next ${userId}:`, shooterCharacter.stateInfo);
-  //     }
-  //   }, duration);
-  // }
-
-  // BbangTargetStateInfo(targetId, duration) {
-  //   const character = this.getCharacter(targetId);
-
-  //   const currentTime = Date.now();
-  //   const nextStateAt = currentTime + duration;
-
-  //   character.stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
-  //   character.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-  //   character.stateInfo.nextStateAt = nextStateAt;
-  //   character.stateInfo.stateTargetUserId = targetId;
-  //   console.log(`빵타겟 current ${targetId}:`, character.stateInfo);
-
-  //   setTimeout(() => {
-  //     const shooterCharacter = this.getCharacter(targetId);
-  //     if (shooterCharacter.stateInfo.nextStateAt === nextStateAt) {
-  //       shooterCharacter.stateInfo.state = character.stateInfo.nextState;
-  //       shooterCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-  //       shooterCharacter.nextStateAt = 0;
-  //       console.log(`빵타겟 next ${targetId}:`, shooterCharacter.stateInfo);
-  //     }
-  //   }, duration);
-  // }
-
-  bbangStateInfo(userId, targetId, duration, room) {
-    const shooter = this.getCharacter(userId);
-    const target = this.getCharacter(targetId);
-
-    const currentTime = Date.now();
-    const nextStateAt = currentTime + duration;
-
-    //? shooter
-    shooter.stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
-    shooter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    shooter.stateInfo.nextStateAt = nextStateAt;
-    shooter.stateInfo.stateTargetUserId = targetId;
-    console.log(`빵슈터 current ${userId}:`, shooter.stateInfo);
-
-    //? target
-    target.stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
-    target.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    target.stateInfo.nextStateAt = nextStateAt;
-    target.stateInfo.stateTargetUserId = userId;
-    console.log(`빵타겟 current ${targetId}:`, target.stateInfo);
-
-    setTimeout(() => {
-      const targetCharacter = this.getCharacter(targetId);
-      const shooterCharacter = this.getCharacter(userId);
-      if (shooterCharacter.stateInfo.nextStateAt === nextStateAt) {
-        this.minusHp(targetId);
-        shooterCharacter.stateInfo.state = shooterCharacter.stateInfo.nextState;
-        shooterCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-        shooterCharacter.nextStateAt = 0;
-        targetCharacter.stateInfo.state = targetCharacter.stateInfo.nextState;
-        targetCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-        targetCharacter.nextStateAt = 0;
-        userUpdateNotification(room);
-      }
-    }, duration);
-  }
-
-  DeathMatchStateInfo(userId, targetId, duration, room) {
-    const shooter = this.getCharacter(userId);
-    const target = this.getCharacter(targetId);
-
-    const currentTime = Date.now();
-    const nextStateAt = currentTime + duration;
-
-    //? shooter
-    shooter.stateInfo.state = CHARACTER_STATE_TYPE.BBANG_SHOOTER;
-    shooter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    shooter.stateInfo.nextStateAt = nextStateAt;
-    shooter.stateInfo.stateTargetUserId = targetId;
-    console.log(`빵슈터 current ${userId}:`, shooter.stateInfo);
-
-    //? target
-    target.stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
-    target.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    target.stateInfo.nextStateAt = nextStateAt;
-    target.stateInfo.stateTargetUserId = targetId;
-    console.log(`빵타겟 current ${targetId}:`, target.stateInfo);
-
-    setTimeout(() => {
-      const targetCharacter = this.getCharacter(targetId);
-      const shooterCharacter = this.getCharacter(userId);
-      if (shooterCharacter.stateInfo.nextStateAt === nextStateAt) {
-        this.minusHp(targetId);
-        shooterCharacter.stateInfo.state = shooterCharacter.stateInfo.nextState;
-        shooterCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-        shooterCharacter.nextStateAt = 0;
-        targetCharacter.stateInfo.state = targetCharacter.stateInfo.nextState;
-        targetCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-        targetCharacter.nextStateAt = 0;
-        userUpdateNotification(room);
-      }
-    }, duration);
-  }
-
-  bigBbangStateInfo(userId, targetId, duration, room) {
-    const shooter = this.getCharacter(userId);
-
-    const currentTime = Date.now();
-    const nextStateAt = currentTime + duration;
-
-    //? shooter
-    shooter.stateInfo.state = CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER;
-    shooter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    shooter.stateInfo.nextStateAt = nextStateAt;
-    shooter.stateInfo.stateTargetUserId = Array.isArray(targetId) ? targetId : [targetId];
-    console.log(`빵슈터 current ${userId}:`, shooter.stateInfo);
-
-    //? Handle target(s)
-    const targetIds = Array.isArray(targetId) ? targetId : [targetId];
-    targetIds.forEach((id) => {
-      const target = this.getCharacter(id);
-
-      target.stateInfo.state = CHARACTER_STATE_TYPE.BIG_BBANG_TARGET;
-      target.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-      target.stateInfo.nextStateAt = nextStateAt;
-      target.stateInfo.stateTargetUserId = id;
-      console.log(`빵타겟 current ${id}:`, target.stateInfo);
-
-      setTimeout(() => {
-        const targetCharacter = this.getCharacter(id);
-        const shooterCharacter = this.getCharacter(userId);
-        if (shooterCharacter.stateInfo.nextStateAt === nextStateAt) {
-          this.minusHp(id);
-          shooterCharacter.stateInfo.state = shooterCharacter.stateInfo.nextState;
-          shooterCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-          shooterCharacter.nextStateAt = 0;
-          targetCharacter.stateInfo.state = targetCharacter.stateInfo.nextState;
-          targetCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-          targetCharacter.nextStateAt = 0;
-          userUpdateNotification(room);
-        }
-      }, duration);
-    });
-  }
-
-  GuerrillaStateInfo(userId, targetId, duration, room) {
-    const shooter = this.getCharacter(userId);
-
-    const currentTime = Date.now();
-    const nextStateAt = currentTime + duration;
-
-    //? shooter
-    shooter.stateInfo.state = CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER;
-    shooter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    shooter.stateInfo.nextStateAt = nextStateAt;
-    shooter.stateInfo.stateTargetUserId = Array.isArray(targetId) ? targetId : [targetId];
-    console.log(`빵슈터 current ${userId}:`, shooter.stateInfo);
-
-    //? Handle target(s)
-    const targetIds = Array.isArray(targetId) ? targetId : [targetId];
-    targetIds.forEach((id) => {
-      const target = this.getCharacter(id);
-
-      target.stateInfo.state = CHARACTER_STATE_TYPE.GUERRILLA_TARGET;
-      target.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-      target.stateInfo.nextStateAt = nextStateAt;
-      target.stateInfo.stateTargetUserId = id;
-      console.log(`빵타겟 current ${id}:`, target.stateInfo);
-
-      setTimeout(() => {
-        const targetCharacter = this.getCharacter(id);
-        const shooterCharacter = this.getCharacter(userId);
-        if (shooterCharacter.stateInfo.nextStateAt === nextStateAt) {
-          this.minusHp(id);
-          shooterCharacter.stateInfo.state = shooterCharacter.stateInfo.nextState;
-          shooterCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-          shooterCharacter.nextStateAt = 0;
-          targetCharacter.stateInfo.state = targetCharacter.stateInfo.nextState;
-          targetCharacter.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-          targetCharacter.nextStateAt = 0;
-          userUpdateNotification(room);
-        }
-      }, duration);
-    });
-  }
-
   shooterPushArr(shooterId, targetIds) {
     // targetIds가 배열이 아니면 배열로 변환
     const targets = Array.isArray(targetIds) ? targetIds : [targetIds];
@@ -598,41 +397,6 @@ class Game {
       shooterArr.push(shooterId);
       console.log(`${targetId}에게 빵을 쏜 유저 ${shooterArr}`);
     });
-  }
-
-  shieldUserStateInfo(targetId) {
-    const shooterArr = this.getCharacter(targetId).shooterArr;
-    // console.log('shooterArr: ', this.getCharacter(targetId).shooterArr);
-    console.log('shooterArr: ', shooterArr);
-
-    // const bbangShooter = this.getCharacter(targetId).shooterArr[0];
-    const bbangShooter = shooterArr[0];
-
-    // 쉴드로 막아낸 공격을한 shooter의 state 바꾸기
-    this.getCharacter(bbangShooter).stateInfo.state = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(bbangShooter).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-    this.getCharacter(bbangShooter).stateInfo.nextStateAt = 0;
-    this.getCharacter(bbangShooter).stateInfo.stateTargetUserId = 0;
-
-    // shooterArr에서 쉴드로 막은 shooterId 제거
-    // this.getCharacter(targetId).shooterArr.shift();
-    shooterArr.shift();
-
-    // 만약 더이상 shooter가 없다면 쉴드를 쓴 사람의 state도 바꾸기
-    if (shooterArr.length === 0) {
-      this.getCharacter(targetId).stateInfo.state = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-      this.getCharacter(targetId).stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
-      this.getCharacter(targetId).stateInfo.nextStateAt = 0;
-      this.getCharacter(targetId).stateInfo.stateTargetUserId = 0;
-    }
-
-    console.log(
-      `${targetId}가 ${bbangShooter}의 공격을 쉴드로 막음 현재 남은 shooter ${shooterArr}`,
-    );
-    console.log(
-      `쉴드를 쓰고 난 targetId ${targetId}의 state정보`,
-      this.getCharacter(targetId).stateInfo,
-    );
   }
 
   // ! 무기 카드 추가/변경

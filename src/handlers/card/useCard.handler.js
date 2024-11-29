@@ -21,108 +21,167 @@ const {
 const useCardHandler = ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
-    console.log(`useCard 실행 ${cardType}, tartgetId: ${targetUserId.low}`);
 
     const targetId = targetUserId.low;
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
     const users = room.getAllUserDatas();
+    const targetIds = room.getLiveUsersId();
     const userId = user.id;
-    const usersId = [];
+    console.log(`useCard 실행 ${cardType}, userId: ${userId}, tartgetId: ${targetUserId.low}`);
 
     const responsePayload = {
       success: true,
       failCode: GLOBAL_FAIL_CODE.NONE_FAILCODE,
     };
 
-    /**
-     * TODO: cardType에따라 카드를 사용할 시 그 카드에 따른 효과를 적용해야 함
-     * 행동카드를 사용한 유저와 대상이 된 유저는 행동카드 사용이 종료 될 때까지 움직일 수 없고,
-     * 다른 유저의 타겟이 될 수 없다.
-     * (유저 1이 유저2에게 발포 사용 시 쉴드카드를 사용하거나 사용하지 않을 때 까지 정지 상태,
-     * 선택 여부를 결정하는데 주어진 시간을 카드별로 3~5초)
-     */
-
     const targetUser = room.getAllUserDatas().find((user) => user.id === targetId);
     const userStateInfo = room.getCharacter(user.id).stateInfo;
+    // console.log('살아있는 유저', room.getLiveUsersId());
 
     switch (cardType) {
       //^ 공격
       case CARD_TYPE.BBANG:
-        const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
-        const isOutoShield = targetUser.character.equips.includes(config.card.cardType.AUTO_SHIELD);
-        if (isOutoShield && range <= config.probability.AUTO_SHIELD) {
-          console.log('자동 실드가 방어해줌!');
-          // 아래 noti가 실행되면 빵야 사용한 사람의 카드가 안 줄어든다.
-          animationNotification(room, config.animationType.SHIELD_ANIMATION, targetUser);
-          break;
+        console.log('빵');
+        console.log('userStateInfo :', JSON.stringify(userStateInfo, null, 2));
+        console.log('state :', JSON.stringify(userStateInfo.state, null, 2));
+
+        if (userStateInfo.state === 4) {
+          console.log('현피중 턴 바꾸기');
+          room.setCharacterState(
+            user.id,
+            CHARACTER_STATE_TYPE.DEATH_MATCH_STATE,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            3,
+            targetId,
+          );
+          room.setCharacterState(
+            targetId,
+            CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            3,
+            user.id,
+          );
+        } else if (userStateInfo.state === 8) {
+          console.log('게릴라 방어');
+          room.setCharacterState(
+            user.id,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            0,
+            0,
+          );
+          room.setCharacterState(
+            targetId,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            0,
+            0,
+          );
+        } else {
+          const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
+          const isOutoShield = targetUser.character.equips.includes(
+            config.card.cardType.AUTO_SHIELD,
+          );
+          if (isOutoShield && range <= config.probability.AUTO_SHIELD) {
+            console.log('자동 실드가 방어해줌!');
+            // 아래 noti가 실행되면 빵야 사용한 사람의 카드가 안 줄어든다.
+            animationNotification(room, config.animationType.SHIELD_ANIMATION, targetUser);
+            break;
+          }
+          room.setCharacterState(
+            user.id,
+            CHARACTER_STATE_TYPE.BBANG_SHOOTER,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            3,
+            targetId,
+          );
+          room.setCharacterState(
+            targetId,
+            CHARACTER_STATE_TYPE.BBANG_TARGET,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            3,
+            user.id,
+          );
+          room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
         }
-        room.setCharacterState(
-          user.id,
-          CHARACTER_STATE_TYPE.BBANG_SHOOTER,
-          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
-          targetId,
-        );
-        room.setCharacterState(
-          targetId,
-          CHARACTER_STATE_TYPE.BBANG_TARGET,
-          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
-          user.id,
-        );
-        // 나를 쏜사람을 기억해두었다가 리액션하면 나를 쏜쪽도 스테이를 변경해주기위함.
-        room.users[targetId].attackerId = user.id;
-        console.log(`빵야카드사용시 payload: ${JSON.stringify(payload, null, 2)}`);
-        room.plusBbangCount(user.id); // 사용유저의 빵카운트를 +1
-        // room.BbangShooterStateInfo(user.id, targetId, 10000);
-        // room.BbangTargetStateInfo(targetId, 10000);
-        room.bbangStateInfo(user.id, targetId, 10000, room);
-        room.shooterPushArr(user.id, targetId);
         break;
       case CARD_TYPE.BIG_BBANG:
-        users.forEach((user) => {
-          if (user.id !== userId) usersId.push(user.id);
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        targetIds.forEach((targetId) => {
+          room.setCharacterState(
+            targetId,
+            CHARACTER_STATE_TYPE.BIG_BBANG_TARGET,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            3,
+            user.id,
+          );
         });
-        room.bigBbangStateInfo(user.id, usersId, 10000, room);
-        room.shooterPushArr(user.id, usersId);
         break;
       case CARD_TYPE.GUERRILLA:
-        users.forEach((user) => {
-          if (user.id !== userId) usersId.push(user.id);
+        console.log('게릴라');
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        targetIds.forEach((targetId) => {
+          room.setCharacterState(
+            targetId,
+            CHARACTER_STATE_TYPE.GUERRILLA_TARGET,
+            CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+            3,
+            user.id,
+          );
         });
-        room.GuerrillaStateInfo(user.id, usersId, 10000, room);
         break;
       case CARD_TYPE.DEATH_MATCH:
-        users.forEach((user) => {
-          if (user.id !== userId) usersId.push(user.id);
-        });
-        room.DeathMatchStateInfo(user.id, targetId, 10000, room);
+        console.log('현피');
+
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.DEATH_MATCH_STATE,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        room.setCharacterState(
+          targetId,
+          CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          user.id,
+        );
         break;
 
       //^ 방어
       case CARD_TYPE.SHIELD:
         console.log('방어 카드 사용');
-        console.log(`쉴드카드사용시 payload: ${JSON.stringify(payload, null, 2)}`);
-        //^ find로 하나만 받기
-        // const bbangShooter =
-        //   users.find(
-        //     (user) =>
-        //       user.character.stateInfo.stateTargetUserId === targetId &&
-        //       user.character.stateInfo.state === 1,
-        //   )?.id || null; // find값이 undifined 일 경우 null 반환
-        //^ map으로 배열로 받기
-        // const bbangShooter = users
-        //   .filter(
-        //     (user) =>
-        //       user.character.stateInfo.stateTargetUserId === targetId &&
-        //       user.character.stateInfo.state === 1,
-        //   )
-        //   .map((user) => user.id);
-        room.shieldUserStateInfo(targetId); // (빵을 쏜사람과, 빵을 맞은사람)
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          0,
+          0,
+        );
+        room.setCharacterState(
+          targetId,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          0,
+          0,
+        );
         break;
       case CARD_TYPE.VACCINE:
-        room.minusHp(user.id); // 테스트를 위해 체력이 깎이게 해놓음
+        room.plusHp(user.id);
         break;
       case CARD_TYPE.CALL_119:
         if (targetId !== 0) {
@@ -163,34 +222,29 @@ const useCardHandler = ({ socket, payload }) => {
       case CARD_TYPE.HAND_GUN:
       case CARD_TYPE.DESERT_EAGLE:
       case CARD_TYPE.AUTO_RIFLE:
-        // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
-        try {
-          if (room.getCharacter(user.id).weapon === cardType) {
-            responsePayload.success = false;
-            responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
-          }
-        } catch (err) {
-          console.error(err);
-        }
         room.addWeapon(user.id, cardType);
         break;
 
       //^ 장비
       case CARD_TYPE.LASER_POINTER:
+        if (!room.getCharacter(user.id).equips.includes(cardType)) {
+          room.addEquip(user.id, cardType);
+        }
       case CARD_TYPE.RADAR:
+        if (!room.getCharacter(user.id).equips.includes(cardType)) {
+          room.addEquip(user.id, cardType);
+        }
       case CARD_TYPE.AUTO_SHIELD:
         console.log('자동 실드 장착!');
-        room.addEquip(targetId, cardType);
+        if (!room.getCharacter(user.id).equips.includes(cardType)) {
+          room.addEquip(user.id, cardType);
+        }
         break;
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
-        if (room.getCharacter(user.id).equips.includes(cardType)) {
-          responsePayload.success = false;
-          responsePayload.failCode = GLOBAL_FAIL_CODE.INVALID_REQUEST;
-        } else {
+        if (!room.getCharacter(user.id).equips.includes(cardType)) {
           room.addEquip(user.id, cardType);
         }
-
         break;
     }
 
