@@ -27,7 +27,7 @@ const defaultStateInfo = {
   state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
   nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
   nextStateAt: 0,
-  targetId: 0,
+  stateTargetUserId: 0,
 };
 
 // 카드 버리기 요청 핸들러

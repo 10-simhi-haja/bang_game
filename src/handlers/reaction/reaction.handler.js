@@ -18,14 +18,11 @@ const REACTION_TYPE = {
 
 const handleReactionRequest = async ({ socket, payload }) => {
   try {
-    console.log(`리액션 시작`);
-
     if (!payload || typeof payload !== 'object') {
       throw new Error('Payload가 올바르지 않습니다.');
     }
 
     const { reactionType } = payload;
-    console.log(`리액션 타입 : ${reactionType}`);
 
     if (!Object.values(REACTION_TYPE).includes(reactionType)) {
       throw new Error('유효하지 않은 리액션 타입입니다.');
@@ -37,42 +34,46 @@ const handleReactionRequest = async ({ socket, payload }) => {
     }
 
     const user = getUserBySocket(socket);
-    const room = getGameSessionByUser(user);
-    const users = room.getAllUserDatas();
+    const game = getGameSessionByUser(user);
+    const users = game.getAllUserDatas();
+    // 나
+    const character = game.getCharacter(user.id);
+    console.dir(character, null);
+    const attCharacter = game.getCharacter(character.stateInfo.stateTargetUserId);
 
-    if (!room.users || !room.users[user.id]) {
-      throw new Error(`User with id ${user.id} not found in room users.`);
+    if (!game.users || !game.users[user.id]) {
+      throw new Error(`User with id ${user.id} not found in game users.`);
     }
 
     // `reactionType`가 NONE_REACTION일시 피해 적용
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
-      console.log('피해받기 선택');
-      if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
-        room.users[user.id].character.hp -= 1;
-        console.log(`유저 체력: ${room.users[user.id].character.hp}`);
+      // 대미지 받는 부분
+
+      if (game.users && game.users[user.id] && game.users[user.id].character.hp > 0) {
+        game.users[user.id].character.hp -= 1;
+        console.log(`유저 체력: ${game.users[user.id].character.hp}`);
       } else {
-        console.error(`User with id ${user.id} not found in room users or already dead.`);
+        console.error(`User with id ${user.id} not found in game users or already dead.`);
       }
       // 리셋을 전체유저에게 하는게 아니라
       // 나랑 나를 공격한 사람을 리셋해야함.
-      // room.resetStateInfoAllUsers();
-      const target = room.getCharacter(user.id);
+      // game.resetStateInfoAllUsers();
+      const target = game.getCharacter(user.id);
       const targetId = target.stateInfo.stateTargetUserId;
-      room.setCharacterState(
+      game.setCharacterState(
         user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         0,
         0,
       );
-      room.setCharacterState(
-        room.users[targetId].user.id,
+      game.setCharacterState(
+        game.users[targetId].user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         0,
         0,
       );
-      // userUpdateNotification(room);
     }
 
     // 리액션 처리 완료 후 응답 전송

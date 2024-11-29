@@ -1,8 +1,15 @@
 import { createResponse } from '../packet/response/createResponse.js';
 import config from '../../config/config.js';
-import { CHARACTER_STATE_TYPE } from '../../constants/header.js';
 
-const packetType = config.packet.packetType;
+const {
+  packet: { packetType: PACKET_TYPE },
+  winType: WIN_TYPE,
+  role: { roleType: ROLE_TYPE },
+  character: { characterStateType: CHARACTER_STATE_TYPE, characterType: CHARACTER_TYPE },
+  card: { cardType: CARD_TYPE },
+  interval: INTERVAL,
+  intervalType: INTERVAL_TYPE,
+} = config;
 
 // 주기적으로 업데이트 노티를 모두에게 보내면서.
 // 스테이트가 변경되면 즉시 해당 유저에게만 노티를. 전체에게 말고.
@@ -21,7 +28,25 @@ const userUpdateNotification = (game) => {
 
     // 유저 업데이트 부분.
     userData.forEach((user) => {
+      // 손패 갯수 업데이트
       user.character.handCardsCount = user.character.handCards.length;
+
+      if (
+        user.character.weapon === CARD_TYPE.AUTO_RIFLE || // 라이플 들거나
+        user.character.characterType === CHARACTER_TYPE.RED // 레드면 빵 수 제한없음
+      ) {
+        user.character.maxBbangCount = Number.MAX_SAFE_INTEGER;
+      } else if (user.character.weapon === CARD_TYPE.HAND_GUN) {
+        // 핸드건이면 2발
+        user.character.maxBbangCount = 2;
+      } else {
+        // 이외에는 1발
+        user.character.maxBbangCount = 1;
+      }
+
+      const isHandGu2n = user.character.equips.includes(config.card.cardType.AUTO_SHIELD);
+      //if()
+      //user.character.maxBbangCount = 1;
     });
 
     const notiData = {
@@ -38,7 +63,7 @@ const userUpdateNotification = (game) => {
         return;
       }
       const notificationResponse = createResponse(
-        packetType.USER_UPDATE_NOTIFICATION,
+        PACKET_TYPE.USER_UPDATE_NOTIFICATION,
         notiUser.socket.sequence,
         notiData,
       );
