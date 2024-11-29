@@ -261,9 +261,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 3;
       } else {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 3;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -284,11 +284,8 @@ class Game {
       userEntry.character.equips = [18, 20];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
-        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
-        { type: CARD_TYPE.BOMB, count: 1 },
-        { type: CARD_TYPE.BBANG, count: 5 },
-        { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
-        { type: CARD_TYPE.SHIELD, count: 1 },
+        { type: 8, count: 1 },
+        { type: 9, count: 1 },
       ];
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);

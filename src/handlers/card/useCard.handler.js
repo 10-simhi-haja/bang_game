@@ -94,9 +94,44 @@ const useCardHandler = ({ socket, payload }) => {
         break;
 
       //^ 유틸
-      case CARD_TYPE.ABSORB:
+      case CARD_TYPE.ABSORB: // 흡수
+        console.log('흡수 발동!: ');
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.ABSORBING,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        room.setCharacterState(
+          targetId,
+          CHARACTER_STATE_TYPE.ABSORB_TARGET,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          user.id,
+        );
         break;
-      case CARD_TYPE.HALLUCINATION:
+      case CARD_TYPE.HALLUCINATION: // 신기루
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.HALLUCINATING,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          10,
+          targetId,
+        );
+        room.setCharacterState(
+          targetId,
+          CHARACTER_STATE_TYPE.HALLUCINATION_TARGET,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          10,
+          user.id,
+        );
+
+        // ABSORBING = 11;             // 흡수 중
+        // ABSORB_TARGET = 12;         // 흡수 대상
+        // HALLUCINATING = 13;         // 신기루 중
+        // HALLUCINATION_TARGET = 14;  // 신기루 대상
+        // CONTAINED = 15;             // 감금 중
         break;
       case CARD_TYPE.FLEA_MARKET:
         // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
