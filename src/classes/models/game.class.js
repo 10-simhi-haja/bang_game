@@ -357,7 +357,7 @@ class Game {
     const giveCard = this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
-    
+
     return (this.getCharacter(userId).handCards = newHandCard);
   }
 
