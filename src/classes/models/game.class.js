@@ -314,9 +314,9 @@ class Game {
         { type: 2, count: 1 },
         { type: 3, count: 2 },
         { type: 4, count: 1 },
-        { type: 5, count: 1 },
+        { type: 9, count: 3 },
         { type: 13, count: 1 },
-        { type: 18, count: 1 },
+        { type: 23, count: 1 },
 
         ...drawCard,
       );
@@ -372,7 +372,7 @@ class Game {
       if (user.id !== userId) this.users[user.id].character.hp += 1;
     });
   }
-
+  // 만기 적금
   MaturedSavings(userId) {
     const giveCard = this.cardDeck.drawMultipleCards(2);
     const handCard = this.getCharacter(userId).handCards;
@@ -382,12 +382,50 @@ class Game {
     // console.log('새롭게 추가된 카드'+newHandCard)
     return (this.getCharacter(userId).handCards = newHandCard);
   }
+  // 복권방
   winLottery(userId) {
     const giveCard = this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
 
     return (this.getCharacter(userId).handCards = newHandCard);
+  }
+  // 핸드카드 신기루
+  handCardHallucination(tarGetId, targetHandCard) {
+    const randomValue = [Math.floor(Math.random() * targetHandCard.length)];
+    // console.log(targetHandCard.length);
+    // console.log(targetHandCard);
+    const removeCard = targetHandCard.filter((index) => index !== targetHandCard[randomValue]);
+    // console.log(removeCard);
+    return (this.getCharacter(tarGetId).handCards = removeCard);
+  }
+  // 장비카드 신기루
+  equipCardHallucination(tarGetId, selectCardType, targetEquipCard) {
+    // console.log(targetEquipCard);
+    // console.log(selectCardType);
+    const removeCard = targetEquipCard.filter((e) => {
+      return e !== selectCardType;
+    });
+
+    return (this.getCharacter(tarGetId).equips = removeCard);
+  }
+  // 무기카드 신기루
+  weaponCardHallucination(tarGetId, selectCardType, targetWeaponCard) {
+    // const removeCard = targetWeaponCard.filter((e) => {
+    //   return e !== selectCardType;
+    // });
+
+    return (this.getCharacter(tarGetId).weapon = 0);
+  }
+  // 디버프카드 신기루
+  debuffsCardHallucination(tarGetId, selectCardType, targetdebuffsCard) {
+    // console.log(targetEquipCard);
+    // console.log(selectCardType);
+    const removeCard = targetdebuffsCard.filter((e) => {
+      return e !== selectCardType;
+    });
+
+    return (this.getCharacter(tarGetId).debuffs = removeCard);
   }
 
   // 카드가 유저의 핸드에서 제거될때.
