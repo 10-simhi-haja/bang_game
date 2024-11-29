@@ -38,14 +38,15 @@ const handleReactionRequest = async ({ socket, payload }) => {
 
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
+    const users = room.getAllUserDatas();
 
     if (!room.users || !room.users[user.id]) {
       throw new Error(`User with id ${user.id} not found in room users.`);
     }
 
-    // `reactionType`가 NONE_REACTION이거나 아무 반응이 없는 경우 즉시 피해 적용
+    // `reactionType`가 NONE_REACTION일시 피해 적용
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
-      console.log(`Immediate damage applied to user ${user.id}`);
+      console.log('피해받기 선택');
       if (room.users && room.users[user.id] && room.users[user.id].character.hp > 0) {
         room.users[user.id].character.hp -= 1;
         console.log(`유저 체력: ${room.users[user.id].character.hp}`);
@@ -55,6 +56,8 @@ const handleReactionRequest = async ({ socket, payload }) => {
       // 리셋을 전체유저에게 하는게 아니라
       // 나랑 나를 공격한 사람을 리셋해야함.
       // room.resetStateInfoAllUsers();
+      const target = room.getCharacter(user.id);
+      const targetId = target.stateInfo.stateTargetUserId;
       room.setCharacterState(
         user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
@@ -62,16 +65,14 @@ const handleReactionRequest = async ({ socket, payload }) => {
         0,
         0,
       );
-      const attackerId = room.users[user.id].attackerId;
-      console.log('test: ', room.users[user.id]);
       room.setCharacterState(
-        room.users[attackerId].user.id,
+        room.users[targetId].user.id,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         0,
         0,
       );
-      userUpdateNotification(room);
+      // userUpdateNotification(room);
     }
 
     // 리액션 처리 완료 후 응답 전송
@@ -84,13 +85,13 @@ const handleReactionRequest = async ({ socket, payload }) => {
       socket.sequence,
       reactionResponseData,
     );
-    console.log('handleReactionRequest - Sending response:', reactionResponse);
 
     if (typeof socket.write === 'function') {
       socket.write(reactionResponse);
     } else {
       throw new Error('socket.write is not a function');
     }
+    console.log('reaction핸들러 작동 끝');
   } catch (error) {
     console.error('리액션 처리 중 에러 발생:', error.message);
 

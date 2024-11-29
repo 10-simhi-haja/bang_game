@@ -41,6 +41,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
     ////////// 리스폰 끝 노티 시작//////
 
     const allUserDatas = game.getAllUserDatas();
+    console.log('게임 내 유저: ', allUserDatas);
     const characterPos = shuffle(CHARACTER_SPAWN_POINT).slice(0, game.getUserLength());
 
     game.setAllUserPos(characterPos);
