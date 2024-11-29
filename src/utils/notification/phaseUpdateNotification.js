@@ -1,9 +1,7 @@
 import config from '../../config/config.js';
-import { CARD_TYPE, PHASE_TYPE } from '../../constants/header.js';
+import { PHASE_TYPE } from '../../constants/header.js';
 import { createResponse } from '../packet/response/createResponse.js';
 import handCardNotification from './handCardsNotification.js';
-import handleAnimationNotification from './animation.notification.js';
-import userUpdateNotification from './userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -61,8 +59,9 @@ const phaseUpdateNotification = (game) => {
       handCardNotification(notiUser, game);
     }
   });
-
-  game.debuffUpdate();
+  if (game.phase === PHASE_TYPE.DAY) {
+    game.debuffUpdate();
+  }
 
   game.setPhaseUpdateInterval(time);
 };

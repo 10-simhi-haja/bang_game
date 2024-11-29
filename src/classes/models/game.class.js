@@ -2,7 +2,6 @@ import config from '../../config/config.js';
 import gameEndNotification from '../../utils/notification/gameEndNotification.js';
 import phaseUpdateNotification from '../../utils/notification/phaseUpdateNotification.js';
 import IntervalManager from '../managers/interval.manager.js';
-import { removeGameSessionById } from '../../sessions/game.session.js';
 import CardDeck from './cardDeck.class.js';
 import warningNotification from '../../utils/notification/warningNotification.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
@@ -51,6 +50,7 @@ class Game {
   remove() {
     this.intervalManager.clearAll();
   }
+
   // 들어온 순서대로 반영.
   // 유저의 계정 user클래스
   getAllUsers() {
@@ -307,7 +307,7 @@ class Game {
         nextStateAt: 0,
         stateTargetUserId: 0,
       }; // 캐릭터 스테이트 타입
-      userEntry.character.equips = [19];
+      userEntry.character.equips = [];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         { type: CARD_TYPE.FLEA_MARKET, count: 1 },
@@ -384,6 +384,7 @@ class Game {
     // console.log('새롭게 추가된 카드'+newHandCard)
     return (this.getCharacter(userId).handCards = newHandCard);
   }
+
   winLottery(userId) {
     const giveCard = this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
@@ -596,29 +597,53 @@ class Game {
 
   // 위성타겟 디버프 가졌는지 확인하고 다음유저에게 넘기기까지
   debuffUpdate() {
+    // 위성 타겟 디버프 처리
     const satelliteTargetUser = this.getDebuffUser(CARD_TYPE.SATELLITE_TARGET);
-    console.dir(satelliteTargetUser, null);
-    const character = this.getCharacter(satelliteTargetUser.id);
+    if (satelliteTargetUser) {
+      const satelliteCharacter = this.getCharacter(satelliteTargetUser.id);
 
-    const index = character.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
-    if (index !== -1) {
-      character.debuffs.splice(index, 1);
+      const satelIndex = satelliteCharacter.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
+      if (satelIndex !== -1) {
+        satelliteCharacter.debuffs.splice(satelIndex, 1);
+      }
+
+      if (Math.random() < 0.03) {
+        console.log(`위성 터졌다!`);
+
+        // 효과가 발동되었을 때
+        satelliteCharacter.hp -= 3;
+        animationNotification(this, ANIMATION_TYPE.SATELLITE_TARGET_ANIMATION, satelliteTargetUser);
+      } else {
+        const nextUser = this.getNextUser(satelliteTargetUser.id);
+        const nextUserCharacter = this.getCharacter(nextUser.id);
+        nextUserCharacter.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
+      }
     }
 
-    if (Math.random() < 0) {
-      console.log(`위성 터졌다!`);
+    // 감옥 디버프 처리
+    const containmentUnitUser = this.getDebuffUser(CARD_TYPE.CONTAINMENT_UNIT);
+    if (containmentUnitUser) {
+      const containmentCharacter = this.getCharacter(containmentUnitUser.id);
 
-      // 효과가 발동되었을 때
-      character.hp -= 1;
-      animationNotification(this, ANIMATION_TYPE.SATELLITE_TARGET_ANIMATION, curUser);
-    } else {
-      const nextUser = this.getNextUser(satelliteTargetUser.id);
-      const nextUserCharacter = this.getCharacter(nextUser.id);
-      nextUserCharacter.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
-    }
+      const containmentIndex = containmentCharacter.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
+      if (containmentIndex !== -1) {
+        containmentCharacter.debuffs.splice(containmentIndex, 1);
+      }
 
-    // 감옥체크
-    if (this.debuffCheck(character, CARD_TYPE.CONTAINMENT_UNIT)) {
+      // 75% 확률로 감금 상태로 전환
+      // 감금 상태인 유저는 스테이트 타입이 변경 된다 이로 생길 수 있는 문제는????
+      // 다른 스테이트 타입으로 바뀌면 플리마켓 로직에서 사용한 이전 상태로 돌리는 기능을 사용한다면?
+      // 그러면 감금 상태인 유저가 공격을 받았을 때 누군가가 플리마켓을 사용한다면 이전 상태인 공격이 풀리면 감금이 풀릴 것
+      // 하루 페이즈동안 감금상태를 강제로 유지하게 한다면?
+      if (Math.random() < 1) {
+        this.setCharacterState(
+          containmentUnitUser.id,
+          CHARACTER_STATE_TYPE.CONTAINED,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          0,
+          containmentCharacter,
+        );
+      }
     }
   }
 
