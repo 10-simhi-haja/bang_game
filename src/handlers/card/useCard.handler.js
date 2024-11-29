@@ -124,6 +124,7 @@ const useCardHandler = ({ socket, payload }) => {
         );
         console.log(`useCard_state: ${room.getCharacter(user.id).stateInfo.state}`);
         targetIds.forEach((targetId) => {
+          if (targetId === user.id) return;
           room.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.BIG_BBANG_TARGET,
@@ -144,6 +145,7 @@ const useCardHandler = ({ socket, payload }) => {
         );
 
         targetIds.forEach((targetId) => {
+          if (targetId === user.id) return;
           room.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.GUERRILLA_TARGET,

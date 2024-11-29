@@ -18,11 +18,11 @@ export const deathMatchInterval = (game, user) => {
   console.log(`빵야나 피해입는걸 선택 안함`);
 
   if (
-    game.getCharacter(targetId).stateInfo.state === CHARACTER_STATE_TYPE.DEATH_MATCH_STATE &&
-    game.users[targetId].character.hp > 0
+    game.getCharacter(user.id).stateInfo.state === CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE &&
+    game.users[user.id].character.hp > 0
   ) {
-    console.log(`${targetId}의 hp 감소`);
-    game.users[targetId].character.hp -= 1;
+    console.log(`${user.id}의 hp 감소`);
+    game.users[user.id].character.hp -= 1;
   }
 
   game.setCharacterState(

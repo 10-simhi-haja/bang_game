@@ -12,6 +12,7 @@ import { bbangInterval } from '../../utils/util/bbangFunction.js';
 import { bigBbangInterval } from '../../utils/util/bigBbangFunction.js';
 import { guerrillaInterval } from '../../utils/util/guerrillaFunction.js';
 import { deathMatchInterval } from '../../utils/util/deathMatchFunction.js';
+import { bigBbangInterval2 } from '../../utils/util/bigBbangFunction2.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -188,20 +189,14 @@ class Game {
         case CHARACTER_STATE_TYPE.GUERRILLA_TARGET:
           break;
         case CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER:
-          console.log(`무차별 난사 setCharacter실행`);
-          console.log(
-            `gameClass_userId: ${JSON.stringify(this.users[curUserId].user.id, null, 2)}`,
-          );
-          console.log(`gameClass_state 전: ${character.stateInfo.state}`);
+          break;
+        case CHARACTER_STATE_TYPE.BIG_BBANG_TARGET:
           this.intervalManager.addInterval(
             curUserId,
             () => bigBbangInterval(this, this.users[curUserId].user),
             time,
             INTERVAL_TYPE.CHARACTER_STATE,
           );
-          console.log(`gameClass_state 후: ${character.stateInfo.state}`);
-          break;
-        case CHARACTER_STATE_TYPE.BIG_BBANG_TARGET:
           break;
         case CHARACTER_STATE_TYPE.ABSORBING:
           break;
