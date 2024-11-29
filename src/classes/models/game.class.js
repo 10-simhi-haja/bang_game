@@ -287,9 +287,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 5;
       } else {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 5;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -635,7 +635,13 @@ class Game {
       // 다른 스테이트 타입으로 바뀌면 플리마켓 로직에서 사용한 이전 상태로 돌리는 기능을 사용한다면?
       // 그러면 감금 상태인 유저가 공격을 받았을 때 누군가가 플리마켓을 사용한다면 이전 상태인 공격이 풀리면 감금이 풀릴 것
       // 하루 페이즈동안 감금상태를 강제로 유지하게 한다면?
+
+      // 버그
+      // 1. 감금 상태일때 무한로딩 상태여서 저격총 아니면 타겟팅이 안됨
+      // 2. 감금 상태일때 공격을 받은 상태에서 플리마켓을 시전하면 공격으로 돌아가는게 데브로 올라온 것으로 알고있는데 바로 감금상태로 돌아감
+      // 3. 밤이 되면 감금이 풀리면서 자유로워지긴 하나 상대방은 캐릭터 위에 로딩이 나와 여전히 타게팅 불가
       if (Math.random() < 1) {
+        console.log(`User ${containmentUnitUser.id}가 감금 상태로 전환되었습니다.`);
         this.setCharacterState(
           containmentUnitUser.id,
           CHARACTER_STATE_TYPE.CONTAINED,
@@ -643,8 +649,38 @@ class Game {
           0,
           containmentCharacter,
         );
+        this.maintainDetentionState(containmentUnitUser.id);
       }
     }
+  }
+
+  // 감금 상태를 강제로 유지하는 함수
+  maintainDetentionState(userId) {
+    const intervalId = setInterval(() => {
+      // 밤 페이즈로 전환되었는지를 확인
+      if (this.phase === PHASE_TYPE.END) {
+        console.log(`밤 페이즈로 전환되었습니다. 감시를 종료합니다.`);
+        clearInterval(intervalId);
+        return;
+      }
+
+      const character = this.getCharacter(userId);
+      if (!character) {
+        clearInterval(intervalId);
+        return;
+      }
+
+      if (character.stateInfo.state !== CHARACTER_STATE_TYPE.CONTAINED) {
+        console.log(`User ${userId}의 상태를 감금 상태로 복구합니다.`);
+        this.setCharacterState(
+          userId,
+          CHARACTER_STATE_TYPE.CONTAINED,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          0,
+          character,
+        );
+      }
+    }, 1000); // 매 0.5초마다 상태 확인
   }
 
   ///////////////////// intervalManager 관련.
