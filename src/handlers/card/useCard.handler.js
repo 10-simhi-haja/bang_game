@@ -17,6 +17,7 @@ const {
   card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
   character: { characterStateType: CHARACTER_STATE_TYPE },
+  interval: INTERVAL,
 } = config;
 
 const useCardHandler = ({ socket, payload }) => {
@@ -51,16 +52,20 @@ const useCardHandler = ({ socket, payload }) => {
           user.id,
           CHARACTER_STATE_TYPE.BIG_BBANG_SHOOTER,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
-          targetId,
+          INTERVAL.ATTACK,
+          targetIds,
         );
+        console.log(`targetIds: ${targetIds}`);
         targetIds.forEach((targetId) => {
           game.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.BIG_BBANG_TARGET,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             user.id,
+          );
+          console.log(
+            `bigbbang state: ${JSON.stringify(room.getCharacter(targetId).stateInfo, null, 2)}`,
           );
         });
         break;
@@ -70,15 +75,16 @@ const useCardHandler = ({ socket, payload }) => {
           user.id,
           CHARACTER_STATE_TYPE.GUERRILLA_SHOOTER,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
-          targetId,
+          INTERVAL.ATTACK,
+          targetIds,
         );
+
         targetIds.forEach((targetId) => {
           game.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.GUERRILLA_TARGET,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             user.id,
           );
         });
@@ -90,14 +96,14 @@ const useCardHandler = ({ socket, payload }) => {
           user.id,
           CHARACTER_STATE_TYPE.DEATH_MATCH_STATE,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
+          INTERVAL.ATTACK,
           targetId,
         );
         game.setCharacterState(
           targetId,
           CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
+          INTERVAL.ATTACK,
           user.id,
         );
         break;
@@ -132,9 +138,38 @@ const useCardHandler = ({ socket, payload }) => {
         break;
 
       //^ 유틸
-      case CARD_TYPE.ABSORB:
+      case CARD_TYPE.ABSORB: // 흡수
+        console.log('흡수 발동!: ');
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.ABSORBING,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          targetId,
+        );
+        room.setCharacterState(
+          targetId,
+          CHARACTER_STATE_TYPE.ABSORB_TARGET,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          3,
+          user.id,
+        );
         break;
-      case CARD_TYPE.HALLUCINATION:
+      case CARD_TYPE.HALLUCINATION: // 신기루
+        room.setCharacterState(
+          user.id,
+          CHARACTER_STATE_TYPE.HALLUCINATING,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          10,
+          targetId,
+        );
+        room.setCharacterState(
+          targetId,
+          CHARACTER_STATE_TYPE.HALLUCINATION_TARGET,
+          CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
+          10,
+          user.id,
+        );
         break;
       case CARD_TYPE.FLEA_MARKET:
         // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
