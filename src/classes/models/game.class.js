@@ -282,6 +282,8 @@ class Game {
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(
+        { type: 6, count: 2 },
+        { type: 7, count: 2 },
         { type: 1, count: 4 },
         { type: 2, count: 2 },
         { type: 3, count: 4 },
@@ -435,7 +437,7 @@ class Game {
     target.stateInfo.state = CHARACTER_STATE_TYPE.BBANG_TARGET;
     target.stateInfo.nextState = CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE;
     target.stateInfo.nextStateAt = nextStateAt;
-    target.stateInfo.stateTargetUserId = targetId;
+    target.stateInfo.stateTargetUserId = userId;
     console.log(`빵타겟 current ${targetId}:`, target.stateInfo);
 
     setTimeout(() => {

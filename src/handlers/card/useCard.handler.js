@@ -23,6 +23,8 @@ const useCardHandler = ({ socket, payload }) => {
     const user = getUserBySocket(socket);
     const room = getGameSessionByUser(user);
     const users = room.getAllUserDatas();
+    const userId = user.id;
+    const usersId = [];
 
     const responsePayload = {
       success: true,
@@ -48,8 +50,6 @@ const useCardHandler = ({ socket, payload }) => {
         room.shooterPushArr(user.id, targetId);
         break;
       case CARD_TYPE.BIG_BBANG:
-        const userId = user.id;
-        const usersId = [];
         users.forEach((user) => {
           if (user.id !== userId) usersId.push(user.id);
         });
@@ -57,9 +57,15 @@ const useCardHandler = ({ socket, payload }) => {
         room.shooterPushArr(user.id, usersId);
         break;
       case CARD_TYPE.GUERRILLA:
+        users.forEach((user) => {
+          if (user.id !== userId) usersId.push(user.id);
+        });
         room.GuerrillaStateInfo(user.id, usersId, 10000, room);
         break;
       case CARD_TYPE.DEATH_MATCH:
+        users.forEach((user) => {
+          if (user.id !== userId) usersId.push(user.id);
+        });
         room.DeathMatchStateInfo(user.id, targetId, 10000, room);
         break;
 
