@@ -19,18 +19,88 @@ const cardSelectHandler = ({ socket, payload }) => {
     console.log(`selectType = ${selectType}, selectCardType = ${selectCardType}`);
 
     const targetId = room.getCharacter(user.id).stateInfo.stateTargetUserId;
+    const cards = room.users[targetId].character;
+    // console.log(cards);
+    let range = 0;
+    let length = 0;
     switch (selectType) {
       case 0: // 핸드
-        console.log(room.users[targetId].character.handCards);
+        length = cards.handCards.length;
+        range = Math.floor(Math.random() * length);
+
+        // console.log('나의 핸드 카드: ', room.users[user.id].character.handCards);
+        // console.log('타겟의 핸드 카드: ', cards.handCards);
+        // console.log('내가 고른 카드: ', cards.handCards[range].type); // 핸드 카드 중에서 선택...
+        // console.log('=====================================');
+
+        const targetCard = room.users[user.id].character.handCards.find(
+          (card) => card.type === cards.handCards[range].type,
+        );
+
+        if (targetCard) {
+          targetCard.count++;
+        } else {
+          const plusCard = { type: cards.handCards[range].type, count: 1 };
+          room.users[user.id].character.handCards.push(plusCard);
+        }
+
+        // console.log('현재 나의 핸드 카드: ', room.users[user.id].character.handCards);
+        // console.log('현재 타겟의 핸드 카드: ', cards.handCards);
         break;
       case 1: // 장비
-        console.log(room.users[targetId].character.equips);
+        length = cards.equips.length;
+
+        console.log('나의 핸드 카드: ', room.users[user.id].character.handCards);
+        console.log('타겟의 장비 카드: ', cards.equips);
+        console.log('내가 고른 카드: ', selectCardType); // 장비 카드 중에서 선택...
+
+        const cardSelectIndex = cards.equips.indexOf(selectCardType);
+        console.log('내가 고른 카드는 몇 번째에?: ', cardSelectIndex); // 장비 카드 중에서 선택...
+
+        const targetCard2 = room.users[user.id].character.handCards.find(
+          (card) => card.type === cards.equips[cardSelectIndex],
+        );
+
+        if (targetCard2) {
+          targetCard2.count++;
+          console.log('잇다!!!');
+        } else {
+          const plusCard = { type: selectCardType, count: 1 };
+          room.users[user.id].character.handCards.push(plusCard);
+          console.log('없다!!!');
+        }
+
+        console.log('현재 나의 핸드 카드: ', room.users[user.id].character.handCards);
         break;
       case 2: // 무기
-        console.log(room.users[targetId].character.weapon);
+        console.log(cards.weapon);
         break;
       case 3: // 디버프
-        console.log(room.users[targetId].character.debuffs);
+        length = cards.debuffs.length;
+
+        console.log('나의 핸드 카드: ', room.users[user.id].character.handCards);
+        console.log('타겟의 디버프 카드: ', cards.debuffs);
+        console.log('내가 고른 카드: ', selectCardType); // 장비 카드 중에서 선택...
+
+        const cardSelectIndex2 = cards.debuffs.indexOf(selectCardType);
+        console.log('내가 고른 카드는 몇 번째에?: ', cardSelectIndex2); // 장비 카드 중에서 선택...
+
+        const targetCard3 = room.users[user.id].character.handCards.find(
+          (card) => card.type === cards.debuffs[cardSelectIndex2],
+        );
+
+        if (targetCard3) {
+          targetCard3.count++;
+          console.log('잇다!!!');
+        } else {
+          const plusCard = { type: selectCardType, count: 1 };
+          room.users[user.id].character.handCards.push(plusCard);
+          console.log('없다!!!');
+        }
+
+        console.log('현재 나의 핸드 카드: ', room.users[user.id].character.handCards);
+
+        console.log(cards.debuffs);
         break;
     }
 
