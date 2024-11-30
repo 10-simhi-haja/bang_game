@@ -25,6 +25,8 @@ const cardSelectHandler = ({ socket, payload }) => {
     let length = 0;
     switch (selectType) {
       case 0: // 핸드
+        room.handCardHallucination(targetId, room.users[targetId].character.handCards);
+
         length = cards.handCards.length;
         range = Math.floor(Math.random() * length);
 
@@ -48,6 +50,12 @@ const cardSelectHandler = ({ socket, payload }) => {
         // console.log('현재 타겟의 핸드 카드: ', cards.handCards);
         break;
       case 1: // 장비
+        room.equipCardHallucination(
+          targetId,
+          selectCardType,
+          room.users[targetId].character.equips,
+        );
+
         length = cards.equips.length;
 
         console.log('나의 핸드 카드: ', room.users[user.id].character.handCards);
@@ -73,9 +81,21 @@ const cardSelectHandler = ({ socket, payload }) => {
         console.log('현재 나의 핸드 카드: ', room.users[user.id].character.handCards);
         break;
       case 2: // 무기
+        room.weaponCardHallucination(
+          targetId,
+          selectCardType,
+          room.users[targetId].character.weapon,
+        );
+        room.addWeapon(user.id, 0);
         console.log(cards.weapon);
         break;
       case 3: // 디버프
+        room.debuffsCardHallucination(
+          targetId,
+          selectCardType,
+          room.users[targetId].character.debuffs,
+        );
+
         length = cards.debuffs.length;
 
         console.log('나의 핸드 카드: ', room.users[user.id].character.handCards);

@@ -6,6 +6,8 @@ import handCardNotification from './handCardsNotification.js';
 const {
   packet: { packetType: PACKET_TYPE },
   interval: INTERVAL,
+  character: { characterStateType: CHARACTER_STATE_TYPE },
+  card: { cardType: CARD_TYPE },
 } = config;
 
 // 페이즈 업데이트 알림
@@ -20,6 +22,7 @@ const phaseUpdateNotification = (game) => {
   }
 
   const characterPosData = game.getAllUserPos();
+  const characterDatas = game.getAllUserDatas();
 
   const phaseUpdateNotiData = {
     phaseType: game.phase,
@@ -38,6 +41,7 @@ const phaseUpdateNotification = (game) => {
 
     notiUser.socket.write(phaseUpdateNoti);
 
+    // 낮일때
     if (game.phase === PHASE_TYPE.DAY) {
       const userCharacter = game.getCharacter(notiUser.id);
 
@@ -54,12 +58,13 @@ const phaseUpdateNotification = (game) => {
       // 낮이 되어서 카드 뽑는 부분.
       const drawCard = game.cardDeck.drawMultipleCards(2);
       userCharacter.handCards.push(...drawCard);
-
       handCardNotification(notiUser, game);
     }
   });
+  if (game.phase === PHASE_TYPE.DAY) {
+    game.debuffUpdate();
+  }
 
   game.setPhaseUpdateInterval(time);
 };
-
 export default phaseUpdateNotification;
