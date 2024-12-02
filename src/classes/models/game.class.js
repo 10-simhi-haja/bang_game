@@ -345,7 +345,7 @@ class Game {
         stateTargetUserId: 0,
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [];
-      userEntry.character.debuffs = [];
+      userEntry.character.debuffs = [23];
       userEntry.character.handCards = [
         { type: CARD_TYPE.FLEA_MARKET, count: 1 },
         { type: CARD_TYPE.BOMB, count: 1 },
@@ -357,16 +357,17 @@ class Game {
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(
-        { type: 6, count: 1 },
-        { type: 7, count: 1 },
-        { type: 1, count: 2 },
-        { type: 2, count: 1 },
-        { type: 3, count: 2 },
-        { type: 4, count: 1 },
-        { type: 9, count: 3 },
-        { type: 13, count: 1 },
-        { type: 23, count: 1 },
-        ...drawCard,
+        { type: 8, count: 2 },
+        { type: 9, count: 2 },
+        // { type: 9, count: 1 },
+        // { type: 23, count: 2 },
+        // { type: 2, count: 1 },
+        // { type: 3, count: 2 },
+        // { type: 4, count: 1 },
+        // { type: 9, count: 3 },
+        // { type: 13, count: 1 },
+        // { type: 23, count: 1 },
+        // ...drawCard,
       );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
@@ -439,46 +440,47 @@ class Game {
   }
 
   // 신기루
-  mirage(type, targetId, selectCard, targetCards, range) {
+  mirage(isAbsorbing, type, targetId, selectCard, targetCards, range) {
     let removeCard;
 
     switch (type) {
       case 0: // 핸드
-        removeCard = targetCards.filter((index) => index !== targetCards[range]);
-        this.getCharacter(targetId).handCards = removeCard;
+        if (!isAbsorbing) {
+          // 신기루일 경우, 사라진 카드는 사용된 카드 덱 쪽으로 저장
+          this.removeCard(targetId, targetCards[range].type);
+        } else {
+          // 흡수
+          this.getCharacter(targetId).handCards[range].count -= 1;
+          // 0장이 되면 아예 제거...
+          if (this.getCharacter(targetId).handCards[range].count === 0) {
+            removeCard = targetCards.filter((index) => index !== targetCards[range]);
+            this.getCharacter(targetId).handCards = removeCard;
+          }
+        }
         break;
       case 1: //장비
-        removeCard = targetCards.filter((index) => index !== selectCard);
-        this.getCharacter(targetId).equips = removeCard;
+        if (!isAbsorbing) {
+          this.removeCard(targetId, selectCard);
+        } else {
+          removeCard = targetCards.filter((index) => index !== selectCard);
+          this.getCharacter(targetId).equips = removeCard;
+        }
         break;
       case 2: // 무기
+        if (!isAbsorbing) {
+          this.removeCard(targetId, this.getCharacter(targetId).weapon);
+        }
         this.getCharacter(targetId).weapon = 0;
         break;
       case 3: // 디버프
+        if (!isAbsorbing) {
+          this.removeCard(targetId, selectCard);
+        }
         removeCard = targetCards.filter((index) => index !== selectCard);
         this.getCharacter(targetId).debuffs = removeCard;
         break;
     }
   }
-  // // 핸드카드 신기루
-  // handCardHallucination(targetId, targetHandCard, range) {
-  //   const removeCard = targetHandCard.filter((index) => index !== targetHandCard[range]);
-  //   this.getCharacter(targetId).handCards = removeCard;
-  // }
-  // // 장비카드 신기루
-  // equipCardHallucination(targetId, selectCardType, targetEquipCard) {
-  //   const removeCard = targetEquipCard.filter((e) => e !== selectCardType);
-  //   this.getCharacter(targetId).equips = removeCard;
-  // }
-  // // 무기카드 신기루
-  // weaponCardHallucination(targetId, selectCardType, targetWeaponCard) {
-  //   this.getCharacter(targetId).weapon = 0;
-  // }
-  // // 디버프카드 신기루
-  // debuffsCardHallucination(targetId, selectCardType, targetdebuffsCard) {
-  //   const removeCard = targetdebuffsCard.filter((e) => e !== selectCardType);
-  //   this.getCharacter(targetId).debuffs = removeCard;
-  // }
 
   // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {
