@@ -349,25 +349,25 @@ class Game {
       userEntry.character.handCards = [
         { type: CARD_TYPE.FLEA_MARKET, count: 1 },
         { type: CARD_TYPE.BOMB, count: 1 },
-        { type: CARD_TYPE.BBANG, count: 5 },
+        { type: CARD_TYPE.BBANG, count: 1 },
         { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
         { type: CARD_TYPE.SHIELD, count: 1 },
       ];
-      userEntry.character.handCards = [];
+      //userEntry.character.handCards = [];
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
-      userEntry.character.handCards.push(
-        { type: 6, count: 1 },
-        { type: 7, count: 1 },
-        { type: 1, count: 2 },
-        { type: 2, count: 1 },
-        { type: 3, count: 2 },
-        { type: 4, count: 1 },
-        { type: 9, count: 3 },
-        { type: 13, count: 1 },
-        { type: 23, count: 1 },
-        ...drawCard,
-      );
+      // userEntry.character.handCards.push(
+      //   { type: 6, count: 1 },
+      //   { type: 7, count: 1 },
+      //   { type: 1, count: 2 },
+      //   { type: 2, count: 1 },
+      //   { type: 3, count: 2 },
+      //   { type: 4, count: 1 },
+      //   { type: 9, count: 3 },
+      //   { type: 13, count: 1 },
+      //   { type: 23, count: 1 },
+      //   ...drawCard,
+      // );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
       userEntry.character.autoShield = false;

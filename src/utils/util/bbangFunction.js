@@ -23,7 +23,7 @@ export const bbangInterval = (game, user) => {
     game.getCharacter(targetId).stateInfo.state === CHARACTER_STATE_TYPE.BBANG_TARGET &&
     game.users[targetId].character.hp > 0
   ) {
-    console.log(`${targetId}의 hp 감소`);
+    console.log(`${targetId}의 hp 감소`); // HP 감소부분.
     game.users[targetId].character.hp -= 1;
   }
 

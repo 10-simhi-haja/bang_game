@@ -65,15 +65,27 @@ const handleReactionRequest = async ({ socket, payload }) => {
       ) {
         character.hp -= 2; // 데저트 이글 끼고 빵일때만 대미지 2
         if (CHARACTER_TYPE.MALANG === character.characterType) {
+          // 말랑이
           const drawCard = game.cardDeck.drawMultipleCards(2);
           character.handCards.push(...drawCard);
         }
       } else {
         character.hp -= 1; // 그외에는 대미지 1
         if (CHARACTER_TYPE.MALANG === character.characterType) {
+          // 말랑이
           const drawCard = game.cardDeck.drawMultipleCards(1);
           character.handCards.push(...drawCard);
         }
+      }
+
+      if (
+        CHARACTER_TYPE.PINK_SLIME === character.characterType &&
+        attCharacter.handCardsCount !== 0
+      ) {
+        const randomIndex = Math.floor(Math.random() * attCharacter.handCardsCount);
+
+        const [removeCard] = attCharacter.handCards.splice(randomIndex, 1);
+        character.handCards.push(removeCard);
       }
 
       // 리셋을 전체유저에게 하는게 아니라
