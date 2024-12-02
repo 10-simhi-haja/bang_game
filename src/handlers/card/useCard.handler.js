@@ -10,6 +10,7 @@ import fleaMarketNotification from '../../utils/notification/fleaMarketNotificat
 import FleaMarket from '../../classes/models/fleaMarket.js';
 import animationNotification from '../../utils/notification/animationNotification.js';
 import { useBbang } from '../../utils/util/card/useCardFunction.js';
+import { CHARACTER_TYPE } from '../../constants/header.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -112,7 +113,16 @@ const useCardHandler = ({ socket, payload }) => {
         console.log('방어 카드 사용');
         // 방어카드 사용
         // 쏜사람이 상어군이나,레이저 조준기 들고 있으면
-        // 방어카드 2개 삭제;
+        // 방어카드 2개 삭제 아래에서 useCard로 삭제하고 있으니
+        // 여기서 1개 밑에서 1개 삭제되면 2개
+        if (
+          (targetUser.character.characterType === CHARACTER_TYPE.SHARK ||
+            targetUser.character.equips.includes(CARD_TYPE.LASER_POINTER)) &&
+          targetUser.character.stateInfo.state === CHARACTER_STATE_TYPE.BBANG_SHOOTER
+        ) {
+          game.removeCard(user.id, cardType);
+        }
+
         game.setCharacterState(
           user.id,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
