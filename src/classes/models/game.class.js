@@ -345,7 +345,7 @@ class Game {
         stateTargetUserId: 0,
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [];
-      userEntry.character.debuffs = [23];
+      userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         { type: CARD_TYPE.FLEA_MARKET, count: 1 },
         { type: CARD_TYPE.BOMB, count: 1 },
@@ -357,17 +357,15 @@ class Game {
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(
-        { type: 8, count: 2 },
-        { type: 9, count: 2 },
-        // { type: 9, count: 1 },
-        // { type: 23, count: 2 },
-        // { type: 2, count: 1 },
-        // { type: 3, count: 2 },
-        // { type: 4, count: 1 },
-        // { type: 9, count: 3 },
-        // { type: 13, count: 1 },
-        // { type: 23, count: 1 },
-        // ...drawCard,
+        { type: 9, count: 1 },
+        { type: 23, count: 2 },
+        { type: 2, count: 1 },
+        { type: 3, count: 2 },
+        { type: 4, count: 1 },
+        { type: 9, count: 3 },
+        { type: 13, count: 1 },
+        { type: 23, count: 1 },
+        ...drawCard,
       );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
