@@ -427,9 +427,6 @@ class Game {
     const giveCard = this.cardDeck.drawMultipleCards(2);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
-    // console.log('새로운카드'+giveCard)
-    // console.log('보유중이던 카드'+handCard)
-    // console.log('새롭게 추가된 카드'+newHandCard)
     return (this.getCharacter(userId).handCards = newHandCard);
   }
   // 복권방
@@ -440,43 +437,48 @@ class Game {
     const newHandCard = [...handCard, ...giveCard];
     return (this.getCharacter(userId).handCards = newHandCard);
   }
-  // 핸드카드 신기루
-  handCardHallucination(tarGetId, targetHandCard) {
-    const randomValue = [Math.floor(Math.random() * targetHandCard.length)];
-    // console.log(targetHandCard.length);
-    // console.log(targetHandCard);
-    const removeCard = targetHandCard.filter((index) => index !== targetHandCard[randomValue]);
-    // console.log(removeCard);
-    return (this.getCharacter(tarGetId).handCards = removeCard);
-  }
-  // 장비카드 신기루
-  equipCardHallucination(tarGetId, selectCardType, targetEquipCard) {
-    // console.log(targetEquipCard);
-    // console.log(selectCardType);
-    const removeCard = targetEquipCard.filter((e) => {
-      return e !== selectCardType;
-    });
 
-    return (this.getCharacter(tarGetId).equips = removeCard);
-  }
-  // 무기카드 신기루
-  weaponCardHallucination(tarGetId, selectCardType, targetWeaponCard) {
-    // const removeCard = targetWeaponCard.filter((e) => {
-    //   return e !== selectCardType;
-    // });
+  // 신기루
+  mirage(type, targetId, selectCard, targetCards, range) {
+    let removeCard;
 
-    return (this.getCharacter(tarGetId).weapon = 0);
+    switch (type) {
+      case 0: // 핸드
+        removeCard = targetCards.filter((index) => index !== targetCards[range]);
+        this.getCharacter(targetId).handCards = removeCard;
+        break;
+      case 1: //장비
+        removeCard = targetCards.filter((index) => index !== selectCard);
+        this.getCharacter(targetId).equips = removeCard;
+        break;
+      case 2: // 무기
+        this.getCharacter(targetId).weapon = 0;
+        break;
+      case 3: // 디버프
+        removeCard = targetCards.filter((index) => index !== selectCard);
+        this.getCharacter(targetId).debuffs = removeCard;
+        break;
+    }
   }
-  // 디버프카드 신기루
-  debuffsCardHallucination(tarGetId, selectCardType, targetdebuffsCard) {
-    // console.log(targetEquipCard);
-    // console.log(selectCardType);
-    const removeCard = targetdebuffsCard.filter((e) => {
-      return e !== selectCardType;
-    });
-
-    return (this.getCharacter(tarGetId).debuffs = removeCard);
-  }
+  // // 핸드카드 신기루
+  // handCardHallucination(targetId, targetHandCard, range) {
+  //   const removeCard = targetHandCard.filter((index) => index !== targetHandCard[range]);
+  //   this.getCharacter(targetId).handCards = removeCard;
+  // }
+  // // 장비카드 신기루
+  // equipCardHallucination(targetId, selectCardType, targetEquipCard) {
+  //   const removeCard = targetEquipCard.filter((e) => e !== selectCardType);
+  //   this.getCharacter(targetId).equips = removeCard;
+  // }
+  // // 무기카드 신기루
+  // weaponCardHallucination(targetId, selectCardType, targetWeaponCard) {
+  //   this.getCharacter(targetId).weapon = 0;
+  // }
+  // // 디버프카드 신기루
+  // debuffsCardHallucination(targetId, selectCardType, targetdebuffsCard) {
+  //   const removeCard = targetdebuffsCard.filter((e) => e !== selectCardType);
+  //   this.getCharacter(targetId).debuffs = removeCard;
+  // }
 
   // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {
