@@ -324,9 +324,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 5;
+        userEntry.character.hp = 3;
       } else {
-        userEntry.character.hp = 5;
+        userEntry.character.hp = 3;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -357,15 +357,16 @@ class Game {
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(
-        { type: 9, count: 1 },
-        { type: 23, count: 2 },
-        { type: 2, count: 1 },
-        { type: 3, count: 2 },
-        { type: 4, count: 1 },
-        { type: 9, count: 3 },
-        { type: 13, count: 1 },
-        { type: 23, count: 1 },
-        ...drawCard,
+        { type: 1, count: 5 },
+        { type: 8, count: 2 },
+        { type: 9, count: 2 },
+        // { type: 2, count: 1 },
+        // { type: 3, count: 2 },
+        // { type: 4, count: 1 },
+        // { type: 9, count: 3 },
+        // { type: 13, count: 1 },
+        // { type: 23, count: 1 },
+        // ...drawCard,
       );
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
