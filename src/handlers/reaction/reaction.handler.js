@@ -1,6 +1,6 @@
 import { getGameSessionBySocket, getGameSessionByUser } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { CARD_TYPE, PACKET_TYPE } from '../../constants/header.js';
+import { CARD_TYPE, CHARACTER_TYPE, PACKET_TYPE } from '../../constants/header.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
@@ -39,7 +39,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
     const users = game.getAllUserDatas();
     // 나
     const character = game.getCharacter(user.id);
-    console.dir(character, null);
     const attCharacter = game.getCharacter(character.stateInfo.stateTargetUserId);
 
     if (!game.users || !game.users[user.id]) {
@@ -53,12 +52,21 @@ const handleReactionRequest = async ({ socket, payload }) => {
       // 데저트 이글 끼고 있으면 2배 데미지
       // 대미지 받고 발동하는 효과 발동
       // 핑크슬라임, 말랑이
-      if (game.users && game.users[user.id] && game.users[user.id].character.hp > 0) {
-        game.users[user.id].character.hp -= 1;
-        console.log(`유저 체력: ${game.users[user.id].character.hp}`);
-      } else {
-        console.error(`User with id ${user.id} not found in game users or already dead.`);
+      if (character.hp <= 0) {
+        console.log(`이미 죽은 유저에게 리액션이 들어왔습니다.`);
+        return;
       }
+
+      // 빵일때만 대미지가 2배여야함.
+      if (
+        attCharacter.weapon === CARD_TYPE.DESERT_EAGLE &&
+        character.stateInfo.stateType === CHARACTER_STATE_TYPE.BBANG_TARGET
+      ) {
+        game.damageCharacter(character, attCharacter, 2);
+      } else {
+        game.damageCharacter(character, attCharacter, 1);
+      }
+
       // 리셋을 전체유저에게 하는게 아니라
       // 나랑 나를 공격한 사람을 리셋해야함.
       // game.resetStateInfoAllUsers();
