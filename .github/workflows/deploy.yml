@@ -29,4 +29,3 @@ jobs:
             echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
             git pull origin main
             pm2 start src/server.js
-            sudo systemctl restart your-service-name
