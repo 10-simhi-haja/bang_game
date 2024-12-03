@@ -212,32 +212,17 @@ const useCardHandler = ({ socket, payload }) => {
 
       //^ 무기
       case CARD_TYPE.SNIPER_GUN:
-        break;
       case CARD_TYPE.HAND_GUN:
-        break;
       case CARD_TYPE.DESERT_EAGLE:
-        break;
       case CARD_TYPE.AUTO_RIFLE:
         game.addWeapon(user.id, cardType);
         break;
 
       //^ 장비
       case CARD_TYPE.LASER_POINTER:
-        break;
       case CARD_TYPE.RADAR:
-        if (!game.getCharacter(user.id).equips.includes(cardType)) {
-          game.addEquip(user.id, cardType);
-        }
       case CARD_TYPE.RADAR:
-        if (!game.getCharacter(user.id).equips.includes(cardType)) {
-          game.addEquip(user.id, cardType);
-        }
       case CARD_TYPE.AUTO_SHIELD:
-        console.log('자동 실드 장착!');
-        if (!game.getCharacter(user.id).equips.includes(cardType)) {
-          game.addEquip(user.id, cardType);
-        }
-        break;
       case CARD_TYPE.STEALTH_SUIT:
         // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
         if (!game.getCharacter(user.id).equips.includes(cardType)) {

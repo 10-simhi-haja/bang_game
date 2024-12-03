@@ -294,7 +294,6 @@ class Game {
       prevStateInfo: {
         ...defaultStateInfo,
       },
-      isDeath: false, // 본인이 죽었는지를 몰라서 추가했던 변수, 반영되는거 없음.
     };
     this.userOrder.push(user.id);
   }
@@ -324,9 +323,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 3;
+        userEntry.character.hp = 1;
       } else {
-        userEntry.character.hp = 4;
+        userEntry.character.hp = 1;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -346,7 +345,12 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [];
+      userEntry.character.handCards = [
+        {
+          type: CARD_TYPE.BBANG,
+          count: 1,
+        },
+      ];
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
@@ -355,6 +359,7 @@ class Game {
       userEntry.character.autoShield = false;
       userEntry.character.isContain = false;
       userEntry.character.maxBbangCount = 1;
+      userEntry.character.isDeath = false; // 죽는 순간 판별위해서 사용
     });
   }
 
@@ -600,12 +605,57 @@ class Game {
     let psychopathCount = 0;
 
     userDatas.forEach((user) => {
-      if (user.character.hp === 0) {
-        return;
-      }
-      // 캐릭터가 핑크군일때 손패가 없으면 한장뽑기.
       // 사망 캐릭터 발생시 그캐릭터 모든 장비, 총, 디버프, 손 카드를 가면군의 손패로
       // 죽는 딱 그순간만 만들어서 그때 처리.
+      if (user.character.hp === 0 && !user.character.isDeath) {
+        user.character.isDeath = true;
+        this.getLiveUsers().forEach((liveUser) => {
+          if (this.users[liveUser.id].character.characterType === CHARACTER_TYPE.MASK) {
+            // 손패 넣기
+            const characterMask = this.users[liveUser.id].character;
+            characterMask.handCards.push(...user.character.handCards);
+
+            // 무기 넣기
+            const weaponCard = {
+              type: user.character.weapon,
+              count: 1,
+            };
+            characterMask.handCards.push(weaponCard);
+
+            // 장비 넣기
+            user.character.equips.forEach((equip) => {
+              const equipCard = {
+                type: equip,
+                count: 1,
+              };
+              characterMask.handCards.push(equipCard);
+            });
+
+            // 디버프 넣기
+            user.character.debuffs.forEach((debuff) => {
+              const debuffCard = {
+                type: debuff,
+                count: 1,
+              };
+              characterMask.handCards.push(debuffCard);
+            });
+          }
+        });
+      }
+
+      if (user.character.hp === 0 && user.character.isDeath) {
+        return;
+      }
+
+      // 캐릭터가 핑크군일때 손패가 없으면 한장뽑기.
+      if (
+        user.character.characterType === CHARACTER_TYPE.PINK &&
+        user.character.handCardsCount === 0
+      ) {
+        // 플리마켓, 만기적금, 복권당첨같은 추가 카드를 얻는카드 사용하는순간0장이어도 뽑음. 일단 보류
+        user.character.handCards.push(this.cardDeck.drawCard());
+        user.character.handCardsCount = user.character.handCards.length;
+      }
 
       // 만약 내가 감금디버프를 가지고있으면서, is감금이 true이면 감금상태로 변환.
       if (

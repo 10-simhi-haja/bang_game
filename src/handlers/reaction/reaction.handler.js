@@ -39,7 +39,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
     const users = game.getAllUserDatas();
     // 나
     const character = game.getCharacter(user.id);
-    console.dir(character, null);
     const attCharacter = game.getCharacter(character.stateInfo.stateTargetUserId);
 
     if (!game.users || !game.users[user.id]) {
