@@ -40,7 +40,7 @@ export const getAllProtoFiles = (dir, fileList = []) => {
 };
 
 const protoFiles = getAllProtoFiles(protoDir);
-console.log(protoFiles);
+//console.log(protoFiles);
 
 const protoMessages = {};
 
@@ -51,7 +51,7 @@ export const loadProtos = async () => {
     await Promise.all(protoFiles.map((file) => root.load(file)));
 
     for (const [packageName, types] of Object.entries(packetNames)) {
-      console.log(packageName, types);
+      //console.log(packageName, types);
       protoMessages[packageName] = {};
       for (const [type, typeName] of Object.entries(types)) {
         protoMessages[packageName][type] = root.lookupType(typeName);

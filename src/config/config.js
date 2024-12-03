@@ -8,13 +8,40 @@
  * 2. header.js
  */
 
-import { PORT, HOST, CLIENT_VERSION } from '../constants/env.js';
+import {
+  PORT,
+  HOST,
+  CLIENT_VERSION,
+  DB_NAME,
+  DB_USER,
+  DB_PASSWORD,
+  DB_HOST,
+  DB_PORT,
+  JWT_SECRET_KEY,
+} from '../constants/env.js';
 import {
   TOTAL_HEADER_LENGTH,
   PAYLOAD_ONEOF_CASE_LENGTH,
   VERSION_LENGTH,
   SEQUENCE_LENGTH,
   PAYLOAD_LENGTH,
+  PACKET_TYPE,
+  CHARACTER_TYPE,
+  ROLE_TYPE,
+  ROLES_DISTRIBUTION,
+  CHARACTER_STATE_TYPE,
+  ROOM_STATE_TYPE,
+  CHARACTER_SPAWN_POINT,
+  CARD_TYPE,
+  GLOBAL_FAIL_CODE,
+  INTERVAL,
+  INTERVAL_TYPE,
+  PHASE_TYPE,
+  WIN_TYPE,
+  CARD_POOL,
+  WARNING_TYPE,
+  ANIMATION_TYPE,
+  PROBABILITY,
 } from '../constants/header.js';
 
 const config = {
@@ -31,7 +58,46 @@ const config = {
     versionLength: VERSION_LENGTH,
     sequenceLength: SEQUENCE_LENGTH,
     payloadLength: PAYLOAD_LENGTH,
+    packetType: PACKET_TYPE,
   },
+  character: {
+    characterType: CHARACTER_TYPE,
+    characterStateType: CHARACTER_STATE_TYPE,
+    characterSpawnPoint: CHARACTER_SPAWN_POINT,
+  },
+  card: {
+    cardType: CARD_TYPE,
+    cardPool: CARD_POOL,
+  },
+  role: {
+    roleType: ROLE_TYPE,
+    rolesDistribution: ROLES_DISTRIBUTION,
+  },
+  roomStateType: {
+    wait: ROOM_STATE_TYPE.WAIT,
+    prepare: ROOM_STATE_TYPE.PREPARE,
+    inGame: ROOM_STATE_TYPE.INGAME,
+  },
+  globalFailCode: {
+    globalFailCode: GLOBAL_FAIL_CODE,
+  },
+  databases: {
+    database: DB_NAME,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    host: DB_HOST,
+    port: DB_PORT,
+  },
+  jwt: {
+    key: JWT_SECRET_KEY,
+  },
+  interval: INTERVAL,
+  intervalType: INTERVAL_TYPE,
+  phaseType: PHASE_TYPE,
+  winType: WIN_TYPE,
+  warningType: WARNING_TYPE,
+  animationType: ANIMATION_TYPE,
+  probability: PROBABILITY,
 };
 
 export default config;

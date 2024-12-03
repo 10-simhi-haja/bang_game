@@ -20,7 +20,7 @@ message CharacterData {
 }
 
 message CharacterPositionData {
-    string id = 1;
+    int64 id = 1;
     double x = 2;
     double y = 3;
 }
@@ -29,5 +29,5 @@ message CharacterStateInfoData {
     CharacterStateType state = 1;
     CharacterStateType nextState = 2;
     int64 nextStateAt = 3; // state가 nextState로 풀리는 밀리초 타임스탬프. state가 NONE이면 0
-    string stateTargetUserId = 4; // state에 target이 있을 경우
+    int64 stateTargetUserId = 4; // state에 target이 있을 경우
 }
