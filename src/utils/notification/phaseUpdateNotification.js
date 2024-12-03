@@ -30,7 +30,7 @@ const phaseUpdateNotification = (game) => {
     characterPositions: characterPosData,
   };
 
-  const users = game.getAllUsers();
+  const users = game.getLiveUsers();
 
   users.forEach((notiUser) => {
     const phaseUpdateNoti = createResponse(
@@ -44,6 +44,11 @@ const phaseUpdateNotification = (game) => {
     // 낮일때
     if (game.phase === PHASE_TYPE.DAY) {
       const userCharacter = game.getCharacter(notiUser.id);
+      if (userCharacter.hp <= 0) {
+        return;
+      }
+
+      userCharacter.bbangCount = 0;
 
       if (userCharacter.handCardsCount > userCharacter.hp) {
         const count = userCharacter.handCardsCount - userCharacter.hp;
