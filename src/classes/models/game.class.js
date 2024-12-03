@@ -604,43 +604,61 @@ class Game {
     let hitmanCount = 0;
     let psychopathCount = 0;
 
+    // 매 업데이트가 아닌 대미지 받고 유저 죽을때 판정하도록.
     userDatas.forEach((user) => {
       // 사망 캐릭터 발생시 그캐릭터 모든 장비, 총, 디버프, 손 카드를 가면군의 손패로
       // 죽는 딱 그순간만 만들어서 그때 처리.
       if (user.character.hp === 0 && !user.character.isDeath) {
         user.character.isDeath = true;
-        this.getLiveUsers().forEach((liveUser) => {
-          if (this.users[liveUser.id].character.characterType === CHARACTER_TYPE.MASK) {
-            // 손패 넣기
-            const characterMask = this.users[liveUser.id].character;
-            characterMask.handCards.push(...user.character.handCards);
+        const maskIndex = this.getLiveUsers().findIndex(
+          (liveUser) => this.users[liveUser.id].character.characterType === CHARACTER_TYPE.MASK,
+        );
 
-            // 무기 넣기
-            const weaponCard = {
-              type: user.character.weapon,
+        if (maskIndex !== -1) {
+          const characterMask = this.users[this.getLiveUsers()[maskIndex].id].character;
+          characterMask.handCards.push(...user.character.handCards);
+
+          // 무기 넣기
+          const weaponCard = {
+            type: user.character.weapon,
+            count: 1,
+          };
+          characterMask.handCards.push(weaponCard);
+
+          // 장비 넣기
+          user.character.equips.forEach((equip) => {
+            const equipCard = {
+              type: equip,
               count: 1,
             };
-            characterMask.handCards.push(weaponCard);
+            characterMask.handCards.push(equipCard);
+          });
 
-            // 장비 넣기
-            user.character.equips.forEach((equip) => {
-              const equipCard = {
-                type: equip,
-                count: 1,
-              };
-              characterMask.handCards.push(equipCard);
-            });
+          // 디버프 넣기
+          user.character.debuffs.forEach((debuff) => {
+            const debuffCard = {
+              type: debuff,
+              count: 1,
+            };
+            characterMask.handCards.push(debuffCard);
+          });
+        } else {
+          // 무기 버리기
+          this.cardDeck.addUseCard(user.character.weapon);
 
-            // 디버프 넣기
-            user.character.debuffs.forEach((debuff) => {
-              const debuffCard = {
-                type: debuff,
-                count: 1,
-              };
-              characterMask.handCards.push(debuffCard);
-            });
-          }
-        });
+          // 장비 버리기
+          user.character.equips.forEach((equip) => {
+            this.cardDeck.addUseCard(equip);
+          });
+
+          // 디버프 버리기
+          user.character.debuffs.forEach((debuff) => {
+            this.cardDeck.addUseCard(debuff);
+          });
+        }
+        user.character.weapon = 0;
+        user.character.equip = [];
+        user.character.debuffs = [];
       }
 
       if (user.character.hp === 0 && user.character.isDeath) {
