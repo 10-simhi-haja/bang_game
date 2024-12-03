@@ -323,9 +323,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 2;
       } else {
-        userEntry.character.hp = 1;
+        userEntry.character.hp = 2;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -466,6 +466,39 @@ class Game {
   //   const removeCard = targetdebuffsCard.filter((e) => e !== selectCardType);
   //   this.getCharacter(targetId).debuffs = removeCard;
   // }
+
+  //^ 대미지 받기  맞는놈    때린놈     피해량
+  damageCharacter(character, attCharacter, damage) {
+    for (let i = 0; i < damage; i++) {
+      if (character.hp <= 0) {
+        return;
+      }
+
+      character.hp--;
+
+      // 죽은애가 히트맨이면 죽인사람 3장뽑기
+      if (character.hp === 0 && character.roleType === ROLE_TYPE.HITMAN) {
+        attCharacter.handCards.push(...this.cardDeck.drawMultipleCards(3));
+      }
+
+      if (CHARACTER_TYPE.MALANG === character.characterType) {
+        // 말랑이
+        const drawCard = this.cardDeck.drawMultipleCards(1);
+        character.handCards.push(...drawCard);
+      }
+
+      // 핑크 슬라임 때린사람 카드 뺏기
+      if (
+        CHARACTER_TYPE.PINK_SLIME === character.characterType &&
+        attCharacter.handCardsCount !== 0
+      ) {
+        const randomIndex = Math.floor(Math.random() * attCharacter.handCardsCount);
+
+        const [removeCard] = attCharacter.handCards.splice(randomIndex, 1);
+        character.handCards.push(removeCard);
+      }
+    }
+  }
 
   // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {
@@ -661,6 +694,7 @@ class Game {
         user.character.debuffs = [];
       }
 
+      // 죽은 상태에 피 0이면 리턴
       if (user.character.hp === 0 && user.character.isDeath) {
         return;
       }

@@ -30,7 +30,7 @@ const phaseUpdateNotification = (game) => {
     characterPositions: characterPosData,
   };
 
-  const users = game.getAllUsers();
+  const users = game.getLiveUsers();
 
   users.forEach((notiUser) => {
     const phaseUpdateNoti = createResponse(
