@@ -55,12 +55,14 @@ const cardSelectHandler = ({ socket, payload }) => {
     }
 
     // 흡수: 상대의 카드를 나의 핸드 카드에 추가
+    let isAbsorbing = false; // 흡수인지 신기루인지 판별
     if (
       room.getCharacter(user.id).stateInfo.state ===
         config.character.characterStateType.ABSORBING &&
       room.getCharacter(targetId).stateInfo.state ===
         config.character.characterStateType.ABSORB_TARGET
     ) {
+      isAbsorbing = true;
       if (chooseCard) {
         chooseCard.count++;
       } else {
@@ -70,7 +72,7 @@ const cardSelectHandler = ({ socket, payload }) => {
     }
 
     // 카드 삭제
-    room.mirage(selectType, targetId, selectCardType, targetCards, range);
+    room.mirage(isAbsorbing, selectType, targetId, selectCardType, targetCards, range);
 
     room.setCharacterState(
       user.id,
