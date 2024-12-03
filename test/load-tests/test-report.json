@@ -1,0 +1,500 @@
+{
+  "aggregate": {
+    "counters": {
+      "vusers.created_by_name.Bang Game Session": 8160,
+      "vusers.created": 8160,
+      "errors.ECONNREFUSED": 16320,
+      "vusers.failed": 8160
+    },
+    "rates": {},
+    "firstCounterAt": 1733211450269,
+    "lastCounterAt": 1733211749510,
+    "firstMetricAt": 1733211450269,
+    "lastMetricAt": 1733211749510,
+    "period": 1733211740000,
+    "summaries": {},
+    "histograms": {}
+  },
+  "intermediate": [
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 20,
+        "vusers.created": 20,
+        "errors.ECONNREFUSED": 40,
+        "vusers.failed": 20
+      },
+      "rates": {},
+      "firstCounterAt": 1733211450269,
+      "lastCounterAt": 1733211459320,
+      "firstMetricAt": 1733211450269,
+      "lastMetricAt": 1733211459320,
+      "period": "1733211450000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 20,
+        "vusers.created": 20,
+        "errors.ECONNREFUSED": 40,
+        "vusers.failed": 20
+      },
+      "rates": {},
+      "firstCounterAt": 1733211460267,
+      "lastCounterAt": 1733211469320,
+      "firstMetricAt": 1733211460267,
+      "lastMetricAt": 1733211469320,
+      "period": "1733211460000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 20,
+        "vusers.created": 20,
+        "errors.ECONNREFUSED": 40,
+        "vusers.failed": 20
+      },
+      "rates": {},
+      "firstCounterAt": 1733211470267,
+      "lastCounterAt": 1733211479319,
+      "firstMetricAt": 1733211470267,
+      "lastMetricAt": 1733211479319,
+      "period": "1733211470000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 62,
+        "vusers.created": 62,
+        "errors.ECONNREFUSED": 124,
+        "vusers.failed": 62
+      },
+      "rates": {},
+      "firstCounterAt": 1733211480270,
+      "lastCounterAt": 1733211489582,
+      "firstMetricAt": 1733211480270,
+      "lastMetricAt": 1733211489582,
+      "period": "1733211480000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 88,
+        "vusers.created": 88,
+        "errors.ECONNREFUSED": 176,
+        "vusers.failed": 88
+      },
+      "rates": {},
+      "firstCounterAt": 1733211490271,
+      "lastCounterAt": 1733211499739,
+      "firstMetricAt": 1733211490271,
+      "lastMetricAt": 1733211499739,
+      "period": "1733211490000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 114,
+        "vusers.created": 114,
+        "errors.ECONNREFUSED": 228,
+        "vusers.failed": 114
+      },
+      "rates": {},
+      "firstCounterAt": 1733211500272,
+      "lastCounterAt": 1733211509832,
+      "firstMetricAt": 1733211500272,
+      "lastMetricAt": 1733211509832,
+      "period": "1733211500000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 140,
+        "vusers.created": 140,
+        "errors.ECONNREFUSED": 280,
+        "vusers.failed": 140
+      },
+      "rates": {},
+      "firstCounterAt": 1733211510277,
+      "lastCounterAt": 1733211519937,
+      "firstMetricAt": 1733211510277,
+      "lastMetricAt": 1733211519937,
+      "period": "1733211510000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 163,
+        "vusers.created": 163,
+        "errors.ECONNREFUSED": 326,
+        "vusers.failed": 163
+      },
+      "rates": {},
+      "firstCounterAt": 1733211520280,
+      "lastCounterAt": 1733211529993,
+      "firstMetricAt": 1733211520280,
+      "lastMetricAt": 1733211529993,
+      "period": "1733211520000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 188,
+        "vusers.created": 188,
+        "errors.ECONNREFUSED": 376,
+        "vusers.failed": 188
+      },
+      "rates": {},
+      "firstCounterAt": 1733211530038,
+      "lastCounterAt": 1733211539994,
+      "firstMetricAt": 1733211530038,
+      "lastMetricAt": 1733211539994,
+      "period": "1733211530000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 213,
+        "vusers.created": 213,
+        "errors.ECONNREFUSED": 426,
+        "vusers.failed": 213
+      },
+      "rates": {},
+      "firstCounterAt": 1733211540041,
+      "lastCounterAt": 1733211549994,
+      "firstMetricAt": 1733211540041,
+      "lastMetricAt": 1733211549994,
+      "period": "1733211540000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 238,
+        "vusers.created": 238,
+        "errors.ECONNREFUSED": 476,
+        "vusers.failed": 238
+      },
+      "rates": {},
+      "firstCounterAt": 1733211550042,
+      "lastCounterAt": 1733211559995,
+      "firstMetricAt": 1733211550042,
+      "lastMetricAt": 1733211559995,
+      "period": "1733211550000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 263,
+        "vusers.created": 263,
+        "errors.ECONNREFUSED": 526,
+        "vusers.failed": 263
+      },
+      "rates": {},
+      "firstCounterAt": 1733211560000,
+      "lastCounterAt": 1733211569956,
+      "firstMetricAt": 1733211560000,
+      "lastMetricAt": 1733211569956,
+      "period": "1733211560000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 290,
+        "vusers.created": 290,
+        "errors.ECONNREFUSED": 580,
+        "vusers.failed": 290
+      },
+      "rates": {},
+      "firstCounterAt": 1733211570001,
+      "lastCounterAt": 1733211579980,
+      "firstMetricAt": 1733211570001,
+      "lastMetricAt": 1733211579980,
+      "period": "1733211570000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 312,
+        "vusers.created": 312,
+        "errors.ECONNREFUSED": 624,
+        "vusers.failed": 312
+      },
+      "rates": {},
+      "firstCounterAt": 1733211580003,
+      "lastCounterAt": 1733211589982,
+      "firstMetricAt": 1733211580003,
+      "lastMetricAt": 1733211589982,
+      "period": "1733211580000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 339,
+        "vusers.created": 339,
+        "errors.ECONNREFUSED": 678,
+        "vusers.failed": 339
+      },
+      "rates": {},
+      "firstCounterAt": 1733211590004,
+      "lastCounterAt": 1733211599989,
+      "firstMetricAt": 1733211590004,
+      "lastMetricAt": 1733211599989,
+      "period": "1733211590000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 365,
+        "vusers.created": 365,
+        "errors.ECONNREFUSED": 728,
+        "vusers.failed": 364
+      },
+      "rates": {},
+      "firstCounterAt": 1733211600036,
+      "lastCounterAt": 1733211609999,
+      "firstMetricAt": 1733211600036,
+      "lastMetricAt": 1733211609999,
+      "period": "1733211600000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 387,
+        "vusers.created": 387,
+        "errors.ECONNREFUSED": 776,
+        "vusers.failed": 388
+      },
+      "rates": {},
+      "firstCounterAt": 1733211610001,
+      "lastCounterAt": 1733211619991,
+      "firstMetricAt": 1733211610001,
+      "lastMetricAt": 1733211619991,
+      "period": "1733211610000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 413,
+        "vusers.created": 413,
+        "errors.ECONNREFUSED": 826,
+        "vusers.failed": 413
+      },
+      "rates": {},
+      "firstCounterAt": 1733211620000,
+      "lastCounterAt": 1733211629959,
+      "firstMetricAt": 1733211620000,
+      "lastMetricAt": 1733211629959,
+      "period": "1733211620000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 439,
+        "vusers.created": 439,
+        "errors.ECONNREFUSED": 878,
+        "vusers.failed": 439
+      },
+      "rates": {},
+      "firstCounterAt": 1733211630001,
+      "lastCounterAt": 1733211639961,
+      "firstMetricAt": 1733211630001,
+      "lastMetricAt": 1733211639961,
+      "period": "1733211630000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 463,
+        "vusers.created": 463,
+        "errors.ECONNREFUSED": 926,
+        "vusers.failed": 463
+      },
+      "rates": {},
+      "firstCounterAt": 1733211640002,
+      "lastCounterAt": 1733211649963,
+      "firstMetricAt": 1733211640002,
+      "lastMetricAt": 1733211649963,
+      "period": "1733211640000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 490,
+        "vusers.created": 490,
+        "errors.ECONNREFUSED": 980,
+        "vusers.failed": 490
+      },
+      "rates": {},
+      "firstCounterAt": 1733211650006,
+      "lastCounterAt": 1733211659962,
+      "firstMetricAt": 1733211650006,
+      "lastMetricAt": 1733211659962,
+      "period": "1733211650000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 500,
+        "vusers.created": 500,
+        "errors.ECONNREFUSED": 1000,
+        "vusers.failed": 500
+      },
+      "rates": {},
+      "firstCounterAt": 1733211660012,
+      "lastCounterAt": 1733211669961,
+      "firstMetricAt": 1733211660012,
+      "lastMetricAt": 1733211669961,
+      "period": "1733211660000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 500,
+        "vusers.created": 500,
+        "errors.ECONNREFUSED": 1000,
+        "vusers.failed": 500
+      },
+      "rates": {},
+      "firstCounterAt": 1733211670012,
+      "lastCounterAt": 1733211679961,
+      "firstMetricAt": 1733211670012,
+      "lastMetricAt": 1733211679961,
+      "period": "1733211670000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 500,
+        "vusers.created": 500,
+        "errors.ECONNREFUSED": 1000,
+        "vusers.failed": 500
+      },
+      "rates": {},
+      "firstCounterAt": 1733211680011,
+      "lastCounterAt": 1733211689961,
+      "firstMetricAt": 1733211680011,
+      "lastMetricAt": 1733211689961,
+      "period": "1733211680000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 500,
+        "vusers.created": 500,
+        "errors.ECONNREFUSED": 1000,
+        "vusers.failed": 500
+      },
+      "rates": {},
+      "firstCounterAt": 1733211690011,
+      "lastCounterAt": 1733211699961,
+      "firstMetricAt": 1733211690011,
+      "lastMetricAt": 1733211699961,
+      "period": "1733211690000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 500,
+        "vusers.created": 500,
+        "errors.ECONNREFUSED": 1000,
+        "vusers.failed": 500
+      },
+      "rates": {},
+      "firstCounterAt": 1733211700011,
+      "lastCounterAt": 1733211709961,
+      "firstMetricAt": 1733211700011,
+      "lastMetricAt": 1733211709961,
+      "period": "1733211700000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 483,
+        "vusers.created": 483,
+        "errors.ECONNREFUSED": 966,
+        "vusers.failed": 483
+      },
+      "rates": {},
+      "firstCounterAt": 1733211710011,
+      "lastCounterAt": 1733211719811,
+      "firstMetricAt": 1733211710011,
+      "lastMetricAt": 1733211719811,
+      "period": "1733211710000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 50,
+        "vusers.created": 50,
+        "errors.ECONNREFUSED": 100,
+        "vusers.failed": 50
+      },
+      "rates": {},
+      "firstCounterAt": 1733211720303,
+      "lastCounterAt": 1733211729510,
+      "firstMetricAt": 1733211720303,
+      "lastMetricAt": 1733211729510,
+      "period": "1733211720000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 50,
+        "vusers.created": 50,
+        "errors.ECONNREFUSED": 100,
+        "vusers.failed": 50
+      },
+      "rates": {},
+      "firstCounterAt": 1733211730303,
+      "lastCounterAt": 1733211739510,
+      "firstMetricAt": 1733211730303,
+      "lastMetricAt": 1733211739510,
+      "period": "1733211730000",
+      "summaries": {},
+      "histograms": {}
+    },
+    {
+      "counters": {
+        "vusers.created_by_name.Bang Game Session": 50,
+        "vusers.created": 50,
+        "errors.ECONNREFUSED": 100,
+        "vusers.failed": 50
+      },
+      "rates": {},
+      "firstCounterAt": 1733211740303,
+      "lastCounterAt": 1733211749510,
+      "firstMetricAt": 1733211740303,
+      "lastMetricAt": 1733211749510,
+      "period": "1733211740000",
+      "summaries": {},
+      "histograms": {}
+    }
+  ]
+}

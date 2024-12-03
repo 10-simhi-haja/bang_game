@@ -1,0 +1,7 @@
+{
+  "name": "load-tests",
+  "version": "1.0.0",
+  "dependencies": {
+    "protobufjs": "^7.2.5"
+  }
+}

@@ -1,0 +1,70 @@
+config:
+  target: 'ws://localhost:5555'
+  phases:
+    - duration: 30
+      arrivalRate: 1
+      name: 'Warm up'
+    - duration: 60
+      arrivalRate: 2
+      rampTo: 5
+      name: 'Normal game load'
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 10
+      name: 'Peak time simulation'
+    - duration: 60
+      arrivalRate: 10
+      name: 'Stress test'
+    - duration: 30
+      arrivalRate: 2
+      name: 'Cool down'
+
+  ws:
+    rejectUnauthorized: false
+    subprotocols: ['websocket']
+  processor: './generateRandomUser.cjs'
+  engines:
+    ws:
+      binary: true
+
+scenarios:
+  - name: 'Bang Game Session'
+    engine: 'ws'
+    flow:
+      - function: 'generateRandomUser'
+      - function: 'createLoginPacket'
+      - send:
+          payload: '{{ binaryPacket }}'
+      - think: 2
+      - function: 'decideRoomAction'
+      - function: 'selectRoomAction'
+      - function: 'createRoomPacket'
+      - send:
+          payload: '{{ binaryPacket }}'
+      - think: 2
+      - function: 'createGamePreparePacket'
+      - send:
+          payload: '{{ binaryPacket }}'
+      - think: 3
+      - function: 'createGameStartPacket'
+      - send:
+          payload: '{{ binaryPacket }}'
+      - think: 2
+      - loop:
+          - function: 'selectRandomCard'
+          - function: 'createUseCardPacket'
+          - send:
+              payload: '{{ binaryPacket }}'
+          - think:
+              min: 1
+              max: 3
+          - function: 'createPositionUpdatePacket'
+          - send:
+              payload: '{{ binaryPacket }}'
+          - think: 1
+        count: 10
+      - think: 5
+
+ensure:
+  max: 500
+  maxErrorRate: 5
