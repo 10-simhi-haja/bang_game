@@ -324,9 +324,9 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 2;
+        userEntry.character.hp = 3;
       } else {
-        userEntry.character.hp = 2;
+        userEntry.character.hp = 3;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
@@ -345,7 +345,7 @@ class Game {
         stateTargetUserId: 0,
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [];
-      userEntry.character.debuffs = [23];
+      userEntry.character.debuffs = [];
       userEntry.character.handCards = [
         { type: CARD_TYPE.FLEA_MARKET, count: 1 },
         { type: CARD_TYPE.BOMB, count: 1 },
