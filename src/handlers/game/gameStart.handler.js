@@ -65,6 +65,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
 
     users.forEach((notiUser) => {
       gameStartNotification(socket, notiUser, gameStartNotiData);
+      game.setUserSyncInterval(notiUser);
     });
 
     // 페이즈 넘어가는 시간 넣어야함
