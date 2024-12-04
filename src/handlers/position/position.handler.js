@@ -61,20 +61,23 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       characterPositions.push(posData);
     });
 
-    const notiData = {
-      characterPositions: characterPositions,
-    };
+    // const notiData = {
+    //   characterPositions: characterPositions,
+    // };
 
-    // 노티피케이션 생성 및 전송
-    const notificationResponse = createResponse(
-      packetType.POSITION_UPDATE_NOTIFICATION,
-      socket.sequence,
-      notiData,
-    );
+    // // 노티피케이션 생성 및 전송
+    // const notificationResponse = createResponse(
+    //   packetType.POSITION_UPDATE_NOTIFICATION,
+    //   socket.sequence,
+    //   notiData,
+    // );
 
-    allUser.forEach((notiUser) => {
-      notiUser.socket.write(notificationResponse);
-    });
+    // allUser.forEach((notiUser) => {
+    //   if (notiUser.id === currentUser.id) {
+    //     return;
+    //   }
+    //   notiUser.socket.write(notificationResponse);
+    // });
   } catch (error) {
     handleError(socket, error);
   }
