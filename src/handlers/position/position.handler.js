@@ -6,6 +6,76 @@ import handleError from '../../utils/errors/errorHandler.js';
 
 const packetType = config.packet.packetType;
 
+// 상수 정의
+const UPDATE_INTERVAL = 33;
+const MIN_SPEED = 2;
+const MAX_SPEED = 5;
+
+// 각 유저의 마지막 위치와 시간을 저장하는 Map
+const lastPositions = new Map();
+const emptyPacketLatencies = new Map(); // 빈 패킷 처리로 추가된 레이턴시
+let lastUpdateTime = Date.now();
+
+function predictPosition(userId, currentTime) {
+  const lastPos = lastPositions.get(userId);
+  if (!lastPos) return null;
+
+  const timeSinceLastUpdate = currentTime - lastUpdateTime;
+  if (timeSinceLastUpdate < UPDATE_INTERVAL) {
+    return {
+      id: userId,
+      x: lastPos.x,
+      y: lastPos.y,
+      timestamp: lastPos.timestamp,
+    };
+  }
+
+  const latency = emptyPacketLatencies.get(userId) || 0;
+  const deltaTime = (currentTime - lastPos.timestamp + latency) / 1000;
+
+  if (lastPos.isMoving) {
+    const speed = Math.min(
+      Math.max(Math.sqrt(lastPos.velocityX ** 2 + lastPos.velocityY ** 2), MIN_SPEED),
+      MAX_SPEED,
+    );
+
+    const distance = Math.sqrt(lastPos.velocityX ** 2 + lastPos.velocityY ** 2);
+    const normalizedVX = distance > 0 ? lastPos.velocityX / distance : 0;
+    const normalizedVY = distance > 0 ? lastPos.velocityY / distance : 0;
+
+    return {
+      id: userId,
+      x: lastPos.x + normalizedVX * speed * deltaTime,
+      y: lastPos.y + normalizedVY * speed * deltaTime,
+      timestamp: currentTime,
+    };
+  }
+
+  return {
+    id: userId,
+    x: lastPos.x,
+    y: lastPos.y,
+    timestamp: currentTime,
+  };
+}
+
+// 핸들러는 빈 패킷을 처리하도록 설정
+function handleEmptyPacket(socket) {
+  const receiveTime = Date.now();
+
+  const responsePacket = createEmptyResponse();
+  socket.write(responsePacket, () => {
+    const sendTime = Date.now();
+    const rtt = sendTime - receiveTime;
+    emptyPacketLatencies.set(socket.userId, rtt);
+    console.log(`RTT for userId ${socket.userId}: ${rtt} ms`);
+  });
+}
+
+function createEmptyResponse() {
+  return Buffer.from([0x00]); // 실제 전송할 데이터 없이 만드는 응답
+}
+
 const handlePositionUpdate = async ({ socket, payload }) => {
   try {
     if (!payload || typeof payload !== 'object') {
@@ -13,67 +83,83 @@ const handlePositionUpdate = async ({ socket, payload }) => {
     }
 
     const { x, y } = payload;
-
     if (typeof x === 'undefined' || typeof y === 'undefined') {
       throw new Error('페이로드에 x 또는 y 값이 없습니다.');
     }
 
     const gameSession = getGameSessionBySocket(socket);
-
     if (!gameSession) {
       throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
     }
 
     const currentUser = getUserBySocket(socket);
-
     if (!currentUser) {
       throw new Error('유저가 존재하지 않습니다.');
     }
 
-    currentUser.setPos(x, y);
+    const currentTime = Date.now();
+    const userId = currentUser.id;
 
-    // const positionResponseData = {
-    //   success: true,
-    //   failCode: 0,
-    // };
+    const lastPos = lastPositions.get(userId);
 
-    // console.log('Position Update Response Data:', positionResponseData);
+    let isMoving = false;
+    let velocityX = 0;
+    let velocityY = 0;
 
-    // const positionResponse = createResponse(
-    //   packetType.POSITION_UPDATE_RESPONSE,
-    //   socket.sequence,
-    //   positionResponseData,
-    // );
+    if (lastPos) {
+      const dx = x - lastPos.x;
+      const dy = y - lastPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // socket.write(positionResponse);
+      if (distance > 0.1) {
+        isMoving = true;
+        const deltaTime = (currentTime - lastPos.timestamp) / 1000;
+        if (deltaTime > 0) {
+          velocityX = dx / deltaTime;
+          velocityY = dy / deltaTime;
+        }
+      }
+    }
 
-    /// 포지션 응답 완
-
-    const characterPositions = [];
-    const allUser = gameSession.getAllUsers();
-
-    allUser.forEach((user, i) => {
-      const posData = {
-        id: user.id,
-        x: user.x,
-        y: user.y,
-      };
-      characterPositions.push(posData);
+    lastPositions.set(userId, {
+      x,
+      y,
+      velocityX,
+      velocityY,
+      isMoving,
+      timestamp: currentTime,
     });
 
-    const notiData = {
-      characterPositions: characterPositions,
-    };
+    currentUser.setPos(x, y);
 
-    // 노티피케이션 생성 및 전송
+    if (currentTime - lastUpdateTime < UPDATE_INTERVAL) {
+      return;
+    }
+    lastUpdateTime = currentTime;
+
+    const characterPositions = [];
+    const allUsers = gameSession.getAllUsers();
+
+    allUsers.forEach((user) => {
+      const posData =
+        user.id === userId
+          ? { id: userId, x, y, timestamp: currentTime }
+          : predictPosition(user.id, currentTime);
+
+      if (posData) {
+        characterPositions.push(posData);
+      }
+    });
+
+    const notiData = { characterPositions };
     const notificationResponse = createResponse(
       packetType.POSITION_UPDATE_NOTIFICATION,
       socket.sequence,
       notiData,
     );
 
-    allUser.forEach((notiUser) => {
-      notiUser.socket.write(notificationResponse);
+    allUsers.forEach((user) => {
+      user.socket.write(notificationResponse);
     });
   } catch (error) {
     handleError(socket, error);
@@ -81,3 +167,15 @@ const handlePositionUpdate = async ({ socket, payload }) => {
 };
 
 export default handlePositionUpdate;
+
+// 빈 패킷에 대한 핸들러 설정 필요
+socket.on('data', (data) => {
+  if (isEmptyPacket(data)) {
+    handleEmptyPacket(socket);
+  }
+  // 기타 데이터는 추가로 처리
+});
+
+function isEmptyPacket(data) {
+  return data.length === 0;
+}

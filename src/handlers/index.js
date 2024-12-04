@@ -17,6 +17,7 @@ import useCardHandler from './card/useCard.handler.js';
 import cardSelectHandler from './card/cardSelect.handler.js';
 import handlePassDebuffRequest from './debuff/debuff.handler.js';
 import fleaMarketPickRequestHandler from './card/fleaMarket/fleaMarket.handler.js';
+import handleLoginResponse from './position/latency.handler.js';
 
 const { packetType } = config.packet;
 
@@ -34,7 +35,7 @@ const handlers = {
     protoType: 'auth.C2SLoginRequest',
   },
   [packetType.LOGIN_RESPONSE]: {
-    handler: undefined,
+    handler: handleLoginResponse,
     protoType: 'auth.S2CLoginResponse', ///
   },
   [packetType.CREATE_ROOM_REQUEST]: {
