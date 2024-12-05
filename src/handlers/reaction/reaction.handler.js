@@ -60,7 +60,7 @@ const handleReactionRequest = async ({ socket, payload }) => {
       // 빵일때만 대미지가 2배여야함.
       if (
         attCharacter.weapon === CARD_TYPE.DESERT_EAGLE &&
-        character.stateInfo.stateType === CHARACTER_STATE_TYPE.BBANG_TARGET
+        character.stateInfo.state === CHARACTER_STATE_TYPE.BBANG_TARGET
       ) {
         game.damageCharacter(character, attCharacter, 2);
       } else {
@@ -103,7 +103,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
     } else {
       throw new Error('socket.write is not a function');
     }
-    console.log('reaction핸들러 작동 끝');
   } catch (error) {
     console.error('리액션 처리 중 에러 발생:', error.message);
 
