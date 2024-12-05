@@ -10,7 +10,6 @@ const CARD_TYPE_NAME_MAP = Object.fromEntries(
 );
 
 class CardDeck {
-  // 다수의 유저 데이터를 담아야하기 때문에 배열로 저장
   constructor() {
     this.deck = Object.entries(CARD_TYPE).reduce((deck, [key, value]) => {
       if (key === 'NONE') return deck;

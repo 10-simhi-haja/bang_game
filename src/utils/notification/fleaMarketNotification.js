@@ -100,9 +100,6 @@ const fleaMarketNotification = (game, user) => {
       const notiCharacter = game.getCharacter(notiUser.id);
       if (notiCharacter.stateInfo.state !== CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE) {
         game.users[notiUser.id].prevStateInfo = { ...notiCharacter.stateInfo };
-        console.log(
-          `none이 아닌 유저다. 이전상태 저장 ${game.users[notiUser.id].prevStateInfo.state}`,
-        );
       }
 
       game.setCharacterState(
