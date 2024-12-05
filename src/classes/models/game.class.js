@@ -500,6 +500,7 @@ class Game {
         character.handCards.push(removeCard);
       }
     }
+    userUpdateNotification(this);
   }
 
   // 카드가 유저의 핸드에서 제거될때.
@@ -757,7 +758,7 @@ class Game {
       gameEndNotification(this.getAllUsers(), this.id, gameEndNotiData);
       return;
     }
-    userUpdateNotification(this);
+    // userUpdateNotification(this);
   }
 
   // debuff가 있는지 체크
@@ -879,7 +880,7 @@ class Game {
       characterPositions.push(posData);
     });
 
-    console.log('Notification Response Data:', { characterPositions });
+    // console.log('Notification Response Data:', { characterPositions });
 
     const notiData = {
       characterPositions: characterPositions,
