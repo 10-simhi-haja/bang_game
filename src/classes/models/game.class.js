@@ -349,6 +349,46 @@ class Game {
       userEntry.character.handCards = [
         {
           type: CARD_TYPE.BBANG,
+          count: 2,
+        },
+        {
+          type: CARD_TYPE.SHIELD,
+          count: 2,
+        },
+        {
+          type: CARD_TYPE.BIG_BBANG,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.DEATH_MATCH,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.GUERRILLA,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.VACCINE,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.FLEA_MARKET,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.AUTO_RIFLE,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.LASER_POINTER,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.ABSORB,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.BOMB,
           count: 1,
         },
       ];

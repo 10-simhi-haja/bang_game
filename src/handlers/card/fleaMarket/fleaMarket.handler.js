@@ -80,7 +80,7 @@ const fleaMarketPickRequestHandler = ({ socket, payload }) => {
             user.id,
             prevState.state,
             prevState.nextState,
-            Date.now() + 5 * 1000,
+            5,
             prevState.stateTargetUserId,
           );
 
