@@ -7,10 +7,10 @@ import handleError from '../../utils/errors/errorHandler.js';
 const packetType = config.packet.packetType;
 
 // 상수 정의
-const UPDATE_INTERVAL = 10;
+const UPDATE_INTERVAL = 100;
 const MIN_SPEED = 2;
 const MAX_SPEED = 5;
-const DEFAULT_LATENCY = 100;
+const DEFAULT_LATENCY = 50;
 
 // 각 유저의 마지막 위치와 시간을 저장하는 Map
 const lastPositions = new Map();
