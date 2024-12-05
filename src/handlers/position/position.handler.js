@@ -145,7 +145,6 @@ const handlePositionUpdate = async ({ socket, payload }) => {
       isMoving,
       timestamp: currentTime,
     });
-
     currentUser.setPos(x, y);
 
     if (currentTime - lastUpdateTime < UPDATE_INTERVAL) {

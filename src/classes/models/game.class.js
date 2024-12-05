@@ -12,6 +12,7 @@ import { bbangInterval } from '../../utils/util/bbangFunction.js';
 import { bigBbangInterval } from '../../utils/util/bigBbangFunction.js';
 import { guerrillaInterval } from '../../utils/util/guerrillaFunction.js';
 import { deathMatchInterval } from '../../utils/util/deathMatchFunction.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -849,50 +850,52 @@ class Game {
       INTERVAL_TYPE.BOMB,
     );
   }
+
+  //! 필요하면 살림.
+  //! 해당 아이디 유저에게 주기 셋팅
+  //!             유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
+  setUserSyncInterval(user) {
+    console.log(`유저: ${user.id}`);
+    this.intervalManager.addInterval(
+      user.id,
+      () => this.userSync(user),
+      INTERVAL.SYNC_POSITION,
+      INTERVAL_TYPE.POSITION,
+    );
+  }
+
+  //!포지션 노티 여기서 쏴주면 됩니다.
+  //!적용하면 상대 캐릭터가 끊기듯이 움직임.
+  userSync(user) {
+    const characterPositions = [];
+    const allUser = this.getAllUsers();
+
+    allUser.forEach((user) => {
+      const posData = {
+        id: user.id,
+        x: user.x,
+        y: user.y,
+      };
+      characterPositions.push(posData);
+    });
+
+    console.log('Notification Response Data:', { characterPositions });
+
+    const notiData = {
+      characterPositions: characterPositions,
+    };
+
+    // 노티피케이션 생성 및 전송
+    const notificationResponse = createResponse(
+      PACKET_TYPE.POSITION_UPDATE_NOTIFICATION,
+      user.socket.sequence,
+      notiData,
+    );
+
+    allUser.forEach((notiUser) => {
+      notiUser.socket.write(notificationResponse);
+    });
+  }
 }
 
 export default Game;
-///// 필요하면 살림.
-// 해당 아이디 유저에게 주기 셋팅
-//              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
-// setUserSyncInterval(user) {
-//   this.intervalManager.addPlayer(
-//     user.id,
-//     () => this.userSync(user),
-//     INTERVAL.SYNC_POSITION,
-//     INTERVAL_TYPE.POSITION,
-//   );
-// }
-
-// // 포지션 노티 여기서 쏴주면 됩니다.
-// // 적용하면 상대 캐릭터가 끊기듯이 움직임.
-// userSync(user) {
-//   const characterPositions = [];
-//   const allUser = this.getAllUsers();
-
-//   allUser.forEach((user) => {
-//     const posData = {
-//       id: user.id,
-//       x: user.x,
-//       y: user.y,
-//     };
-//     characterPositions.push(posData);
-//   });
-
-//   console.log('Notification Response Data:', { characterPositions });
-
-//   const notiData = {
-//     characterPositions: characterPositions,
-//   };
-
-//   // 노티피케이션 생성 및 전송
-//   const notificationResponse = createResponse(
-//     PACKET_TYPE.POSITION_UPDATE_NOTIFICATION,
-//     user.socket.sequence,
-//     notiData,
-//   );
-
-//   allUser.forEach((notiUser) => {
-//     notiUser.socket.write(notificationResponse);
-//   });
-// }
