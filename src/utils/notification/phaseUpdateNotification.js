@@ -2,6 +2,7 @@ import config from '../../config/config.js';
 import { PHASE_TYPE } from '../../constants/header.js';
 import { createResponse } from '../packet/response/createResponse.js';
 import handCardNotification from './handCardsNotification.js';
+import userUpdateNotification from './userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -64,6 +65,7 @@ const phaseUpdateNotification = (game) => {
       const drawCard = game.cardDeck.drawMultipleCards(2);
       userCharacter.handCards.push(...drawCard);
       handCardNotification(notiUser, game);
+      userUpdateNotification(game);
     }
   });
   if (game.phase === PHASE_TYPE.DAY) {

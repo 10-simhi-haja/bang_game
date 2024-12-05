@@ -11,6 +11,7 @@ import FleaMarket from '../../classes/models/fleaMarket.js';
 import animationNotification from '../../utils/notification/animationNotification.js';
 import { useBbang } from '../../utils/util/card/useCardFunction.js';
 import { CHARACTER_TYPE } from '../../constants/header.js';
+import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -238,7 +239,7 @@ const useCardHandler = ({ socket, payload }) => {
     }
 
     // 유저 업데이트 노티피케이션 발송
-    // userUpdateNotification(game);
+    userUpdateNotification(game);
 
     // 카드 사용 노티피케이션 발송
     useCardNotification(socket, user.id, game, payload);
