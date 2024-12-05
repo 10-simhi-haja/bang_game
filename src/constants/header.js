@@ -240,7 +240,7 @@ export const PHASE_TYPE = {
 // 필요한 주기가 있으면 추가해서 사용.
 // 전부 초단위
 export const INTERVAL = {
-  SYNC_POSITION: 0.1,
+  SYNC_POSITION: 1,
   SYNC_GAME: 1,
   PHASE_UPDATE_DAY: 120,
   PHASE_UPDATE_END: 30,
