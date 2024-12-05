@@ -20,6 +20,7 @@ const {
   character: { characterStateType: CHARACTER_STATE_TYPE },
   probability: PROBABILITY,
   animationType: ANIMATION_TYPE,
+  interval: INTERVAL,
 } = config;
 
 export const useBbang = (game, user, targetUser, responsePayload) => {
@@ -35,14 +36,14 @@ export const useBbang = (game, user, targetUser, responsePayload) => {
         user.id,
         CHARACTER_STATE_TYPE.DEATH_MATCH_STATE,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        3,
+        INTERVAL.ATTACK,
         targetId,
       );
       game.setCharacterState(
         targetId,
         CHARACTER_STATE_TYPE.DEATH_MATCH_TURN_STATE,
         CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-        3,
+        INTERVAL.ATTACK,
         user.id,
       );
       break;
@@ -99,14 +100,14 @@ export const useBbang = (game, user, targetUser, responsePayload) => {
           user.id,
           CHARACTER_STATE_TYPE.BBANG_SHOOTER,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
+          INTERVAL.ATTACK,
           targetId,
         );
         game.setCharacterState(
           targetId,
           CHARACTER_STATE_TYPE.BBANG_TARGET,
           CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-          3,
+          INTERVAL.ATTACK,
           user.id,
         );
       } else {
