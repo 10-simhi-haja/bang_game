@@ -14,7 +14,6 @@ export const handleLoginResponse = ({ socket }) => {
 
   const userId = currentUser.id;
   loginResponseTimes.set(userId, currentTime);
-  console.log(`User ${userId} login response time recorded at ${currentTime}`);
 };
 
 export default handleLoginResponse;

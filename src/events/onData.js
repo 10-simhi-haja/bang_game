@@ -5,10 +5,16 @@ import validateSequence from './../utils/socket/sequence.js';
 import packetParser from './../utils/packet/parser/packetParser.js';
 import { getHandlerByPacketType } from './../handlers/index.js';
 import handleError from './../utils/errors/errorHandler.js';
+import { handleEmptyPacket, isEmptyPacket } from '../handlers/position/position.handler.js';
 
 const onData = (socket) => async (data) => {
   if (!socket) {
     throw new CustomError(ErrorCodes.SOCKET_ERROR, `소켓을 찾을 수 없거나 연결이 끊겼다.`);
+  }
+
+  if (isEmptyPacket(data)) {
+    handleEmptyPacket(socket);
+    return;
   }
 
   socket.buffer = Buffer.concat([socket.buffer, data]);

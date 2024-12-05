@@ -7,14 +7,20 @@ import handleError from '../../utils/errors/errorHandler.js';
 const packetType = config.packet.packetType;
 
 // 상수 정의
-const UPDATE_INTERVAL = 33;
+const UPDATE_INTERVAL = 10;
 const MIN_SPEED = 2;
 const MAX_SPEED = 5;
+const DEFAULT_LATENCY = 100;
 
 // 각 유저의 마지막 위치와 시간을 저장하는 Map
 const lastPositions = new Map();
-const emptyPacketLatencies = new Map(); // 빈 패킷 처리로 추가된 레이턴시
+const emptyPacketLatencies = new Map();
 let lastUpdateTime = Date.now();
+
+function getLatencyForUser(userId) {
+  const latency = emptyPacketLatencies.get(userId);
+  return latency !== undefined ? latency / 2 : DEFAULT_LATENCY;
+}
 
 function predictPosition(userId, currentTime) {
   const lastPos = lastPositions.get(userId);
@@ -30,7 +36,7 @@ function predictPosition(userId, currentTime) {
     };
   }
 
-  const latency = emptyPacketLatencies.get(userId) || 0;
+  const latency = getLatencyForUser(userId);
   const deltaTime = (currentTime - lastPos.timestamp + latency) / 1000;
 
   if (lastPos.isMoving) {
@@ -43,11 +49,15 @@ function predictPosition(userId, currentTime) {
     const normalizedVX = distance > 0 ? lastPos.velocityX / distance : 0;
     const normalizedVY = distance > 0 ? lastPos.velocityY / distance : 0;
 
+    const predictedX = lastPos.x + normalizedVX * speed * deltaTime;
+    const predictedY = lastPos.y + normalizedVY * speed * deltaTime;
+
     return {
       id: userId,
-      x: lastPos.x + normalizedVX * speed * deltaTime,
-      y: lastPos.y + normalizedVY * speed * deltaTime,
+      x: predictedX,
+      y: predictedY,
       timestamp: currentTime,
+      latency: latency,
     };
   }
 
@@ -56,6 +66,7 @@ function predictPosition(userId, currentTime) {
     x: lastPos.x,
     y: lastPos.y,
     timestamp: currentTime,
+    latency: latency,
   };
 }
 
@@ -74,6 +85,11 @@ function handleEmptyPacket(socket) {
 
 function createEmptyResponse() {
   return Buffer.from([0x00]); // 실제 전송할 데이터 없이 만드는 응답
+}
+
+// 빈 패킷 여부를 확인하는 함수
+function isEmptyPacket(data) {
+  return data.length === 1 && data[0] === 0x00;
 }
 
 const handlePositionUpdate = async ({ socket, payload }) => {
@@ -166,16 +182,5 @@ const handlePositionUpdate = async ({ socket, payload }) => {
   }
 };
 
+export { handleEmptyPacket, isEmptyPacket };
 export default handlePositionUpdate;
-
-// 빈 패킷에 대한 핸들러 설정 필요
-socket.on('data', (data) => {
-  if (isEmptyPacket(data)) {
-    handleEmptyPacket(socket);
-  }
-  // 기타 데이터는 추가로 처리
-});
-
-function isEmptyPacket(data) {
-  return data.length === 0;
-}
