@@ -19,6 +19,7 @@ const animationNotification = (game, animationType, targetUser = null) => {
       break;
     case config.animationType.BOMB_ANIMATION:
       // 폭탄 디버프 가지고 있는 유저 찾기
+      // 게임 클래스의 getDebuffUser를 통해 찾을 수 있을 듯?
       const userDatas = game.getAllUserDatas();
       const debuffUserId = userDatas
         .filter((user) => user.character.debuffs.includes(config.card.cardType.BOMB)) // debuffs에 23이 포함된 유저 필터링
