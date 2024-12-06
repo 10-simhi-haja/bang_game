@@ -73,12 +73,12 @@ const fleaMarketPickRequestHandler = ({ socket, payload }) => {
       users.forEach((user) => {
         if (game.users[user.id].prevStateInfo.state !== CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE) {
           const prevState = game.users[user.id].prevStateInfo;
-
+          console.log(`이전상태로 되돌아가자 ${game.users[user.id].prevStateInfo.state}`);
           game.setCharacterState(
             user.id,
             prevState.state,
             prevState.nextState,
-            Date.now() + 5 * 1000,
+            5,
             prevState.stateTargetUserId,
           );
           game.users[user.id].prevStateInfo = { ...defaultStateInfo };
