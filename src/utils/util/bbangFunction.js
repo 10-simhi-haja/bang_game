@@ -32,9 +32,9 @@ export const bbangInterval = (game, user) => {
   ) {
     console.log(`${targetId}의 hp 감소`); // HP 감소부분.
     if (attCharacter.weapon === CARD_TYPE.DESERT_EAGLE) {
-      game.damageCharacter(character, attCharacter, 2);
+      game.damageCharacter(attCharacter, character, 2);
     } else {
-      game.damageCharacter(character, attCharacter, 1);
+      game.damageCharacter(attCharacter, character, 1);
     }
   }
 

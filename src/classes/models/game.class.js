@@ -896,9 +896,9 @@ class Game {
   //! 해당 아이디 유저에게 주기 셋팅
   //!             유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
   setUserSyncInterval(user) {
-    console.log(`유저: ${user.id}`);
-    this.intervalManager.addInterval(
-      user.id,
+    console.log(`유저: ${user}`);
+    this.intervalManager.addGameInterval(
+      this.id,
       () => this.userSync(user),
       INTERVAL.SYNC_POSITION,
       INTERVAL_TYPE.POSITION,
@@ -929,7 +929,7 @@ class Game {
     // 노티피케이션 생성 및 전송
     const notificationResponse = createResponse(
       PACKET_TYPE.POSITION_UPDATE_NOTIFICATION,
-      user.socket.sequence,
+      null,
       notiData,
     );
 
