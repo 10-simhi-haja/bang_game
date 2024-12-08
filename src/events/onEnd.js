@@ -6,6 +6,7 @@ import config from '../config/config.js';
 import CustomError from '../utils/errors/customError.js';
 import ErrorCodes from '../utils/errors/errorCodes.js';
 
+// ! 게임 중에 방장이 나가면 오류 발생!!!!
 // 종료되면 해당 유저 게임에서 제거하는 과정.
 export const onEnd = (socket) => async () => {
   console.log('클라이언트와 연결이 종료되었다.');
