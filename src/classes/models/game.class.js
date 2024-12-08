@@ -895,32 +895,27 @@ class Game {
   //! 필요하면 살림.
   //! 해당 아이디 유저에게 주기 셋팅
   //!             유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
-  setUserSyncInterval(user) {
-    console.log(`유저: ${user}`);
+  setUserSyncInterval() {
     this.intervalManager.addGameInterval(
       this.id,
-      () => this.userSync(user),
-      INTERVAL.SYNC_POSITION,
+      () => this.userSync(),
+      INTERVAL.SYNC_POSITION, // 1초마다 진행
       INTERVAL_TYPE.POSITION,
     );
   }
 
   //!포지션 노티 여기서 쏴주면 됩니다.
   //!적용하면 상대 캐릭터가 끊기듯이 움직임.
-  userSync(user) {
-    const characterPositions = [];
+  userSync() {
     const allUser = this.getAllUsers();
 
-    allUser.forEach((user) => {
-      const posData = {
+    const characterPositions = allUser.map((user) => {
+      return {
         id: user.id,
         x: user.x,
         y: user.y,
       };
-      characterPositions.push(posData);
     });
-
-    // console.log('Notification Response Data:', { characterPositions });
 
     const notiData = {
       characterPositions: characterPositions,
