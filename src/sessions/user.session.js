@@ -1,6 +1,8 @@
 import User from '../classes/models/user.class.js';
 import { v4 as uuidv4 } from 'uuid';
 import { userSessions } from './sessions.js';
+import CustomError from '../utils/errors/customError.js';
+import ErrorCodes from '../utils/errors/errorCodes.js';
 
 export const addUser = async (socket, accountId, nickname) => {
   const user = new User(socket, accountId, nickname);
@@ -26,6 +28,9 @@ export const getUserByDeviceId = (deviceId) => {
 
 export const getUserBySocket = (socket) => {
   const user = userSessions.find((user) => user.socket === socket);
+  if (!user) {
+    throw new CustomError(ErrorCodes.USER_NOT_FOUND, '유저를 찾을 수 없다.', socket.sequence);
+  }
   return user;
 };
 

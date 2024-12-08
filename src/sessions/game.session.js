@@ -1,5 +1,7 @@
 // 핸들러 구현을 위해 임시로 작성한 로직, 돌아가는지 확인이 불가능 하기에 팀원들 코드로 대체 예정
 import Game from '../classes/models/game.class.js';
+import CustomError from '../utils/errors/customError.js';
+import ErrorCodes from '../utils/errors/errorCodes.js';
 import { gameSessions } from './sessions.js';
 
 export const addGameSession = async (data) => {
@@ -20,20 +22,44 @@ export const removeGameSessionById = (id) => {
 };
 
 export const getGameSessionById = (id) => {
-  return gameSessions.find((session) => session.id === id);
+  const game = gameSessions.find((session) => session.id === id);
+  if (!game) {
+    throw new CustomError(
+      ErrorCodes.GAME_NOT_FOUND,
+      '유저가 속한 게임을 찾을 수 없다',
+      socket.sequence,
+    );
+  }
+  return game;
 };
 
 export const getGameSessionBySocket = (socket) => {
-  return gameSessions.find((session) =>
+  const game = gameSessions.find((session) =>
     session.getAllUsers().some((user) => user.socket === socket),
   );
+  if (!game) {
+    throw new CustomError(
+      ErrorCodes.GAME_NOT_FOUND,
+      '유저가 속한 게임을 찾을 수 없다',
+      socket.sequence,
+    );
+  }
+  return game;
 };
 
 // 유저가 속한 게임찾기
 export const getGameSessionByUser = (user) => {
-  return gameSessions.find((session) =>
+  const game = gameSessions.find((session) =>
     session.getAllUsers().some((sessionUser) => sessionUser.id === user.id),
   );
+  if (!game) {
+    throw new CustomError(
+      ErrorCodes.GAME_NOT_FOUND,
+      '유저가 속한 게임을 찾을 수 없다',
+      socket.sequence,
+    );
+  }
+  return game;
 };
 
 export const getAllGameSessions = () => {

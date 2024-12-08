@@ -205,14 +205,22 @@ const handlers = {
 
 export const getHandlerByPacketType = (PacketType) => {
   if (!handlers[PacketType]) {
-    throw new CustomError(ErrorCodes.UNKNOWN_HANDLER_ID, '핸들러 아이디를 찾을 수 없습니다.');
+    throw new CustomError(
+      ErrorCodes.UNKNOWN_HANDLER_ID,
+      '핸들러 아이디를 찾을 수 없습니다.',
+      socket.sequence,
+    );
   }
   return handlers[PacketType].handler;
 };
 
 export const getProtoTypeNameByPacketType = (PacketType) => {
   if (!handlers[PacketType]) {
-    throw new CustomError(ErrorCodes.UNKNOWN_PROTOTYPE_NAME, '프로토타입 이름을 찾을 수 없습니다.');
+    throw new CustomError(
+      ErrorCodes.UNKNOWN_PROTOTYPE_NAME,
+      '프로토타입 이름을 찾을 수 없습니다.',
+      socket.sequence,
+    );
   }
   return handlers[PacketType].protoType;
 };
@@ -222,6 +230,7 @@ export const getHandlerById = (handlerId) => {
     throw new CustomError(
       ErrorCodes.UNKNOWN_HANDLER_ID,
       `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+      socket.sequence,
     );
   }
   return handlers[handlerId].handler;
@@ -232,6 +241,7 @@ export const getProtoTypeNameByHandlerId = (handlerId) => {
     throw new CustomError(
       ErrorCodes.UNKNOWN_HANDLER_ID,
       `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+      socket.sequence,
     );
   }
   return handlers[handlerId].protoType;
@@ -242,6 +252,7 @@ export const getFieldNameByHandlerId = (handlerId) => {
     throw new CustomError(
       ErrorCodes.UNKNOWN_HANDLER_ID,
       `핸들러를 찾을 수 없습니다: ID ${handlerId}`,
+      socket.sequence,
     );
   }
   return handlers[handlerId].fieldName;
