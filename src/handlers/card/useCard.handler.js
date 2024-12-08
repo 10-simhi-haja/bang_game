@@ -28,6 +28,7 @@ const useCardHandler = ({ socket, payload }) => {
     const targetId = targetUserId.low;
     const user = getUserBySocket(socket);
     const game = getGameSessionByUser(user);
+    console.log('혹시 이것도 문제야?: ', game);
     const users = game.getAllUserDatas();
     const targetIds = game.getLiveUsersId();
     const userId = user.id;
