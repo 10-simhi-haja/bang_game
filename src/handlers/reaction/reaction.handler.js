@@ -6,6 +6,8 @@ import userUpdateNotification from '../../utils/notification/userUpdateNotificat
 import { getUserBySocket } from '../../sessions/user.session.js';
 import animationNotification from '../../utils/notification/animationNotification.js';
 import config from '../../config/config.js';
+import CustomError from '../../utils/errors/customError.js';
+import ErrorCodes from '../../utils/errors/errorCodes.js';
 
 const packetType = PACKET_TYPE;
 const {
@@ -20,20 +22,24 @@ const REACTION_TYPE = {
 const handleReactionRequest = async ({ socket, payload }) => {
   try {
     if (!payload || typeof payload !== 'object') {
-      throw new Error('Payload가 올바르지 않습니다.');
+      throw new CustomError(
+        ErrorCodes.PAYLOAD_ERROR,
+        'Payload가 올바르지 않습니다.',
+        socket.sequence,
+      );
     }
 
     const { reactionType } = payload;
 
     if (!Object.values(REACTION_TYPE).includes(reactionType)) {
-      throw new Error('유효하지 않은 리액션 타입입니다.');
+      throw new CustomError(
+        ErrorCodes.REACTION_ERROR,
+        '유효하지 않은 리액션 타입입니다.',
+        socket.sequence,
+      );
     }
 
-    const gameSession = await getGameSessionBySocket(socket);
-    if (!gameSession) {
-      throw new Error('해당 유저의 게임 세션이 존재하지 않습니다.');
-    }
-
+    // const gameSession = await getGameSessionBySocket(socket);
     const user = getUserBySocket(socket);
     const game = getGameSessionByUser(user);
     const users = game.getAllUserDatas();

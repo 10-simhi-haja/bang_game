@@ -15,7 +15,6 @@ const joinRoomHandler = async ({ socket, payload }) => {
   try {
     const roomId = payload.roomId;
     const room = getGameSessionById(roomId);
-
     const user = getUserBySocket(socket);
 
     room.addUser(user);
