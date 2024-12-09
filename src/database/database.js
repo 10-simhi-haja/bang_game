@@ -1,9 +1,9 @@
 import mysql from 'mysql2/promise';
 import config from '../config/config.js';
 
-const createPool = () => {
+const createPool = (dbConfig) => {
   const pool = mysql.createPool({
-    ...config.databases,
+    ...dbConfig,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -20,6 +20,9 @@ const createPool = () => {
   return pool;
 };
 
-const dbPool = createPool();
+const dbPool = {
+  UESR_DB: createPool(config.databases.UESR_DB),
+  GAME_DB: createPool(config.databases.GAME_DB),
+};
 
 export default dbPool;

@@ -12,4 +12,10 @@ export const DB_PASSWORD = process.env.DB_PASSWORD || 'password1';
 export const DB_HOST = process.env.DB_HOST || 'localhost';
 export const DB_PORT = process.env.DB_PORT || 3306;
 
+export const DB_NAME2 = process.env.DB_NAME2 || 'database1';
+export const DB_USER2 = process.env.DB_USER2 || 'user1';
+export const DB_PASSWORD2 = process.env.DB_PASSWORD2 || 'password1';
+export const DB_HOST2 = process.env.DB_HOST2 || 'localhost';
+export const DB_PORT2 = process.env.DB_PORT2 || 3306;
+
 export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || 'secretkey';

@@ -18,6 +18,11 @@ import {
   DB_HOST,
   DB_PORT,
   JWT_SECRET_KEY,
+  DB_NAME2,
+  DB_USER2,
+  DB_PASSWORD2,
+  DB_HOST2,
+  DB_PORT2,
 } from '../constants/env.js';
 import {
   TOTAL_HEADER_LENGTH,
@@ -82,11 +87,20 @@ const config = {
     globalFailCode: GLOBAL_FAIL_CODE,
   },
   databases: {
-    database: DB_NAME,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    host: DB_HOST,
-    port: DB_PORT,
+    UESR_DB: {
+      database: DB_NAME,
+      user: DB_USER,
+      password: DB_PASSWORD,
+      host: DB_HOST,
+      port: DB_PORT,
+    },
+    GAME_DB: {
+      database: DB_NAME2,
+      user: DB_USER2,
+      password: DB_PASSWORD2,
+      host: DB_HOST2,
+      port: DB_PORT2,
+    },
   },
   jwt: {
     key: JWT_SECRET_KEY,
