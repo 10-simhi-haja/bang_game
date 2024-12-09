@@ -24,7 +24,6 @@ const destroyCardRequestHandler = ({ socket, payload }) => {
     const { destroyCards } = payload;
 
     const user = getUserBySocket(socket);
-
     const game = getGameSessionByUser(user);
 
     // 요청온 카드의 숫자만큼 반복제거

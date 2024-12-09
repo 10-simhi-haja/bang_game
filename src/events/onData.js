@@ -8,7 +8,11 @@ import handleError from './../utils/errors/errorHandler.js';
 
 const onData = (socket) => async (data) => {
   if (!socket) {
-    throw new CustomError(ErrorCodes.SOCKET_ERROR, `소켓을 찾을 수 없거나 연결이 끊겼다.`);
+    throw new CustomError(
+      ErrorCodes.SOCKET_ERROR,
+      `소켓을 찾을 수 없거나 연결이 끊겼다.`,
+      socket.sequence,
+    );
   }
 
   socket.buffer = Buffer.concat([socket.buffer, data]);
@@ -34,6 +38,7 @@ const onData = (socket) => async (data) => {
       throw new CustomError(
         ErrorCodes.CLIENT_VERSION_MISMATCH,
         '클라이언트 버전이 일치하지 않습니다.',
+        socket.sequence,
       );
     }
 
@@ -42,9 +47,10 @@ const onData = (socket) => async (data) => {
     offset += config.packet.sequenceLength;
     const isValidSequence = validateSequence(socket, sequence);
     if (!isValidSequence) {
-      throw (
-        (new CustomError(ErrorCodes.INVALID_SEQUENCE),
-        `패킷이 중복되거나 누락되었다: 예상 시퀀스: ${socket.sequence + 1}, 받은 시퀀스: ${sequence}`)
+      throw new CustomError(
+        ErrorCodes.INVALID_SEQUENCE,
+        `패킷이 중복되거나 누락되었다: 예상 시퀀스: ${socket.sequence + 1}, 받은 시퀀스: ${sequence}`,
+        socket.sequence,
       );
     }
     // 6. 페이로드 길이 (4 bytes)

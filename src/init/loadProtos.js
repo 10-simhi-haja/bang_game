@@ -60,7 +60,11 @@ export const loadProtos = async () => {
 
     console.log('Protobuf 파일 로드 완료');
   } catch (err) {
-    throw new CustomError(ErrorCodes.PROTOBUF_ERROR, `Protobuf 파일 로드 중 오류 발생 : ${err}`);
+    throw new CustomError(
+      ErrorCodes.PROTOBUF_ERROR,
+      `Protobuf 파일 로드 중 오류 발생 : ${err}`,
+      socket.sequence,
+    );
   }
 };
 
