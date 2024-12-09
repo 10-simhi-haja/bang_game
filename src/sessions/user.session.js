@@ -15,6 +15,12 @@ export const removeUserBySocket = async (socket) => {
 
   if (index !== -1) {
     return userSessions.splice(index, 1)[0];
+  } else {
+    throw new CustomError(
+      ErrorCodes.USER_NOT_FOUND,
+      '삭제할 유저 인덱스를 찾지 못했다',
+      socket.sequence,
+    );
   }
 };
 

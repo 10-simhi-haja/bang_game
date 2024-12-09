@@ -18,7 +18,8 @@ export const onEnd = (socket) => async () => {
   const room = getGameSessionByUser(user);
 
   // 유저가 게임에 속했을 경우
-  if (room) {
+  if (room && room.state !== config.roomStateType.inGame) {
+    console.log('이건 뭘까?: ', room.state);
     room.removeUser(user.id);
 
     // 방장이 나갔을 경우
