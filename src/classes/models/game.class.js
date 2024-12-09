@@ -798,7 +798,7 @@ class Game {
       gameEndNotification(this.getAllUsers(), this.id, gameEndNotiData);
       return;
     }
-    // userUpdateNotification(this);
+    userUpdateNotification(this);
   }
 
   // debuff가 있는지 체크
