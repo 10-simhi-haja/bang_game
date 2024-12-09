@@ -816,7 +816,8 @@ class Game {
         satelliteCharacter.debuffs.splice(satelIndex, 1);
       }
 
-      if (Math.random() < 0.03) {
+      const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
+      if (range <= config.probability.SATELLITE_TARGET) {
         console.log(`위성 터졌다!`);
 
         // 효과가 발동되었을 때
