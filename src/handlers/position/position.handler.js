@@ -46,29 +46,29 @@ const handlePositionUpdate = async ({ socket, payload }) => {
 
     const allUser = gameSession.getAllUsers();
 
-    // const characterPositions = allUser.map((user) => ({
-    //   id: user.id,
-    //   x: user.x,
-    //   y: user.y,
-    // }));
+    const characterPositions = allUser.map((user) => ({
+      id: user.id,
+      x: user.x,
+      y: user.y,
+    }));
 
-    // const notiData = {
-    //   characterPositions: characterPositions,
-    // };
+    const notiData = {
+      characterPositions: characterPositions,
+    };
 
-    // // 노티피케이션 생성 및 전송
-    // const notificationResponse = createResponse(
-    //   packetType.POSITION_UPDATE_NOTIFICATION,
-    //   socket.sequence,
-    //   notiData,
-    // );
+    // 노티피케이션 생성 및 전송
+    const notificationResponse = createResponse(
+      packetType.POSITION_UPDATE_NOTIFICATION,
+      socket.sequence,
+      notiData,
+    );
 
-    // allUser.forEach((notiUser) => {
-    //   if (notiUser.id === currentUser.id) {
-    //     return;
-    //   }
-    //   notiUser.socket.write(notificationResponse);
-    // });
+    allUser.forEach((notiUser) => {
+      if (notiUser.id === currentUser.id) {
+        return;
+      }
+      notiUser.socket.write(notificationResponse);
+    });
   } catch (error) {
     handleError(socket, error);
   }

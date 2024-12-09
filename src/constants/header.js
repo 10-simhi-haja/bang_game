@@ -241,7 +241,7 @@ export const PHASE_TYPE = {
 // 전부 초단위
 export const INTERVAL = {
   SYNC_POSITION: 1,
-  SYNC_GAME: 1,
+  SYNC_GAME: 2,
   PHASE_UPDATE_DAY: 300,
   PHASE_UPDATE_END: 60,
   FLEA_MARKET_PICK: 10,
