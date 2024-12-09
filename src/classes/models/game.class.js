@@ -529,13 +529,15 @@ class Game {
 
   // 카드가 유저의 핸드에서 제거될때.
   removeCard(userId, cardType) {
-    const handCards = this.getCharacter(userId).handCards;
+    const character = this.getCharacter(userId);
+    const handCards = character.handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
-    this.cardDeck.addUseCard(cardType);
+    // handCards에 카드가 있어야 removeCard가 실행
     if (index !== -1) {
       handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
+      this.cardDeck.addUseCard(cardType);
+      character.handCardsCount = handCards.length;
     }
-    this.getCharacter(userId).handCardsCount = handCards.length;
   }
 
   shooterPushArr(shooterId, targetIds) {
