@@ -356,22 +356,6 @@ class Game {
           count: 2,
         },
         {
-          type: CARD_TYPE.BIG_BBANG,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.DEATH_MATCH,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.GUERRILLA,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.VACCINE,
-          count: 1,
-        },
-        {
           type: CARD_TYPE.FLEA_MARKET,
           count: 1,
         },

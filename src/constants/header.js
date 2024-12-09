@@ -91,11 +91,11 @@ export const PACKET_TYPE = {
 
 export const CHARACTER_TYPE = {
   NONE_CHARACTER: 0,
-  RED: 1, // 빨강이
+  // RED: 1, // 빨강이
   // SHARK: 3, // 상어군
   MALANG: 5, // 말랑이
   FROGGY: 7, // 개굴군
-  // PINK: 8, // 핑크군
+  PINK: 8, // 핑크군
   // SWIM_GLASSES: 9, // 물안경군
   // MASK: 10, // 가면군
   // DINOSAUR: 12, // 공룡이
@@ -242,8 +242,8 @@ export const PHASE_TYPE = {
 export const INTERVAL = {
   SYNC_POSITION: 0.1,
   SYNC_GAME: 1,
-  PHASE_UPDATE_DAY: 300,
-  PHASE_UPDATE_END: 60,
+  PHASE_UPDATE_DAY: 150,
+  PHASE_UPDATE_END: 20,
   FLEA_MARKET_PICK: 10,
   BOMB: 5,
   BOMB_ANIMATION: 5,
