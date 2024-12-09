@@ -22,7 +22,7 @@ export const guerrillaInterval = (game, user) => {
     game.users[user.id].character.hp > 0
   ) {
     console.log(`${user.id}의 hp 감소`);
-    game.users[user.id].character.hp -= 1;
+    game.damageCharacter(game.getCharacter(user.id), game.getCharacter(targetId), 1);
   }
 
   game.setCharacterState(

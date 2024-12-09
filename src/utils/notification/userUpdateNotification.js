@@ -43,10 +43,6 @@ const userUpdateNotification = (game) => {
         // 이외에는 1발
         user.character.maxBbangCount = 1;
       }
-
-      const isHandGu2n = user.character.equips.includes(config.card.cardType.AUTO_SHIELD);
-      //if()
-      //user.character.maxBbangCount = 1;
     });
 
     const notiData = {

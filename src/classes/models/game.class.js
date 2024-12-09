@@ -12,6 +12,7 @@ import { bbangInterval } from '../../utils/util/bbangFunction.js';
 import { bigBbangInterval } from '../../utils/util/bigBbangFunction.js';
 import { guerrillaInterval } from '../../utils/util/guerrillaFunction.js';
 import { deathMatchInterval } from '../../utils/util/deathMatchFunction.js';
+import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -294,7 +295,6 @@ class Game {
       prevStateInfo: {
         ...defaultStateInfo,
       },
-      isDeath: false, // 본인이 죽었는지를 몰라서 추가했던 변수, 반영되는거 없음.
     };
     this.userOrder.push(user.id);
   }
@@ -324,20 +324,20 @@ class Game {
         characterType === CHARACTER_TYPE.DINOSAUR ||
         characterType === CHARACTER_TYPE.PINK_SLIME
       ) {
-        userEntry.character.hp = 5;
+        userEntry.character.hp = 3;
       } else {
-        userEntry.character.hp = 5;
+        userEntry.character.hp = 4;
       }
 
       if (roleType === ROLE_TYPE.TARGET) {
-        //userEntry.character.hp++;
+        userEntry.character.hp++;
         this.targetCount++;
       } else if (roleType === ROLE_TYPE.HITMAN) {
         this.hitmanCount++;
       } else if (roleType === ROLE_TYPE.PSYCHOPATH) {
         this.psychopathCount++;
       }
-      userEntry.character.weapon = 13; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
+      userEntry.character.weapon = 0; // 총 장착하는 곳. 총 카드 번호가 아니라면 불가능하게 검증단계 필요.
       userEntry.character.stateInfo = {
         state: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
         nextState: CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
@@ -347,31 +347,44 @@ class Game {
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
-        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
-        { type: CARD_TYPE.BOMB, count: 1 },
-        { type: CARD_TYPE.BBANG, count: 5 },
-        { type: CARD_TYPE.AUTO_SHIELD, count: 1 },
-        { type: CARD_TYPE.SHIELD, count: 1 },
+        {
+          type: CARD_TYPE.BBANG,
+          count: 2,
+        },
+        {
+          type: CARD_TYPE.SHIELD,
+          count: 2,
+        },
+        {
+          type: CARD_TYPE.FLEA_MARKET,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.AUTO_RIFLE,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.LASER_POINTER,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.ABSORB,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.BOMB,
+          count: 1,
+        },
       ];
-      userEntry.character.handCards = [];
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
-      userEntry.character.handCards.push(
-        { type: 9, count: 1 },
-        { type: 23, count: 2 },
-        { type: 2, count: 1 },
-        { type: 3, count: 2 },
-        { type: 4, count: 1 },
-        { type: 9, count: 3 },
-        { type: 13, count: 1 },
-        { type: 23, count: 1 },
-        ...drawCard,
-      );
+      userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
       userEntry.character.autoShield = false;
       userEntry.character.isContain = false;
       userEntry.character.maxBbangCount = 1;
+      userEntry.character.isDeath = false; // 죽는 순간 판별위해서 사용
     });
   }
 
@@ -478,6 +491,40 @@ class Game {
         this.getCharacter(targetId).debuffs = removeCard;
         break;
     }
+  }
+
+  //^ 대미지 받기  맞는놈    때린놈     피해량
+  damageCharacter(character, attCharacter, damage) {
+    for (let i = 0; i < damage; i++) {
+      if (character.hp <= 0) {
+        return;
+      }
+
+      character.hp--;
+
+      // 죽은애가 히트맨이면 죽인사람 3장뽑기
+      if (character.hp === 0 && character.roleType === ROLE_TYPE.HITMAN) {
+        attCharacter.handCards.push(...this.cardDeck.drawMultipleCards(3));
+      }
+
+      if (CHARACTER_TYPE.MALANG === character.characterType) {
+        // 말랑이
+        const drawCard = this.cardDeck.drawMultipleCards(1);
+        character.handCards.push(...drawCard);
+      }
+
+      // 핑크 슬라임 때린사람 카드 뺏기
+      if (
+        CHARACTER_TYPE.PINK_SLIME === character.characterType &&
+        attCharacter.handCardsCount !== 0
+      ) {
+        const randomIndex = Math.floor(Math.random() * attCharacter.handCardsCount);
+
+        const [removeCard] = attCharacter.handCards.splice(randomIndex, 1);
+        character.handCards.push(removeCard);
+      }
+    }
+    userUpdateNotification(this);
   }
 
   // 카드가 유저의 핸드에서 제거될때.
@@ -617,13 +664,77 @@ class Game {
     let hitmanCount = 0;
     let psychopathCount = 0;
 
+    // 매 업데이트가 아닌 대미지 받고 유저 죽을때 판정하도록.
     userDatas.forEach((user) => {
-      if (user.character.hp === 0) {
-        return;
-      }
-      // 캐릭터가 핑크군일때 손패가 없으면 한장뽑기.
       // 사망 캐릭터 발생시 그캐릭터 모든 장비, 총, 디버프, 손 카드를 가면군의 손패로
       // 죽는 딱 그순간만 만들어서 그때 처리.
+      if (user.character.hp === 0 && !user.character.isDeath) {
+        user.character.isDeath = true;
+        const maskIndex = this.getLiveUsers().findIndex(
+          (liveUser) => this.users[liveUser.id].character.characterType === CHARACTER_TYPE.MASK,
+        );
+
+        if (maskIndex !== -1) {
+          const characterMask = this.users[this.getLiveUsers()[maskIndex].id].character;
+          characterMask.handCards.push(...user.character.handCards);
+
+          // 무기 넣기
+          const weaponCard = {
+            type: user.character.weapon,
+            count: 1,
+          };
+          characterMask.handCards.push(weaponCard);
+
+          // 장비 넣기
+          user.character.equips.forEach((equip) => {
+            const equipCard = {
+              type: equip,
+              count: 1,
+            };
+            characterMask.handCards.push(equipCard);
+          });
+
+          // 디버프 넣기
+          user.character.debuffs.forEach((debuff) => {
+            const debuffCard = {
+              type: debuff,
+              count: 1,
+            };
+            characterMask.handCards.push(debuffCard);
+          });
+        } else {
+          // 무기 버리기
+          this.cardDeck.addUseCard(user.character.weapon);
+
+          // 장비 버리기
+          user.character.equips.forEach((equip) => {
+            this.cardDeck.addUseCard(equip);
+          });
+
+          // 디버프 버리기
+          user.character.debuffs.forEach((debuff) => {
+            this.cardDeck.addUseCard(debuff);
+          });
+        }
+        user.character.weapon = 0;
+        user.character.equip = [];
+        user.character.debuffs = [];
+      }
+
+      // 죽은 상태에 피 0이면 리턴
+      if (user.character.hp === 0 && user.character.isDeath) {
+        return;
+      }
+
+      // 캐릭터가 핑크군일때 손패가 없으면 한장뽑기.
+      if (
+        user.character.characterType === CHARACTER_TYPE.PINK &&
+        user.character.handCardsCount === 0
+      ) {
+        // 플리마켓, 만기적금, 복권당첨같은 추가 카드를 얻는카드 사용하는순간0장이어도 뽑음. 일단 보류
+        user.character.handCards.push(this.cardDeck.drawCard());
+        user.character.handCardsCount = user.character.handCards.length;
+      }
 
       // 만약 내가 감금디버프를 가지고있으면서, is감금이 true이면 감금상태로 변환.
       if (
@@ -764,50 +875,47 @@ class Game {
       INTERVAL_TYPE.BOMB,
     );
   }
+
+  //! 필요하면 살림.
+  //! 해당 아이디 유저에게 주기 셋팅
+  //!             유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
+  setUserSyncInterval() {
+    this.intervalManager.addGameInterval(
+      this.id,
+      () => this.userSync(),
+      INTERVAL.SYNC_POSITION, // 1초마다 진행
+      INTERVAL_TYPE.POSITION,
+    );
+  }
+
+  //!포지션 노티 여기서 쏴주면 됩니다.
+  //!적용하면 상대 캐릭터가 끊기듯이 움직임.
+  userSync() {
+    const allUser = this.getAllUsers();
+
+    const characterPositions = allUser.map((user) => {
+      return {
+        id: user.id,
+        x: user.x,
+        y: user.y,
+      };
+    });
+
+    const notiData = {
+      characterPositions: characterPositions,
+    };
+
+    // 노티피케이션 생성 및 전송
+    const notificationResponse = createResponse(
+      PACKET_TYPE.POSITION_UPDATE_NOTIFICATION,
+      null,
+      notiData,
+    );
+
+    allUser.forEach((notiUser) => {
+      notiUser.socket.write(notificationResponse);
+    });
+  }
 }
 
 export default Game;
-///// 필요하면 살림.
-// 해당 아이디 유저에게 주기 셋팅
-//              유저아이디, 주기, 주기타입, 실행할 함수, 함수의 매개변수들
-// setUserSyncInterval(user) {
-//   this.intervalManager.addPlayer(
-//     user.id,
-//     () => this.userSync(user),
-//     INTERVAL.SYNC_POSITION,
-//     INTERVAL_TYPE.POSITION,
-//   );
-// }
-
-// // 포지션 노티 여기서 쏴주면 됩니다.
-// // 적용하면 상대 캐릭터가 끊기듯이 움직임.
-// userSync(user) {
-//   const characterPositions = [];
-//   const allUser = this.getAllUsers();
-
-//   allUser.forEach((user) => {
-//     const posData = {
-//       id: user.id,
-//       x: user.x,
-//       y: user.y,
-//     };
-//     characterPositions.push(posData);
-//   });
-
-//   console.log('Notification Response Data:', { characterPositions });
-
-//   const notiData = {
-//     characterPositions: characterPositions,
-//   };
-
-//   // 노티피케이션 생성 및 전송
-//   const notificationResponse = createResponse(
-//     PACKET_TYPE.POSITION_UPDATE_NOTIFICATION,
-//     user.socket.sequence,
-//     notiData,
-//   );
-
-//   allUser.forEach((notiUser) => {
-//     notiUser.socket.write(notificationResponse);
-//   });
-// }

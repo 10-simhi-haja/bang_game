@@ -1,5 +1,6 @@
 import config from '../../config/config.js';
 import { createResponse } from '../packet/response/createResponse.js';
+import userUpdateNotification from './userUpdateNotification.js';
 
 const animationNotification = (game, animationType, targetUser = null) => {
   const users = game.getAllUsers();
@@ -19,6 +20,7 @@ const animationNotification = (game, animationType, targetUser = null) => {
       break;
     case config.animationType.BOMB_ANIMATION:
       // 폭탄 디버프 가지고 있는 유저 찾기
+      // 게임 클래스의 getDebuffUser를 통해 찾을 수 있을 듯?
       const userDatas = game.getAllUserDatas();
       const debuffUserId = userDatas
         .filter((user) => user.character.debuffs.includes(config.card.cardType.BOMB)) // debuffs에 23이 포함된 유저 필터링
@@ -29,6 +31,7 @@ const animationNotification = (game, animationType, targetUser = null) => {
       if (userCharacter.stateInfo.state === 0) {
         console.log('애니메이션 동작!!!');
         userCharacter.hp -= 2;
+        userCharacter.debuffs = userCharacter.debuffs.filter((debuff) => debuff !== 23);
 
         responseDate = {
           userId: debuffUserId[0],
@@ -36,7 +39,7 @@ const animationNotification = (game, animationType, targetUser = null) => {
         };
 
         game.intervalManager.removeGameIntervalByType(game.id, config.intervalType.BOMB_ANIMATION);
-        // userUpdateNotification(game);
+        userUpdateNotification(game);
       } else {
         console.log('아직 애니메이션 동작 안 하는 중...');
       }
