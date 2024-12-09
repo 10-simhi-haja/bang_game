@@ -1,5 +1,6 @@
 import config from '../../config/config.js';
 import { createResponse } from '../packet/response/createResponse.js';
+import userUpdateNotification from './userUpdateNotification.js';
 
 const animationNotification = (game, animationType, targetUser = null) => {
   const users = game.getAllUsers();
@@ -30,6 +31,7 @@ const animationNotification = (game, animationType, targetUser = null) => {
       if (userCharacter.stateInfo.state === 0) {
         console.log('애니메이션 동작!!!');
         userCharacter.hp -= 2;
+        userCharacter.debuffs = userCharacter.debuffs.filter((debuff) => debuff !== 23);
 
         responseDate = {
           userId: debuffUserId[0],
@@ -37,7 +39,7 @@ const animationNotification = (game, animationType, targetUser = null) => {
         };
 
         game.intervalManager.removeGameIntervalByType(game.id, config.intervalType.BOMB_ANIMATION);
-        // userUpdateNotification(game);
+        userUpdateNotification(game);
       } else {
         console.log('아직 애니메이션 동작 안 하는 중...');
       }
