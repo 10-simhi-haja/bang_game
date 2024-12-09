@@ -67,7 +67,7 @@ export const gameStartRequestHandler = ({ socket, payload }) => {
       gameStartNotification(socket, notiUser, gameStartNotiData);
     });
     // 모든 유저마다 만들어 줄 필요는 없음.
-    game.setUserSyncInterval();
+    // game.setUserSyncInterval();
     // 페이즈 넘어가는 시간 넣어야함
 
     game.setPhaseUpdateInterval(time);
