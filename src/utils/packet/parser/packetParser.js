@@ -13,7 +13,11 @@ const packetParser = (payload) => {
   try {
     payloadData = packet.decode(payload);
   } catch (error) {
-    throw new CustomError(ErrorCodes.PACKET_DECODE_ERROR, '패킷 디코딩 중 오류가 발생했습니다.');
+    throw new CustomError(
+      ErrorCodes.PACKET_DECODE_ERROR,
+      '패킷 디코딩 중 오류가 발생했습니다.',
+      socket.sequence,
+    );
   }
 
   // 3. 게임 공통 패킷 구조가 oneof 형태이기 때문에 프로토버프의 필드값까지 같이 저장되고 있음.

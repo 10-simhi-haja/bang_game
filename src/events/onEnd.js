@@ -3,16 +3,22 @@ import { getUserBySocket, removeUserBySocket } from '../sessions/user.session.js
 import leaveRoomNotification from '../utils/notification/leaveRoomNotification.js';
 import { createResponse } from '../utils/packet/response/createResponse.js';
 import config from '../config/config.js';
+import CustomError from '../utils/errors/customError.js';
+import ErrorCodes from '../utils/errors/errorCodes.js';
 
+// ! 게임 중에 방장이 나가면 오류 발생!!!!
 // 종료되면 해당 유저 게임에서 제거하는 과정.
 export const onEnd = (socket) => async () => {
   console.log('클라이언트와 연결이 종료되었다.');
   const user = getUserBySocket(socket);
+  if (!user) {
+    console.error('유저를 찾을 수 없다: ', socket.id);
+    throw new CustomError(ErrorCodes.USER_NOT_FOUND, '유저를 찾을 수 없다', socket.sequence);
+  }
   const room = getGameSessionByUser(user);
 
   // 유저가 게임에 속했을 경우
   if (room) {
-    console.log('삭제!!!!');
     room.removeUser(user.id);
 
     // 방장이 나갔을 경우

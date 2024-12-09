@@ -25,9 +25,9 @@ const useCardHandler = ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
 
-    const targetId = targetUserId.low;
     const user = getUserBySocket(socket);
     const game = getGameSessionByUser(user);
+    const targetId = targetUserId.low;
     const users = game.getAllUserDatas();
     const targetIds = game.getLiveUsersId();
     const userId = user.id;
@@ -239,7 +239,7 @@ const useCardHandler = ({ socket, payload }) => {
     }
 
     // 유저 업데이트 노티피케이션 발송
-    userUpdateNotification(game);
+    // userUpdateNotification(game);
 
     // 카드 사용 노티피케이션 발송
     useCardNotification(socket, user.id, game, payload);
