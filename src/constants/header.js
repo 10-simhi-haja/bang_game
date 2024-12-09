@@ -300,5 +300,6 @@ export const ANIMATION_TYPE = {
 };
 
 export const PROBABILITY = {
-  AUTO_SHIELD: 25,
+  AUTO_SHIELD: 25, // 자동 실드 확률
+  SATELLITE_TARGET: 3, // 빔 확률
 };

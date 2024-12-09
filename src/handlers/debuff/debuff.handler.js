@@ -21,7 +21,7 @@ const handlePassDebuffRequest = async ({ socket, payload }) => {
     );
     const debuffCardIndex = room.users[user.id].character.debuffs.indexOf(debuffs);
     console.log('debuffCardIndex: ', debuffCardIndex);
-    if (debuffCardIndex === undefined) {
+    if (debuffCardIndex === undefined || debuffCardIndex < 0) {
       throw new CustomError(
         ErrorCodes.NOT_FOUND_CARD,
         '유저의 핸드에 해당 디버프 카드가 존재하지 않는다.',
