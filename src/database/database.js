@@ -12,7 +12,7 @@ const createPool = (dbConfig) => {
   const originalQuery = pool.query;
   pool.query = (sql, params) => {
     // 쿼리 실행 시 로그
-    console.log(`Executing query: ${sql} ${params ? `, ${JSON.stringify(params)}` : ``}`);
+    // console.log(`Executing query: ${sql} ${params ? `, ${JSON.stringify(params)}` : ``}`);
 
     return originalQuery.call(pool, sql, params);
   };

@@ -17,7 +17,7 @@ const {
 
 // 방장이 게임시작을 누르고 역할분배가 완료되면 게임시작 요청이 온다.
 // 게임 시작 요청을 받고 모두에게 알림을 보낸다.
-export const gameStartRequestHandler = ({ socket, payload }) => {
+export const gameStartRequestHandler = async ({ socket, payload }) => {
   try {
     const owner = getUserBySocket(socket);
     const game = getGameSessionByUser(owner);

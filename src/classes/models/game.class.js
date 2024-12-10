@@ -48,7 +48,7 @@ class Game {
     this.hitmanCount = 0;
     this.psychopathCount = 0;
 
-    this.cardDeck = new CardDeck();
+    this.cardDeck = new CardDeck(this.id);
     this.fleaMarket = null;
   }
 
@@ -312,7 +312,7 @@ class Game {
     this.state = PREPARE;
 
     // 역할 배분에 순서가 중요하진 않음.
-    Object.values(this.users).forEach((userEntry, index) => {
+    Object.values(this.users).forEach(async (userEntry, index) => {
       const characterType = preparedCharacter[index];
       const roleType = preparedRole[index];
 
@@ -377,7 +377,7 @@ class Game {
         },
       ];
 
-      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
+      const drawCard = await this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
@@ -435,16 +435,16 @@ class Game {
     });
   }
   // 만기 적금
-  MaturedSavings(userId) {
-    const giveCard = this.cardDeck.drawMultipleCards(2);
+  async MaturedSavings(userId) {
+    const giveCard = await this.cardDeck.drawMultipleCards(2);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
     return (this.getCharacter(userId).handCards = newHandCard);
   }
   // 복권방
 
-  winLottery(userId) {
-    const giveCard = this.cardDeck.drawMultipleCards(3);
+  async winLottery(userId) {
+    const giveCard = await this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
     return (this.getCharacter(userId).handCards = newHandCard);
@@ -494,7 +494,7 @@ class Game {
   }
 
   //^ 대미지 받기  맞는놈    때린놈     피해량
-  damageCharacter(character, attCharacter, damage) {
+  async damageCharacter(character, attCharacter, damage) {
     for (let i = 0; i < damage; i++) {
       if (character.hp <= 0) {
         return;
@@ -504,12 +504,12 @@ class Game {
 
       // 죽은애가 히트맨이면 죽인사람 3장뽑기
       if (character.hp === 0 && character.roleType === ROLE_TYPE.HITMAN) {
-        attCharacter.handCards.push(...this.cardDeck.drawMultipleCards(3));
+        attCharacter.handCards.push(...(await this.cardDeck.drawMultipleCards(3)));
       }
 
       if (CHARACTER_TYPE.MALANG === character.characterType) {
         // 말랑이
-        const drawCard = this.cardDeck.drawMultipleCards(1);
+        const drawCard = await this.cardDeck.drawMultipleCards(1);
         character.handCards.push(...drawCard);
       }
 
