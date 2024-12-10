@@ -21,7 +21,7 @@ const {
   interval: INTERVAL,
 } = config;
 
-const useCardHandler = ({ socket, payload }) => {
+const useCardHandler = async ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
 
@@ -204,6 +204,7 @@ const useCardHandler = ({ socket, payload }) => {
         case CARD_TYPE.FLEA_MARKET:
           // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
           const fleaMarket = new FleaMarket(game);
+          await fleaMarket.initialize(game);
           game.fleaMarket = fleaMarket;
           fleaMarketNotification(game, user);
           break;

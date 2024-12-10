@@ -667,7 +667,7 @@ class Game {
     let psychopathCount = 0;
 
     // 매 업데이트가 아닌 대미지 받고 유저 죽을때 판정하도록.
-    userDatas.forEach((user) => {
+    userDatas.forEach(async (user) => {
       // 사망 캐릭터 발생시 그캐릭터 모든 장비, 총, 디버프, 손 카드를 가면군의 손패로
       // 죽는 딱 그순간만 만들어서 그때 처리.
       if (user.character.hp === 0 && !user.character.isDeath) {
@@ -734,7 +734,7 @@ class Game {
         user.character.handCardsCount === 0
       ) {
         // 플리마켓, 만기적금, 복권당첨같은 추가 카드를 얻는카드 사용하는순간0장이어도 뽑음. 일단 보류
-        user.character.handCards.push(this.cardDeck.drawCard());
+        user.character.handCards.push(await this.cardDeck.drawCard());
         user.character.handCardsCount = user.character.handCards.length;
       }
 
