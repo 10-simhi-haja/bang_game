@@ -14,8 +14,6 @@ const loginHandler = async ({ socket, payload }) => {
     const { email, password } = payload;
 
     const user = await findUserEmail(email);
-    const test = await loadSpawnPoint();
-    console.log(test);
 
     // DB 유저 확인
     if (!user) {

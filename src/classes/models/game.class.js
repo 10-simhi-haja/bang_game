@@ -13,6 +13,7 @@ import { bigBbangInterval } from '../../utils/util/bigBbangFunction.js';
 import { guerrillaInterval } from '../../utils/util/guerrillaFunction.js';
 import { deathMatchInterval } from '../../utils/util/deathMatchFunction.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import { setGameRedis, setGameStateRedis, setUserRedis } from '../../redis/game.redis.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -296,6 +297,16 @@ class Game {
         ...defaultStateInfo,
       },
     };
+
+    const test = {
+      id: this.id,
+      userData: {
+        id: user.id,
+        ...defaultCharacter,
+      },
+    };
+    setUserRedis(test);
+
     this.userOrder.push(user.id);
   }
 
@@ -310,6 +321,7 @@ class Game {
 
     // 룸 상태 prepare로 변경
     this.state = PREPARE;
+    setGameStateRedis(this.id, this.state);
 
     // 역할 배분에 순서가 중요하진 않음.
     Object.values(this.users).forEach(async (userEntry, index) => {
