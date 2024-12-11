@@ -5,9 +5,9 @@ class RedisManager {
   constructor() {
     if (!RedisManager.instance) {
       this.redisClient = new Redis({
-        host: config.databases.REDIS_DB.host,
-        port: config.databases.REDIS_DB.port,
-        password: config.databases.REDIS_DB.password,
+        host: config.databases.REDIS.host,
+        port: config.databases.REDIS.port,
+        password: config.databases.REDIS.password,
       });
 
       this.redisClient.on('connect', () => console.log('Redis 연결 성공?'));
