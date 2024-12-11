@@ -11,7 +11,7 @@ export const setGameRedis = async (gameData) => {
 
 // 게임 방의 상태가 바뀔 때
 export const setGameStateRedis = async (gameId, gameState) => {
-  const key = `GAME${gameData.id}:${gameId}`;
+  const key = `GAME${gameId}:${gameId}`;
   const data = {
     state: gameState,
   };

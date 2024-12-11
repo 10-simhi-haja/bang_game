@@ -7,7 +7,6 @@ import config from '../../config/config.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import { addUser, getUserById } from '../../sessions/user.session.js';
 import { createJWT } from '../../utils/jwt/createToken.js';
-import { loadSpawnPoint } from '../../database/character/spawnPoint.queries.js';
 
 const loginHandler = async ({ socket, payload }) => {
   try {
