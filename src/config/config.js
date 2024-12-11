@@ -23,6 +23,11 @@ import {
   DB_PASSWORD2,
   DB_HOST2,
   DB_PORT2,
+  REDIS_PASSWORD,
+  REDIS_HOST,
+  REDIS_PORT,
+  REDIS_NAME,
+  REDIS_USER,
 } from '../constants/env.js';
 import {
   TOTAL_HEADER_LENGTH,
@@ -100,6 +105,13 @@ const config = {
       password: DB_PASSWORD2,
       host: DB_HOST2,
       port: DB_PORT2,
+    },
+    REDIS_DB: {
+      database: REDIS_NAME,
+      user: REDIS_USER,
+      password: REDIS_PASSWORD,
+      host: REDIS_HOST,
+      port: REDIS_PORT,
     },
   },
   jwt: {
