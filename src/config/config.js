@@ -26,16 +26,9 @@ import {
   SEQUENCE_LENGTH,
   PAYLOAD_LENGTH,
   PACKET_TYPE,
-  CHARACTER_TYPE,
-  ROLE_TYPE,
-  ROLES_DISTRIBUTION,
-  CHARACTER_STATE_TYPE,
   ROOM_STATE_TYPE,
-  CHARACTER_SPAWN_POINT,
   CARD_TYPE,
   GLOBAL_FAIL_CODE,
-  INTERVAL,
-  INTERVAL_TYPE,
   PHASE_TYPE,
   WIN_TYPE,
   CARD_POOL,
@@ -43,6 +36,15 @@ import {
   ANIMATION_TYPE,
   PROBABILITY,
 } from '../constants/header.js';
+
+import {
+  CHARACTER_TYPE,
+  ROLE_TYPE,
+  ROLES_DISTRIBUTION,
+  CHARACTER_STATE_TYPE,
+} from '../constants/character.js';
+
+import { INTERVAL, INTERVAL_TYPE } from '../constants/interval.js';
 
 const config = {
   server: {
@@ -63,7 +65,6 @@ const config = {
   character: {
     characterType: CHARACTER_TYPE,
     characterStateType: CHARACTER_STATE_TYPE,
-    characterSpawnPoint: CHARACTER_SPAWN_POINT,
   },
   card: {
     cardType: CARD_TYPE,
