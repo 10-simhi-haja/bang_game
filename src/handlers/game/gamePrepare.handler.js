@@ -126,13 +126,16 @@ const prepareRole = (playersCount) => {
 
 // 게임 시작을 누르는것은 방장.
 // 요청을 보내고 다른 모든이들에게 알림을 보낸다.
-export const gamePrepareRequestHandler = ({ socket, payload }) => {
+export const gamePrepareRequestHandler = async ({ socket, payload }) => {
   try {
     // 1. 방장의 소켓으로 prepare 요청이 들어온다.
     // 1-1. ownerId로 game세션을 찾을수 있어야함.
     const owner = getUserBySocket(socket);
 
     const game = getGameSessionByUser(owner);
+
+    //^ 카드덱 초기화
+    await game.cardDeck.initializeDeck();
 
     // 방 인원수
     const playerCount = game.getUserLength();

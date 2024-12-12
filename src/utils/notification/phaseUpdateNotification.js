@@ -33,7 +33,7 @@ const phaseUpdateNotification = (game) => {
 
   const users = game.getLiveUsers();
 
-  users.forEach((notiUser) => {
+  users.forEach(async (notiUser) => {
     const phaseUpdateNoti = createResponse(
       PACKET_TYPE.PHASE_UPDATE_NOTIFICATION,
       notiUser.socket.sequence,
@@ -62,7 +62,7 @@ const phaseUpdateNotification = (game) => {
       }
 
       // 낮이 되어서 카드 뽑는 부분.
-      const drawCard = game.cardDeck.drawMultipleCards(2);
+      const drawCard = await game.cardDeck.drawMultipleCards(2);
       userCharacter.handCards.push(...drawCard);
       handCardNotification(notiUser, game);
       userUpdateNotification(game);
