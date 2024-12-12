@@ -387,6 +387,14 @@ class Game {
           type: CARD_TYPE.BOMB,
           count: 1,
         },
+        {
+          type: CARD_TYPE.MATURED_SAVINGS,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.WIN_LOTTERY,
+          count: 1,
+        },
       ];
 
       const drawCard = await this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
