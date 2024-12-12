@@ -27,11 +27,9 @@ import {
   PAYLOAD_LENGTH,
   PACKET_TYPE,
   ROOM_STATE_TYPE,
-  CARD_TYPE,
   GLOBAL_FAIL_CODE,
   PHASE_TYPE,
   WIN_TYPE,
-  CARD_POOL,
   WARNING_TYPE,
   ANIMATION_TYPE,
   PROBABILITY,
@@ -45,6 +43,7 @@ import {
 } from '../constants/character.js';
 
 import { INTERVAL, INTERVAL_TYPE } from '../constants/interval.js';
+import { CARD_TYPE, CARD_POOL } from '../constants/card.js';
 
 const config = {
   server: {
