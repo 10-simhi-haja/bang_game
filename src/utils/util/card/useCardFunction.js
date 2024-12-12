@@ -10,7 +10,7 @@
 // import FleaMarket from '../../classes/models/fleaMarket.js';
 // import animationNotification from '../../utils/notification/animationNotification.js';
 import config from '../../../config/config.js';
-import { CHARACTER_TYPE } from '../../../constants/header.js';
+import { CHARACTER_TYPE } from '../../../constants/character.js';
 import animationNotification from '../../notification/animationNotification.js';
 
 const {

@@ -5,7 +5,7 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import gameStartNotification from '../../utils/notification/gameStartNotification.js';
 import { shuffle } from '../../utils/util/shuffle.js';
-import { loadSpawnPoint } from '../../database/character/spawnPoint.queries.js';
+import { loadSpawnPoint } from '../../database/character/spawnPoint.db.js';
 import { setGameStateRedis } from '../../redis/game.redis.js';
 
 const {

@@ -10,7 +10,7 @@ import fleaMarketNotification from '../../utils/notification/fleaMarketNotificat
 import FleaMarket from '../../classes/models/fleaMarket.js';
 import animationNotification from '../../utils/notification/animationNotification.js';
 import { useBbang } from '../../utils/util/card/useCardFunction.js';
-import { CHARACTER_TYPE } from '../../constants/header.js';
+import { CHARACTER_TYPE } from '../../constants/character.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const {
