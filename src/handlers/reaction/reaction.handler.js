@@ -1,6 +1,7 @@
 import { getGameSessionBySocket, getGameSessionByUser } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { CARD_TYPE, CHARACTER_TYPE, PACKET_TYPE } from '../../constants/header.js';
+import { PACKET_TYPE } from '../../constants/header.js';
+import { CARD_TYPE } from '../../constants/card.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
