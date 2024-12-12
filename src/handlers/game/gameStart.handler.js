@@ -6,6 +6,7 @@ import handleError from '../../utils/errors/errorHandler.js';
 import gameStartNotification from '../../utils/notification/gameStartNotification.js';
 import { shuffle } from '../../utils/util/shuffle.js';
 import { loadSpawnPoint } from '../../database/character/spawnPoint.queries.js';
+import { setGameStateRedis } from '../../redis/game.redis.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -23,6 +24,7 @@ export const gameStartRequestHandler = async ({ socket, payload }) => {
     const owner = getUserBySocket(socket);
     const game = getGameSessionByUser(owner);
     game.changeState(INGAME);
+    setGameStateRedis(game.id, INGAME);
 
     // 게임시작 응답 데이터
     const gameStartResponseData = {

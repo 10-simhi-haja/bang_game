@@ -21,7 +21,7 @@ const {
   interval: INTERVAL,
 } = config;
 
-const useCardHandler = ({ socket, payload }) => {
+const useCardHandler = async ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
 
@@ -44,7 +44,19 @@ const useCardHandler = ({ socket, payload }) => {
     const userStateInfo = game.getCharacter(user.id).stateInfo;
     const bbangCount = game.getCharacter(user.id).bbangCount;
     // console.log('살아있는 유저', game.getLiveUsersId());
-
+    const notRemoveCardType = [
+      CARD_TYPE.SNIPER_GUN,
+      CARD_TYPE.HAND_GUN,
+      CARD_TYPE.DESERT_EAGLE,
+      CARD_TYPE.AUTO_RIFLE,
+      CARD_TYPE.LASER_POINTER,
+      CARD_TYPE.RADAR,
+      CARD_TYPE.AUTO_SHIELD,
+      CARD_TYPE.STEALTH_SUIT,
+      CARD_TYPE.CONTAINMENT_UNIT,
+      CARD_TYPE.SATELLITE_TARGET,
+      CARD_TYPE.BOMB,
+    ];
     if (index !== -1)
       switch (cardType) {
         //^ 공격
@@ -192,6 +204,7 @@ const useCardHandler = ({ socket, payload }) => {
         case CARD_TYPE.FLEA_MARKET:
           // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
           const fleaMarket = new FleaMarket(game);
+          await fleaMarket.initialize(game);
           game.fleaMarket = fleaMarket;
           fleaMarketNotification(game, user);
           break;
@@ -225,10 +238,8 @@ const useCardHandler = ({ socket, payload }) => {
         //^ 장비
         case CARD_TYPE.LASER_POINTER:
         case CARD_TYPE.RADAR:
-        case CARD_TYPE.RADAR:
         case CARD_TYPE.AUTO_SHIELD:
         case CARD_TYPE.STEALTH_SUIT:
-          // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
           if (!game.getCharacter(user.id).equips.includes(cardType)) {
             game.addEquip(user.id, cardType);
           }
@@ -240,7 +251,7 @@ const useCardHandler = ({ socket, payload }) => {
 
     // 카드 사용 후 카드 삭제 및 유저 업데이트
     // game.minusHandCardsCount(user.id);
-    if (responsePayload.success === true) {
+    if (responsePayload.success === true && !notRemoveCardType.includes(cardType)) {
       game.removeCard(user.id, cardType);
     }
 
