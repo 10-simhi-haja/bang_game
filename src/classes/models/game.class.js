@@ -375,6 +375,14 @@ class Game {
           type: CARD_TYPE.BOMB,
           count: 1,
         },
+        {
+          type: CARD_TYPE.MATURED_SAVINGS,
+          count: 1,
+        },
+        {
+          type: CARD_TYPE.WIN_LOTTERY,
+          count: 1,
+        },
       ];
 
       const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
@@ -434,6 +442,7 @@ class Game {
       if (user.id !== userId) this.users[user.id].character.hp += 1;
     });
   }
+
   // 만기 적금
   MaturedSavings(userId) {
     const giveCard = this.cardDeck.drawMultipleCards(2);
@@ -441,6 +450,7 @@ class Game {
     const newHandCard = [...handCard, ...giveCard];
     return (this.getCharacter(userId).handCards = newHandCard);
   }
+
   // 복권방
 
   winLottery(userId) {
