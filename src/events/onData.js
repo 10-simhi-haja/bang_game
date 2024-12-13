@@ -86,11 +86,11 @@ const onData = (socket) => async (data) => {
         const handler = getHandlerByPacketType(packetType);
         await handler({ socket, payload });
 
-        if(data.length < socket.buffer.length)
-          socket.buffer.lengt -= data.length;
+        console.log('이거 됨????');
         
         break;
       } else {
+        console.log('안되는 듯');
         break;
       }
     }
