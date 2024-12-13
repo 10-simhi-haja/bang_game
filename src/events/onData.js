@@ -91,6 +91,10 @@ const onData = (socket) => async (data) => {
         const handler = getHandlerByPacketType(packetType);
         await handler({ socket, payload });
 
+        if (0 < socket.buffer.length) {
+          socket.buffer.subarray(offset + payloadLength);
+        }
+
         console.log('이거 됨????');
 
         break;
