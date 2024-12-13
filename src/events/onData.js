@@ -17,6 +17,7 @@ const onData = (socket) => async (data) => {
       );
     }
 
+    const test = socket.buffer;
     socket.buffer = Buffer.concat([socket.buffer, data]);
 
     const totalHeaderLength = config.packet.totalHeaderLength;
@@ -91,7 +92,7 @@ const onData = (socket) => async (data) => {
         await handler({ socket, payload });
 
         if (0 < socket.buffer.length) {
-          socket.buffer.slice(0, socket.buffer.length);
+          socket.buffer = test;
           console.log('동작??');
         }
         if (getUserSessions().length > 1) {
