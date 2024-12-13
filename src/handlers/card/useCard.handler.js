@@ -33,7 +33,7 @@ const useCardHandler = async ({ socket, payload }) => {
     const userId = user.id;
     const handCards = game.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
-    console.log(`useCard 실행 ${cardType}, userId: ${userId}, tartgetId: ${targetUserId.low}`);
+    // console.log(`useCard 실행 ${cardType}, userId: ${userId}, tartgetId: ${targetUserId.low}`);
 
     const responsePayload = {
       success: true,

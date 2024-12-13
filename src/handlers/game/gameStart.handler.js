@@ -45,6 +45,7 @@ export const gameStartRequestHandler = async ({ socket, payload }) => {
     const allUserDatas = game.getAllUserDatas();
     const spawDate = await loadSpawnPoint();
     const characterPos = shuffle(spawDate).slice(0, game.getUserLength());
+    // console.log('게임 내 유저: ', allUserDatas);
 
     game.setAllUserPos(characterPos);
     const characterPosData = game.getAllUserPos();

@@ -47,13 +47,13 @@ const onData = (socket) => async (data) => {
       const sequence = socket.buffer.readUInt32BE(offset);
       offset += config.packet.sequenceLength;
       const isValidSequence = validateSequence(socket, sequence);
-      if (!isValidSequence) {
-        throw new CustomError(
-          ErrorCodes.INVALID_SEQUENCE,
-          `패킷이 중복되거나 누락되었다: 예상 시퀀스: ${socket.sequence + 1}, 받은 시퀀스: ${sequence}`,
-          socket.sequence,
-        );
-      }
+      // if (!isValidSequence) {
+      //   throw new CustomError(
+      //     ErrorCodes.INVALID_SEQUENCE,
+      //     `패킷이 중복되거나 누락되었다: 예상 시퀀스: ${socket.sequence + 1}, 받은 시퀀스: ${sequence}`,
+      //     socket.sequence,
+      //   );
+      // }
       // 6. 페이로드 길이 (4 bytes)
       const payloadLength = socket.buffer.readUInt32BE(offset);
       offset += config.packet.payloadLength;
@@ -67,6 +67,11 @@ const onData = (socket) => async (data) => {
         socket.buffer = socket.buffer.subarray(offset + payloadLength);
         const handler = getHandlerByPacketType(packetType);
         await handler({ socket, payload });
+
+        if (0 < socket.buffer.length) {
+          socket.buffer = socket.buffer.slice(socket.buffer.length);
+          console.error('확인하고 있음==================================');
+        }
         break;
       } else {
         break;
