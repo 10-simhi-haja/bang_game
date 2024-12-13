@@ -70,10 +70,8 @@ const onData = (socket) => async (data) => {
 
         if (0 < socket.buffer.length) {
           socket.buffer = socket.buffer.slice(socket.buffer.length);
+          console.error('확인하고 있음==================================');
         }
-
-        console.log('이거 됨????');
-
         break;
       } else {
         break;
