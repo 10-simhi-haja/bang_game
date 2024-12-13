@@ -83,14 +83,17 @@ const onData = (socket) => async (data) => {
         const { payload } = packetParser(payloadBuffer);
 
         socket.buffer = socket.buffer.subarray(offset + payloadLength);
+        if (getUserSessions().length > 1) {
+          console.log(`${user.nickname}(offset): ${offset}`);
+          console.log(`${user.nickname}(payloadLength): ${payloadLength}`);
+        }
         const handler = getHandlerByPacketType(packetType);
         await handler({ socket, payload });
 
         console.log('이거 됨????');
-        
+
         break;
       } else {
-        console.log('안되는 듯');
         break;
       }
     }
