@@ -5,6 +5,7 @@ import validateSequence from './../utils/socket/sequence.js';
 import packetParser from './../utils/packet/parser/packetParser.js';
 import { getHandlerByPacketType } from './../handlers/index.js';
 import handleError from './../utils/errors/errorHandler.js';
+import { getUserBySocket, getUserSessions } from '../sessions/user.session.js';
 
 const onData = (socket) => async (data) => {
   try {
@@ -19,6 +20,11 @@ const onData = (socket) => async (data) => {
     socket.buffer = Buffer.concat([socket.buffer, data]);
 
     const totalHeaderLength = config.packet.totalHeaderLength;
+    let user;
+    if (getUserSessions().length > 1) {
+      user = getUserBySocket(socket);
+      console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
+    }
     while (socket.buffer.length >= totalHeaderLength) {
       // 1. 패킷 타입 길이만큼 버퍼 읽을 위치 지정
       let offset = 0;
@@ -58,6 +64,9 @@ const onData = (socket) => async (data) => {
       const payloadLength = socket.buffer.readUInt32BE(offset);
       offset += config.packet.payloadLength;
 
+      if (getUserSessions().length > 1) {
+        console.log(`${user.nickname}(header): ${payloadLength + totalHeaderLength}`);
+      }
       if (socket.buffer.length >= payloadLength + totalHeaderLength) {
         // 7. 페이로드 (payloadLength bytes)
         const payloadBuffer = socket.buffer.subarray(offset, offset + payloadLength);

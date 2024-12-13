@@ -172,8 +172,8 @@ class Game {
         this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
         break;
       case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
-        console.log(`빵 setCharacter실행`);
-        console.log(`userId: ${JSON.stringify(this.users[curUserId].user.id, null, 2)}`);
+        // console.log(`빵 setCharacter실행`);
+        // console.log(`userId: ${JSON.stringify(this.users[curUserId].user.id, null, 2)}`);
         this.intervalManager.addInterval(
           curUserId,
           () => bbangInterval(this, this.users[curUserId].user),
