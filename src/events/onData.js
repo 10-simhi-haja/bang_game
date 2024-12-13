@@ -91,7 +91,8 @@ const onData = (socket) => async (data) => {
         await handler({ socket, payload });
 
         if (0 < socket.buffer.length) {
-          socket.buffer.subarray(offset + payloadLength);
+          socket.buffer.slice(0, socket.buffer.length);
+          console.log('동작??');
         }
         if (getUserSessions().length > 1) {
           console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
