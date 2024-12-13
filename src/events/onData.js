@@ -31,11 +31,19 @@ const onData = (socket) => async (data) => {
 
       // 2. 패킷 타입 - 핸들러 (2 bytes)
       const packetType = socket.buffer.readUInt16BE(offset);
+      if (getUserSessions().length > 1) {
+        user = getUserBySocket(socket);
+        console.log(`${user.nickname}(packetType): ${packetType}`);
+      }
       offset += config.packet.payloadOneofCaseLength; // 2
 
       // 3. 클라이언트 버전 길이 (1 byte)
       const versionLength = socket.buffer.readUInt8(offset);
       offset += config.packet.versionLength; // 1
+      if (getUserSessions().length > 1) {
+        user = getUserBySocket(socket);
+        console.log(`${user.nickname}(versionLength): ${versionLength}`);
+      }
 
       // 4. 클라이언트 버전 (versionLength bytes)
       const version = socket.buffer.subarray(offset, offset + versionLength).toString('utf-8');
