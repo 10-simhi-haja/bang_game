@@ -24,6 +24,7 @@ const onData = (socket) => async (data) => {
     if (getUserSessions().length > 1) {
       user = getUserBySocket(socket);
       console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
+      console.log(`${user.nickname}(data): ${data}`);
     }
     while (socket.buffer.length >= totalHeaderLength) {
       // 1. 패킷 타입 길이만큼 버퍼 읽을 위치 지정
