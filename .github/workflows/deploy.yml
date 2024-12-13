@@ -29,4 +29,5 @@ jobs:
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
             echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
             git pull origin main
+            npm install
             pm2 restart src/server.js || pm2 start src/server.js
