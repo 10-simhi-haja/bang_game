@@ -86,13 +86,15 @@ const onData = (socket) => async (data) => {
         if (getUserSessions().length > 1) {
           console.log(`${user.nickname}(offset): ${offset}`);
           console.log(`${user.nickname}(payloadLength): ${payloadLength}`);
-          console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
         }
         const handler = getHandlerByPacketType(packetType);
         await handler({ socket, payload });
 
         if (0 < socket.buffer.length) {
           socket.buffer.subarray(offset + payloadLength);
+        }
+        if (getUserSessions().length > 1) {
+          console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
         }
 
         console.log('이거 됨????');
