@@ -24,4 +24,6 @@ export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'password2';
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
 export const REDIS_PORT = process.env.REDIS_PORT || 15261;
 
+console.log('test: ', REDIS_HOST);
+
 export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || 'secretkey';
