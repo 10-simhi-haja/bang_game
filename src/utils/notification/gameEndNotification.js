@@ -1,5 +1,6 @@
 import CardDeck from '../../classes/models/cardDeck.class.js';
 import config from '../../config/config.js';
+import { deleteGameFolderRedis } from '../../redis/game.redis.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import { createResponse } from '../packet/response/createResponse.js';
 
@@ -24,6 +25,8 @@ const gameEndNotification = async (users, gameId, payload) => {
   await cardDeck.clearDeck();
 
   removeGameSessionById(gameId);
+  console.log('게임 종료!!');
+  deleteGameFolderRedis(gameId);
 };
 
 export default gameEndNotification;
