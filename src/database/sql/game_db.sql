@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS characters_spawn_point
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    x FLOAT NOT NULL,
+    y FLOAT NOT NULL
+);

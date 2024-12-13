@@ -13,6 +13,12 @@ import { bigBbangInterval } from '../../utils/util/bigBbangFunction.js';
 import { guerrillaInterval } from '../../utils/util/guerrillaFunction.js';
 import { deathMatchInterval } from '../../utils/util/deathMatchFunction.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import {
+  delUserRedis,
+  setGameStateRedis,
+  setUserRedis,
+  setUserStateRedis,
+} from '../../redis/game.redis.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -48,7 +54,7 @@ class Game {
     this.hitmanCount = 0;
     this.psychopathCount = 0;
 
-    this.cardDeck = new CardDeck();
+    this.cardDeck = new CardDeck(this.id);
     this.fleaMarket = null;
   }
 
@@ -165,6 +171,7 @@ class Game {
     character.stateInfo.nextState = nextState;
     character.stateInfo.nextStateAt = Date.now() + time * 1000;
     character.stateInfo.stateTargetUserId = targetId;
+    setUserStateRedis(this.id, curUserId, curState, nextState, time, targetId);
 
     switch (curState) {
       case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
@@ -286,7 +293,6 @@ class Game {
       handCards: [],
       bbangCount: 0,
       handCardsCount: 0,
-      autoShield: false,
     };
 
     this.users[user.id] = {
@@ -296,6 +302,16 @@ class Game {
         ...defaultStateInfo,
       },
     };
+
+    const redisUserData = {
+      id: this.id,
+      userData: {
+        id: user.id,
+        ...defaultStateInfo,
+      },
+    };
+    setUserRedis(redisUserData);
+
     this.userOrder.push(user.id);
   }
 
@@ -310,9 +326,10 @@ class Game {
 
     // 룸 상태 prepare로 변경
     this.state = PREPARE;
+    setGameStateRedis(this.id, this.state);
 
     // 역할 배분에 순서가 중요하진 않음.
-    Object.values(this.users).forEach((userEntry, index) => {
+    Object.values(this.users).forEach(async (userEntry, index) => {
       const characterType = preparedCharacter[index];
       const roleType = preparedRole[index];
 
@@ -347,41 +364,21 @@ class Game {
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
-        {
-          type: CARD_TYPE.BBANG,
-          count: 2,
-        },
-        {
-          type: CARD_TYPE.SHIELD,
-          count: 2,
-        },
-        {
-          type: CARD_TYPE.FLEA_MARKET,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.AUTO_RIFLE,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.LASER_POINTER,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.ABSORB,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.BOMB,
-          count: 1,
-        },
+        { type: CARD_TYPE.BBANG, count: 2 },
+        { type: CARD_TYPE.SHIELD, count: 2 },
+        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
+        { type: CARD_TYPE.AUTO_RIFLE, count: 1 },
+        { type: CARD_TYPE.LASER_POINTER, count: 1 },
+        { type: CARD_TYPE.ABSORB, count: 1 },
+        { type: CARD_TYPE.BOMB, count: 1 },
+        { type: CARD_TYPE.MATURED_SAVINGS, count: 1 },
+        { type: CARD_TYPE.WIN_LOTTERY, count: 1 },
       ];
 
-      const drawCard = this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
+      const drawCard = await this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
-      userEntry.character.autoShield = false;
       userEntry.character.isContain = false;
       userEntry.character.maxBbangCount = 1;
       userEntry.character.isDeath = false; // 죽는 순간 판별위해서 사용
@@ -393,6 +390,15 @@ class Game {
     if (!this.users[userId]) {
       return;
     }
+
+    const redisUserData = {
+      id: this.id,
+      userData: {
+        id: userId,
+      },
+    };
+    delUserRedis(redisUserData);
+
     this.intervalManager.removeInterval(userId);
     delete this.users[userId];
     this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
@@ -435,16 +441,16 @@ class Game {
     });
   }
   // 만기 적금
-  MaturedSavings(userId) {
-    const giveCard = this.cardDeck.drawMultipleCards(2);
+  async MaturedSavings(userId) {
+    const giveCard = await this.cardDeck.drawMultipleCards(2);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
     return (this.getCharacter(userId).handCards = newHandCard);
   }
   // 복권방
 
-  winLottery(userId) {
-    const giveCard = this.cardDeck.drawMultipleCards(3);
+  async winLottery(userId) {
+    const giveCard = await this.cardDeck.drawMultipleCards(3);
     const handCard = this.getCharacter(userId).handCards;
     const newHandCard = [...handCard, ...giveCard];
     return (this.getCharacter(userId).handCards = newHandCard);
@@ -494,7 +500,7 @@ class Game {
   }
 
   //^ 대미지 받기  맞는놈    때린놈     피해량
-  damageCharacter(character, attCharacter, damage) {
+  async damageCharacter(character, attCharacter, damage) {
     for (let i = 0; i < damage; i++) {
       if (character.hp <= 0) {
         return;
@@ -504,12 +510,12 @@ class Game {
 
       // 죽은애가 히트맨이면 죽인사람 3장뽑기
       if (character.hp === 0 && character.roleType === ROLE_TYPE.HITMAN) {
-        attCharacter.handCards.push(...this.cardDeck.drawMultipleCards(3));
+        attCharacter.handCards.push(...(await this.cardDeck.drawMultipleCards(3)));
       }
 
       if (CHARACTER_TYPE.MALANG === character.characterType) {
         // 말랑이
-        const drawCard = this.cardDeck.drawMultipleCards(1);
+        const drawCard = await this.cardDeck.drawMultipleCards(1);
         character.handCards.push(...drawCard);
       }
 
@@ -667,7 +673,7 @@ class Game {
     let psychopathCount = 0;
 
     // 매 업데이트가 아닌 대미지 받고 유저 죽을때 판정하도록.
-    userDatas.forEach((user) => {
+    userDatas.forEach(async (user) => {
       // 사망 캐릭터 발생시 그캐릭터 모든 장비, 총, 디버프, 손 카드를 가면군의 손패로
       // 죽는 딱 그순간만 만들어서 그때 처리.
       if (user.character.hp === 0 && !user.character.isDeath) {
@@ -734,7 +740,7 @@ class Game {
         user.character.handCardsCount === 0
       ) {
         // 플리마켓, 만기적금, 복권당첨같은 추가 카드를 얻는카드 사용하는순간0장이어도 뽑음. 일단 보류
-        user.character.handCards.push(this.cardDeck.drawCard());
+        user.character.handCards.push(await this.cardDeck.drawCard());
         user.character.handCardsCount = user.character.handCards.length;
       }
 
