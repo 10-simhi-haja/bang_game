@@ -92,7 +92,7 @@ const onData = (socket) => async (data) => {
         await handler({ socket, payload });
 
         if (0 < socket.buffer.length) {
-          socket.buffer = Buffer.alloc(0); // 버퍼 초기화
+          // socket.buffer = Buffer.alloc(0); // 버퍼 초기화
           console.log('동작??');
         }
         if (getUserSessions().length > 1) {
