@@ -22,11 +22,11 @@ const onData = (socket) => async (data) => {
 
     const totalHeaderLength = config.packet.totalHeaderLength;
     let user;
-    if (getUserSessions().length > 1) {
-      user = getUserBySocket(socket);
-      console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
-      console.log(`${user.nickname}(data): ${data.length}`); // 마지막!!!
-    }
+    // if (getUserSessions().length > 1) {
+    //   user = getUserBySocket(socket);
+    //   console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
+    //   console.log(`${user.nickname}(data): ${data.length}`); // 마지막!!!
+    // }
     while (socket.buffer.length >= totalHeaderLength) {
       // 1. 패킷 타입 길이만큼 버퍼 읽을 위치 지정
       let offset = 0;
@@ -42,10 +42,10 @@ const onData = (socket) => async (data) => {
       // 3. 클라이언트 버전 길이 (1 byte)
       const versionLength = socket.buffer.readUInt8(offset);
       offset += config.packet.versionLength; // 1
-      if (getUserSessions().length > 1) {
-        user = getUserBySocket(socket);
-        console.log(`${user.nickname}(versionLength): ${versionLength}`);
-      }
+      // if (getUserSessions().length > 1) {
+      //   user = getUserBySocket(socket);
+      //   console.log(`${user.nickname}(versionLength): ${versionLength}`);
+      // }
 
       // 4. 클라이언트 버전 (versionLength bytes)
       const version = socket.buffer.subarray(offset, offset + versionLength).toString('utf-8');
@@ -74,9 +74,9 @@ const onData = (socket) => async (data) => {
       const payloadLength = socket.buffer.readUInt32BE(offset);
       offset += config.packet.payloadLength;
 
-      if (getUserSessions().length > 1) {
-        console.log(`${user.nickname}(header): ${payloadLength + totalHeaderLength}`);
-      }
+      // if (getUserSessions().length > 1) {
+      //   console.log(`${user.nickname}(header): ${payloadLength + totalHeaderLength}`);
+      // }
       if (socket.buffer.length >= payloadLength + totalHeaderLength) {
         // 7. 페이로드 (payloadLength bytes)
         const payloadBuffer = socket.buffer.subarray(offset, offset + payloadLength);
@@ -84,10 +84,10 @@ const onData = (socket) => async (data) => {
         const { payload } = packetParser(payloadBuffer);
 
         socket.buffer = socket.buffer.subarray(offset + payloadLength);
-        if (getUserSessions().length > 1) {
-          console.log(`${user.nickname}(offset): ${offset}`);
-          console.log(`${user.nickname}(payloadLength): ${payloadLength}`);
-        }
+        // if (getUserSessions().length > 1) {
+        //   console.log(`${user.nickname}(offset): ${offset}`);
+        //   console.log(`${user.nickname}(payloadLength): ${payloadLength}`);
+        // }
         const handler = getHandlerByPacketType(packetType);
         await handler({ socket, payload });
 
@@ -95,9 +95,9 @@ const onData = (socket) => async (data) => {
           socket.buffer = socket.buffer.slice(socket.buffer.length);
           console.log('동작??');
         }
-        if (getUserSessions().length > 1) {
-          console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
-        }
+        // if (getUserSessions().length > 1) {
+        //   console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
+        // }
 
         console.log('이거 됨????');
 
