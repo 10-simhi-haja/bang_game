@@ -114,7 +114,7 @@ enum RoomStateType {
 enum PhaseType {
     NONE_PHASE = 0;
     DAY = 1;
-    EVENING = 2;
+    MISSION = 2;
     END = 3;
 }
 

@@ -25,7 +25,6 @@ const userUpdateNotification = (game) => {
 
     // 유저 데이터 변환
     const userData = game.getAllUserDatas();
-
     // 유저 업데이트 부분.
     userData.forEach((user) => {
       // 손패 갯수 업데이트

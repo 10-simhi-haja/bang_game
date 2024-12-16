@@ -642,10 +642,18 @@ class Game {
   }
 
   nextPhase() {
-    if (this.phase === PHASE_TYPE.END) {
-      this.phase = PHASE_TYPE.DAY;
-    } else if (this.phase === PHASE_TYPE.DAY) {
-      this.phase = PHASE_TYPE.END;
+    switch (this.phase) {
+      case PHASE_TYPE.MISSION:
+        this.phase = PHASE_TYPE.DAY;
+        break;
+      case PHASE_TYPE.DAY:
+        this.phase = PHASE_TYPE.END;
+        break;
+      case PHASE_TYPE.END:
+        this.phase = PHASE_TYPE.MISSION;
+        break;
+      default:
+        console.error('Unknown phase:', this.phase);
     }
   }
 

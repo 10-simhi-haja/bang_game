@@ -42,6 +42,7 @@ import {
   CHARACTER_STATE_TYPE,
   ROOM_STATE_TYPE,
   CHARACTER_SPAWN_POINT,
+  MISSION_SPAWN_POINT,
   CARD_TYPE,
   GLOBAL_FAIL_CODE,
   INTERVAL,
@@ -74,6 +75,7 @@ const config = {
     characterType: CHARACTER_TYPE,
     characterStateType: CHARACTER_STATE_TYPE,
     characterSpawnPoint: CHARACTER_SPAWN_POINT,
+    missionSpawnPoint: MISSION_SPAWN_POINT,
   },
   card: {
     cardType: CARD_TYPE,

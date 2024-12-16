@@ -230,9 +230,20 @@ export const CHARACTER_SPAWN_POINT = [
   { x: -15.202, y: -4.736 },
 ];
 
+export const MISSION_SPAWN_POINT = [
+  { x: 0, y: 0 },
+  { x: 0, y: -1 },
+  { x: 0, y: -2 },
+  { x: 0, y: -3 },
+  { x: 3, y: 0 },
+  { x: 3, y: -1 },
+  { x: 3, y: -2 },
+  { x: 3, y: -3 },
+];
+
 export const PHASE_TYPE = {
   DAY: 1,
-  // EVENING: 2, 필요시 추가,
+  MISSION: 2,
   END: 3,
 };
 
@@ -242,8 +253,9 @@ export const PHASE_TYPE = {
 export const INTERVAL = {
   SYNC_POSITION: 1,
   SYNC_GAME: 2,
-  PHASE_UPDATE_DAY: 300,
-  PHASE_UPDATE_END: 60,
+  PHASE_UPDATE_DAY: 10,
+  PHASE_UPDATE_END: 10,
+  PHASE_UPDATE_MISSION: 10,
   FLEA_MARKET_PICK: 10,
   BOMB: 5,
   BOMB_ANIMATION: 5,
