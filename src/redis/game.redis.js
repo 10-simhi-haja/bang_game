@@ -15,10 +15,15 @@ export const setGameStateRedis = async (gameId, gameState) => {
   await redisManager.getClient().hset(key, data);
 };
 
+export const getGameRedis = async (gameId) => {
+  const key = `GAME${gameId}:${gameId}`;
+  return await redisManager.getClient().hgetall(key);
+};
+
 export const setUserRedis = async (data) => {
   const key = `GAME${data.id}:USER${data.userData.id}`;
   const userData = data.userData;
-  await redisManager.getClient().hset(key, userData);
+  await redisManager.getClient().hset(key, { userData, socket: JSON.stringify(data.socket) });
 };
 
 // 유저의 상태가 바뀔 때

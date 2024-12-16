@@ -308,6 +308,7 @@ class Game {
       userData: {
         id: user.id,
         ...defaultStateInfo,
+        socket: user.socket,
       },
     };
     setUserRedis(redisUserData);
@@ -410,6 +411,10 @@ class Game {
   getUser(userId) {
     const user = this.users[userId].user;
     return user;
+  }
+
+  setUsetSocket(userId, data) {
+    this.users[userId].user.socket = data;
   }
 
   getCharacter(userId) {

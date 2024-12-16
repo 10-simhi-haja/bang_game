@@ -1,8 +1,11 @@
 import config from '../../config/config.js';
+import { getGameRedis } from '../../redis/game.redis.js';
 import { getGameSessionById } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import gameStartNotification from '../../utils/notification/gameStartNotification.js';
 import joinRoomNotification from '../../utils/notification/joinRoomNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import { gameStartRequestHandler } from '../game/gameStart.handler.js';
 import handleError from './../../utils/errors/errorHandler.js';
 
 const {
@@ -16,6 +19,55 @@ const joinRoomHandler = async ({ socket, payload }) => {
     const roomId = payload.roomId;
     const room = getGameSessionById(roomId);
     const user = getUserBySocket(socket);
+
+    const userIds = Object.keys(room.users).map((id) => parseInt(id, 10));
+    const isInclude = userIds.includes(user.id);
+
+    // 방에 포함되어 있지 않고, 게임이 진행 중이면 들어갈 수 없다.
+    if (!isInclude && room.state !== config.roomStateType.wait) {
+      return;
+    } else if (isInclude) {
+      // 방에 포함되어 있고, 게임이 진행 중이면 들어갈 수 있다.
+      console.log('이미 입장되어 있다');
+      room.setUsetSocket(user.id, socket);
+
+      const includedUser = Object.entries(room.users)
+        .filter(([key, value]) => value.user.id === user.id) // user.id가 일치하는 항목만 추출
+        .reduce((obj, [key, value]) => {
+          obj[key] = value; // 필터링된 데이터를 객체로 변환
+          return obj;
+        }, {});
+
+      // const includedSocket = Object.values(includedUser).map((user) => user.user.socket);
+
+      const gameStateData = {
+        phaseType: 1,
+        nextPhaseAt: Date.now() + 60 * 1000, // 단위  1초
+      };
+      const allUserDatas = room.getAllUserDatas();
+      const characterPosData = room.getAllUserPos();
+      // 게임 시작 알림 데이터
+      const gameStartNotiData = {
+        gameState: gameStateData,
+        users: allUserDatas,
+        characterPositions: characterPosData,
+      };
+      const users = room.getAllUsers();
+      users.forEach((notiUser) => {
+        if (notiUser.socket === socket) {
+          // 새로 연결된 소켓인지 확인
+          console.log('게임 시작 알림 전송: ', notiUser.nickname);
+          gameStartNotification(socket, notiUser, gameStartNotiData);
+        } else {
+          console.log('notiUser.socket: ', notiUser.socket);
+          console.log('socket: ', socket);
+        }
+      });
+
+      // await gameStartRequestHandler({ socket });
+      return;
+      // console.log('입장한 유저: ', includedUser);
+    }
 
     // 게임이 시작 중이거나 역할 분배 중일 땐 들어갈 수 없다.
     if (room.state !== config.roomStateType.wait) return;
@@ -55,7 +107,6 @@ const joinRoomHandler = async ({ socket, payload }) => {
 
     socket.write(joinRoomResponse);
     joinRoomNotification(socket, user.id, userData, room);
-    //console.log(userData);
   } catch (error) {
     handleError(socket, error);
   }

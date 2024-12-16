@@ -64,9 +64,9 @@ const handlePositionUpdate = async ({ socket, payload }) => {
     );
 
     allUser.forEach((notiUser) => {
-      if (notiUser.id === currentUser.id) {
-        return;
-      }
+      // if (notiUser.id === currentUser.id) {
+      //   return;
+      // }
       notiUser.socket.write(notificationResponse);
     });
   } catch (error) {
