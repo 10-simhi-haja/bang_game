@@ -538,11 +538,27 @@ class Game {
     const character = this.getCharacter(userId);
     const handCards = character.handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
-    // handCards에 카드가 있어야 removeCard가 실행
+    const notRemoveCardType = [
+      CARD_TYPE.SNIPER_GUN,
+      CARD_TYPE.HAND_GUN,
+      CARD_TYPE.DESERT_EAGLE,
+      CARD_TYPE.AUTO_RIFLE,
+      CARD_TYPE.LASER_POINTER,
+      CARD_TYPE.RADAR,
+      CARD_TYPE.AUTO_SHIELD,
+      CARD_TYPE.STEALTH_SUIT,
+    ];
     if (index !== -1) {
-      handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
-      this.cardDeck.addUseCard(cardType);
-      character.handCardsCount = handCards.length;
+      if (notRemoveCardType.includes(cardType)) {
+        // notRemoveCardType에 포함된 카드라면 카드 제거만 실행
+        handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
+        character.handCardsCount = handCards.length;
+      } else {
+        // 그 외의 카드 타입은 기존 로직 모두 실행
+        handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
+        character.handCardsCount = handCards.length;
+        this.cardDeck.addUseCard(cardType);
+      }
     }
   }
 
