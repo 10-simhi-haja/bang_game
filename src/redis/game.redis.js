@@ -23,7 +23,25 @@ export const getGameRedis = async (gameId) => {
 export const setUserRedis = async (data) => {
   const key = `GAME${data.id}:USER${data.userData.id}`;
   const userData = data.userData;
-  await redisManager.getClient().hset(key, { userData, socket: JSON.stringify(data.socket) });
+  await redisManager.getClient().hset(key, {
+    ...userData,
+    // socket: JSON.stringify(data.userData.socket),
+  });
+};
+
+export const getUserRedis = async (gameId, userId) => {
+  const key = `GAME${gameId}:USER${userId}`;
+  const test = await redisManager.getClient().hgetall(key);
+  return test;
+};
+
+export const setUserPositionRedis = async (gameId, userId, x, y) => {
+  const key = `GAME${gameId}:USER${userId}`;
+  console.log(`${userId}=> x: ${x}, y: ${y}`);
+  await redisManager.getClient().hset(key, {
+    x: x,
+    y: y,
+  });
 };
 
 // 유저의 상태가 바뀔 때

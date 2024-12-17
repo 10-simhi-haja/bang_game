@@ -16,6 +16,7 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import {
   delUserRedis,
   setGameStateRedis,
+  setUserPositionRedis,
   setUserRedis,
   setUserStateRedis,
 } from '../../redis/game.redis.js';
@@ -303,15 +304,16 @@ class Game {
       },
     };
 
-    const redisUserData = {
-      id: this.id,
-      userData: {
-        id: user.id,
-        ...defaultStateInfo,
-        socket: user.socket,
-      },
-    };
-    setUserRedis(redisUserData);
+    // const redisUserData = {
+    //   id: this.id,
+    //   userData: {
+    //     id: user.id,
+    //     // socketId: `${socket.remoteAddress}:${socket.remotePort}`,
+    //     // ...defaultStateInfo,
+    //     // socket: user.socket,
+    //   },
+    // };
+    // setUserRedis(redisUserData);
 
     this.userOrder.push(user.id);
   }
@@ -614,6 +616,7 @@ class Game {
   setAllUserPos(posDatas) {
     this.getAllUsers().forEach((user, i) => {
       user.setPos(posDatas[i].x, posDatas[i].y);
+      setUserPositionRedis(this.id, user.id, posDatas[i].x, posDatas[i].y);
     });
   }
 

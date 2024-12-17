@@ -5,6 +5,7 @@ import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
+import { setUserPositionRedis } from '../../redis/game.redis.js';
 
 const packetType = config.packet.packetType;
 
@@ -43,6 +44,7 @@ const handlePositionUpdate = async ({ socket, payload }) => {
 
     currentUser.setPos(x, y);
     currentUser.lastUpdateTime = now;
+    setUserPositionRedis(gameSession.id, currentUser.id, x, y);
 
     const allUser = gameSession.getAllUsers();
 
@@ -64,9 +66,9 @@ const handlePositionUpdate = async ({ socket, payload }) => {
     );
 
     allUser.forEach((notiUser) => {
-      // if (notiUser.id === currentUser.id) {
-      //   return;
-      // }
+      if (notiUser.id === currentUser.id) {
+        return;
+      }
       notiUser.socket.write(notificationResponse);
     });
   } catch (error) {
