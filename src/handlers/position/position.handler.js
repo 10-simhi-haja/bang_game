@@ -27,20 +27,20 @@ const handlePositionUpdate = async ({ socket, payload }) => {
     const gameSession = getGameSessionBySocket(socket);
     const currentUser = getUserBySocket(socket);
 
-    // const prevX = currentUser.x;
-    // const prevY = currentUser.y;
+    const prevX = currentUser.x;
+    const prevY = currentUser.y;
 
-    // const now = Date.now();
-    // if (now - currentUser.lastUpdateTime < 250) {
-    //   // console.log('아직 시간이 안 됐다.');
-    //   return;
-    // }
+    const now = Date.now();
+    if (now - currentUser.lastUpdateTime < 250) {
+      // console.log('아직 시간이 안 됐다.');
+      return;
+    }
 
-    // const distance = Math.sqrt(Math.pow(x - prevX, 2) + Math.pow(y - prevY, 2));
-    // if (distance < 0.25) {
-    //   // console.log('아직 거리가 안 됐다.');
-    //   return;
-    // }
+    const distance = Math.sqrt(Math.pow(x - prevX, 2) + Math.pow(y - prevY, 2));
+    if (distance < 0.25) {
+      // console.log('아직 거리가 안 됐다.');
+      return;
+    }
 
     currentUser.setPos(x, y);
     // currentUser.lastUpdateTime = now;
