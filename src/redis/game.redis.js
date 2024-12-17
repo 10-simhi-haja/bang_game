@@ -37,7 +37,7 @@ export const getUserRedis = async (gameId, userId) => {
 
 export const setUserPositionRedis = async (gameId, userId, x, y) => {
   const key = `GAME${gameId}:USER${userId}`;
-  console.log(`${userId}=> x: ${x}, y: ${y}`);
+  // console.log(`${userId}=> x: ${x}, y: ${y}`);
   await redisManager.getClient().hset(key, {
     x: x,
     y: y,

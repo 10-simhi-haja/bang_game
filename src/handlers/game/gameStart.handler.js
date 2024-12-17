@@ -25,11 +25,6 @@ export const gameStartRequestHandler = async ({ socket, payload }) => {
     const game = getGameSessionByUser(owner);
     game.changeState(INGAME);
     setGameStateRedis(game.id, INGAME);
-    const redisData = {
-      id: game.id,
-      users: game.userOrder,
-    };
-    setGameRedis(redisData);
 
     // 게임시작 응답 데이터
     const gameStartResponseData = {
@@ -61,6 +56,13 @@ export const gameStartRequestHandler = async ({ socket, payload }) => {
       phaseType: 1,
       nextPhaseAt: Date.now() + time * 1000, // 단위  1초
     };
+
+    const redisData = {
+      id: game.id,
+      users: game.userOrder,
+      nextPhaseAt: gameStateData.nextPhaseAt,
+    };
+    setGameRedis(redisData);
 
     // 게임 시작 알림 데이터
     const gameStartNotiData = {
