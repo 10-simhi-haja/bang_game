@@ -43,17 +43,22 @@ const handlePositionUpdate = async ({ socket, payload }) => {
     }
 
     currentUser.setPos(x, y);
-    // currentUser.lastUpdateTime = now;
+    currentUser.lastUpdateTime = now;
     setUserPositionRedis(gameSession.id, currentUser.id, x, y);
 
     const allUser = gameSession.getAllUsers();
-    const userRedis = await getUserRedis(gameSession.id, currentUser.id);
 
-    const characterPositions = allUser.map((user) => ({
-      id: user.id,
-      x: user.x,
-      y: user.y,
-    }));
+    const characterPositions = await Promise.all(
+      allUser.map(async (user) => {
+        const redisData = await getUserRedis(gameSession.id, user.id); // 비동기 Redis 데이터 가져오기
+        return {
+          id: user.id,
+          x: redisData?.x || 0, // redisData가 없으면 기본값 0
+          y: redisData?.y || 0,
+        };
+      }),
+    );
+    console.log(characterPositions);
 
     const notiData = {
       characterPositions: characterPositions,
