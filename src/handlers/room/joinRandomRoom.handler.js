@@ -19,6 +19,9 @@ const joinRandomRoomHandler = async ({ socket }) => {
     const room = getGameSessionById(roomId);
     const user = getUserBySocket(socket);
 
+    // 게임이 시작 중이거나 역할 분배 중일 땐 들어갈 수 없다.
+    if (room.state !== config.roomStateType.wait) return;
+
     room.addUser(user);
 
     const defaultCharacterData = {

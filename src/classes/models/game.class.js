@@ -13,7 +13,12 @@ import { bigBbangInterval } from '../../utils/util/bigBbangFunction.js';
 import { guerrillaInterval } from '../../utils/util/guerrillaFunction.js';
 import { deathMatchInterval } from '../../utils/util/deathMatchFunction.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
-import { setGameRedis, setGameStateRedis, setUserRedis } from '../../redis/game.redis.js';
+import {
+  delUserRedis,
+  setGameStateRedis,
+  setUserRedis,
+  setUserStateRedis,
+} from '../../redis/game.redis.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -166,6 +171,7 @@ class Game {
     character.stateInfo.nextState = nextState;
     character.stateInfo.nextStateAt = Date.now() + time * 1000;
     character.stateInfo.stateTargetUserId = targetId;
+    setUserStateRedis(this.id, curUserId, curState, nextState, time, targetId);
 
     switch (curState) {
       case CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE:
@@ -173,8 +179,8 @@ class Game {
         this.intervalManager.removeIntervalByType(curUserId, INTERVAL_TYPE.CHARACTER_STATE);
         break;
       case CHARACTER_STATE_TYPE.BBANG_SHOOTER:
-        console.log(`빵 setCharacter실행`);
-        console.log(`userId: ${JSON.stringify(this.users[curUserId].user.id, null, 2)}`);
+        // console.log(`빵 setCharacter실행`);
+        // console.log(`userId: ${JSON.stringify(this.users[curUserId].user.id, null, 2)}`);
         this.intervalManager.addInterval(
           curUserId,
           () => bbangInterval(this, this.users[curUserId].user),
@@ -287,7 +293,6 @@ class Game {
       handCards: [],
       bbangCount: 0,
       handCardsCount: 0,
-      autoShield: false,
     };
 
     this.users[user.id] = {
@@ -298,14 +303,14 @@ class Game {
       },
     };
 
-    const test = {
+    const redisUserData = {
       id: this.id,
       userData: {
         id: user.id,
-        ...defaultCharacter,
+        ...defaultStateInfo,
       },
     };
-    setUserRedis(test);
+    setUserRedis(redisUserData);
 
     this.userOrder.push(user.id);
   }
@@ -359,49 +364,21 @@ class Game {
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [
-        {
-          type: CARD_TYPE.BBANG,
-          count: 2,
-        },
-        {
-          type: CARD_TYPE.SHIELD,
-          count: 2,
-        },
-        {
-          type: CARD_TYPE.FLEA_MARKET,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.AUTO_RIFLE,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.LASER_POINTER,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.ABSORB,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.BOMB,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.MATURED_SAVINGS,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.WIN_LOTTERY,
-          count: 1,
-        },
+        { type: CARD_TYPE.BBANG, count: 2 },
+        { type: CARD_TYPE.SHIELD, count: 2 },
+        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
+        { type: CARD_TYPE.AUTO_RIFLE, count: 1 },
+        { type: CARD_TYPE.LASER_POINTER, count: 1 },
+        { type: CARD_TYPE.ABSORB, count: 1 },
+        { type: CARD_TYPE.BOMB, count: 1 },
+        { type: CARD_TYPE.MATURED_SAVINGS, count: 1 },
+        { type: CARD_TYPE.WIN_LOTTERY, count: 1 },
       ];
 
       const drawCard = await this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
       userEntry.character.handCardsCount = userEntry.character.handCards.length;
-      userEntry.character.autoShield = false;
       userEntry.character.isContain = false;
       userEntry.character.maxBbangCount = 1;
       userEntry.character.isDeath = false; // 죽는 순간 판별위해서 사용
@@ -413,6 +390,15 @@ class Game {
     if (!this.users[userId]) {
       return;
     }
+
+    const redisUserData = {
+      id: this.id,
+      userData: {
+        id: userId,
+      },
+    };
+    delUserRedis(redisUserData);
+
     this.intervalManager.removeInterval(userId);
     delete this.users[userId];
     this.userOrder = this.userOrder.filter((id) => id !== userId); // 순서에서도 제거
@@ -552,11 +538,27 @@ class Game {
     const character = this.getCharacter(userId);
     const handCards = character.handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
-    // handCards에 카드가 있어야 removeCard가 실행
+    const notRemoveCardType = [
+      CARD_TYPE.SNIPER_GUN,
+      CARD_TYPE.HAND_GUN,
+      CARD_TYPE.DESERT_EAGLE,
+      CARD_TYPE.AUTO_RIFLE,
+      CARD_TYPE.LASER_POINTER,
+      CARD_TYPE.RADAR,
+      CARD_TYPE.AUTO_SHIELD,
+      CARD_TYPE.STEALTH_SUIT,
+    ];
     if (index !== -1) {
-      handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
-      this.cardDeck.addUseCard(cardType);
-      character.handCardsCount = handCards.length;
+      if (notRemoveCardType.includes(cardType)) {
+        // notRemoveCardType에 포함된 카드라면 카드 제거만 실행
+        handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
+        character.handCardsCount = handCards.length;
+      } else {
+        // 그 외의 카드 타입은 기존 로직 모두 실행
+        handCards[index].count > 1 ? (handCards[index].count -= 1) : handCards.splice(index, 1);
+        character.handCardsCount = handCards.length;
+        this.cardDeck.addUseCard(cardType);
+      }
     }
   }
 

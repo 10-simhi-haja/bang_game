@@ -33,7 +33,7 @@ const useCardHandler = async ({ socket, payload }) => {
     const userId = user.id;
     const handCards = game.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
-    console.log(`useCard 실행 ${cardType}, userId: ${userId}, tartgetId: ${targetUserId.low}`);
+    // console.log(`useCard 실행 ${cardType}, userId: ${userId}, tartgetId: ${targetUserId.low}`);
 
     const responsePayload = {
       success: true,
@@ -44,19 +44,7 @@ const useCardHandler = async ({ socket, payload }) => {
     const userStateInfo = game.getCharacter(user.id).stateInfo;
     const bbangCount = game.getCharacter(user.id).bbangCount;
     // console.log('살아있는 유저', game.getLiveUsersId());
-    const notRemoveCardType = [
-      CARD_TYPE.SNIPER_GUN,
-      CARD_TYPE.HAND_GUN,
-      CARD_TYPE.DESERT_EAGLE,
-      CARD_TYPE.AUTO_RIFLE,
-      CARD_TYPE.LASER_POINTER,
-      CARD_TYPE.RADAR,
-      CARD_TYPE.AUTO_SHIELD,
-      CARD_TYPE.STEALTH_SUIT,
-      CARD_TYPE.CONTAINMENT_UNIT,
-      CARD_TYPE.SATELLITE_TARGET,
-      CARD_TYPE.BOMB,
-    ];
+
     if (index !== -1)
       switch (cardType) {
         //^ 공격
@@ -251,7 +239,7 @@ const useCardHandler = async ({ socket, payload }) => {
 
     // 카드 사용 후 카드 삭제 및 유저 업데이트
     // game.minusHandCardsCount(user.id);
-    if (responsePayload.success === true && !notRemoveCardType.includes(cardType)) {
+    if (responsePayload.success === true) {
       game.removeCard(user.id, cardType);
     }
 
