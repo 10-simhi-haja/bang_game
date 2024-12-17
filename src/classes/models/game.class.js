@@ -366,17 +366,7 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [
-        { type: CARD_TYPE.BBANG, count: 2 },
-        { type: CARD_TYPE.SHIELD, count: 2 },
-        { type: CARD_TYPE.FLEA_MARKET, count: 1 },
-        { type: CARD_TYPE.AUTO_RIFLE, count: 1 },
-        { type: CARD_TYPE.LASER_POINTER, count: 1 },
-        { type: CARD_TYPE.ABSORB, count: 1 },
-        { type: CARD_TYPE.BOMB, count: 1 },
-        { type: CARD_TYPE.MATURED_SAVINGS, count: 1 },
-        { type: CARD_TYPE.WIN_LOTTERY, count: 1 },
-      ];
+      userEntry.character.handCards = [];
 
       const drawCard = await this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
