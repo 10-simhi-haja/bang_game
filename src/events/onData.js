@@ -16,6 +16,7 @@ const onData = (socket) => async (data) => {
       );
     }
 
+    const test = socket.buffer;
     socket.buffer = Buffer.concat([socket.buffer, data]);
 
     const totalHeaderLength = config.packet.totalHeaderLength;
@@ -46,7 +47,7 @@ const onData = (socket) => async (data) => {
       // 5. 패킷 시퀀스 (4 bytes)
       const sequence = socket.buffer.readUInt32BE(offset);
       offset += config.packet.sequenceLength;
-      const isValidSequence = validateSequence(socket, sequence);
+      // const isValidSequence = validateSequence(socket, sequence);
       // if (!isValidSequence) {
       //   throw new CustomError(
       //     ErrorCodes.INVALID_SEQUENCE,
