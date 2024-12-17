@@ -29,13 +29,13 @@ jobs:
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
             echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
 
-            cho "DB_NAME2=${{ secrets.DB_NAME2 }}" >> .env
+            echo "DB_NAME2=${{ secrets.DB_NAME2 }}" >> .env
             echo "DB_USER2=${{ secrets.DB_USER2 }}" >> .env
             echo "DB_PASSWORD2=${{ secrets.DB_PASSWORD2 }}" >> .env
             echo "DB_HOST2=${{ secrets.DB_HOST2 }}" >> .env
             echo "DB_PORT2=${{ secrets.DB_PORT2 }}" >> .env
 
-            cho "REDIS_NAME=${{ secrets.REDIS_NAME }}" >> .env
+            echo "REDIS_NAME=${{ secrets.REDIS_NAME }}" >> .env
             echo "REDIS_USER=${{ secrets.REDIS_USER }}" >> .env
             echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env
             echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> .env
