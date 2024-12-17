@@ -5,7 +5,6 @@ import validateSequence from './../utils/socket/sequence.js';
 import packetParser from './../utils/packet/parser/packetParser.js';
 import { getHandlerByPacketType } from './../handlers/index.js';
 import handleError from './../utils/errors/errorHandler.js';
-import { getUserBySocket, getUserSessions } from '../sessions/user.session.js';
 
 const onData = (socket) => async (data) => {
   try {
@@ -45,26 +44,17 @@ const onData = (socket) => async (data) => {
         );
       }
 
-      let user;
-      if (getUserSessions().length > 1) {
-        user = getUserBySocket(socket);
-        console.log(`${user.nickname}(socket.buffer.length): ${socket.buffer.length}`);
-        console.log(`${user.nickname}(data): ${data.length}`); // 마지막!!!
-        console.log(`${user.nickname}(packetType): ${packetType}`);
-        console.log(`${user.nickname}(versionLength): ${versionLength}`);
-      }
-
       // 5. 패킷 시퀀스 (4 bytes)
       const sequence = socket.buffer.readUInt32BE(offset);
       offset += config.packet.sequenceLength;
-      const isValidSequence = validateSequence(socket, sequence);
-      if (!isValidSequence) {
-        throw new CustomError(
-          ErrorCodes.INVALID_SEQUENCE,
-          `패킷이 중복되거나 누락되었다: 예상 시퀀스: ${socket.sequence + 1}, 받은 시퀀스: ${sequence}`,
-          socket.sequence,
-        );
-      }
+      // const isValidSequence = validateSequence(socket, sequence);
+      // if (!isValidSequence) {
+      //   throw new CustomError(
+      //     ErrorCodes.INVALID_SEQUENCE,
+      //     `패킷이 중복되거나 누락되었다: 예상 시퀀스: ${socket.sequence + 1}, 받은 시퀀스: ${sequence}`,
+      //     socket.sequence,
+      //   );
+      // }
       // 6. 페이로드 길이 (4 bytes)
       const payloadLength = socket.buffer.readUInt32BE(offset);
       offset += config.packet.payloadLength;
@@ -79,10 +69,10 @@ const onData = (socket) => async (data) => {
         const handler = getHandlerByPacketType(packetType);
         await handler({ socket, payload });
 
-        // if (0 < socket.buffer.length) {
-        //   socket.buffer = socket.buffer.slice(socket.buffer.length);
-        //   console.error('확인하고 있음==================================');
-        // }
+        if (0 < socket.buffer.length) {
+          socket.buffer = socket.buffer.slice(socket.buffer.length);
+          console.error('확인하고 있음==================================');
+        }
         break;
       } else {
         break;
