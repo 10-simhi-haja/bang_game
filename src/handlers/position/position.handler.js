@@ -51,8 +51,8 @@ const handlePositionUpdate = async ({ socket, payload }) => {
 
     const characterPositions = allUser.map((user) => ({
       id: user.id,
-      x: user.x,
-      y: user.y,
+      x: userRedis.x,
+      y: userRedis.y,
     }));
 
     const notiData = {
