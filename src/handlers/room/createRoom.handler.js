@@ -3,9 +3,9 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 import config from '../../config/config.js';
 import { addGameSession } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
-import { setGameRedis } from '../../redis/game.redis.js';
+import { setGameRedis, setUserRedis } from '../../redis/game.redis.js';
 
-let count = 0;
+let count = 1;
 const createRoomHandler = async ({ socket, payload }) => {
   try {
     const { name, maxUserNum } = payload;
@@ -25,6 +25,15 @@ const createRoomHandler = async ({ socket, payload }) => {
     // 방을 생성한 유저를 찾는다
     const user = getUserBySocket(socket);
     gameSession.addUser(user);
+
+    const redisUserData = {
+      id: gameSession.id,
+      userData: {
+        id: user.id,
+        socketId: socket.id,
+      },
+    };
+    setUserRedis(redisUserData);
 
     const responseData = {
       success: true,
