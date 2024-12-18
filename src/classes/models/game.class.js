@@ -97,7 +97,7 @@ class Game {
       }
     } while (nextUserIndex !== curUserIndex);
 
-    throw new Error('살아있는 ��저가 없습니다.');
+    throw new Error('살아있는 유저가 없습니다.');
   }
 
   getPrevUser(userId) {
