@@ -3,10 +3,10 @@ import path from 'path';
 import protobuf from 'protobufjs';
 import { PACKET_TYPE } from '../../constants/header.js';
 
-const HOST = '127.0.0.1';
+const HOST = '52.79.226.3';
 const PORT = 5555;
-const TOTAL_USERS = 700;
-const REGISTRATION_DELAY = 100;
+const TOTAL_USERS = 7;
+const REGISTRATION_DELAY = 180;
 
 class RegistrationClient {
   constructor(id) {

@@ -3,13 +3,13 @@ import path from 'path';
 import protobuf from 'protobufjs';
 import { PACKET_TYPE } from '../../constants/header.js';
 
-const HOST = '127.0.0.1';
+const HOST = '52.79.226.3';
 const PORT = 5555;
-const ROOMS_COUNT = 100; // 방 개수
+const ROOMS_COUNT = 14; // 방 개수
 const PLAYERS_PER_ROOM = 7; // 방당 플레이어 수
 const TOTAL_CLIENTS = ROOMS_COUNT * PLAYERS_PER_ROOM; // 총 클라이언트 수
 const CONNECTION_DELAY = 100;
-const TEST_DURATION = 60000; // 테스트 지속 시간 (1분)
+const TEST_DURATION = 600000; // 테스트 지속 시간 (1분)
 const RESPONSE_TIMEOUT = 5000; // 응답 타임아웃 (5초)
 
 class TestClient {
