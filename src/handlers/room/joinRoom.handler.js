@@ -1,8 +1,12 @@
 import config from '../../config/config.js';
+import { getUserRedis, setUserRedis } from '../../redis/game.redis.js';
 import { getGameSessionById } from '../../sessions/game.session.js';
+import { socketPool } from '../../sessions/sessions.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
+import gameStartNotification from '../../utils/notification/gameStartNotification.js';
 import joinRoomNotification from '../../utils/notification/joinRoomNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+import { gameStartRequestHandler } from '../game/gameStart.handler.js';
 import handleError from './../../utils/errors/errorHandler.js';
 
 const {
@@ -17,8 +21,56 @@ const joinRoomHandler = async ({ socket, payload }) => {
     const room = getGameSessionById(roomId);
     const user = getUserBySocket(socket);
 
+    const userIds = Object.keys(room.users).map((id) => parseInt(id, 10));
+    const isInclude = userIds.includes(user.id);
+
+    const redisUserData = {
+      id: room.id,
+      userData: {
+        id: user.id,
+        socketId: socket.id,
+      },
+    };
+
+    // 방에 포함되어 있지 않고, 게임이 진행 중이면 들어갈 수 없다.
+    if (!isInclude && room.state !== config.roomStateType.wait) {
+      return;
+    } else if (isInclude) {
+      // 방에 포함되어 있고, 게임이 진행 중이면 들어갈 수 있다.
+      console.log('이미 입장되어 있다');
+
+      setUserRedis(redisUserData);
+      room.setUsetSocket(user.id, socket);
+
+      const gameStateData = {
+        phaseType: 1,
+        nextPhaseAt: Date.now() + 500 * 1000, // 단위  1초
+      };
+      const allUserDatas = room.getAllUserDatas();
+      const characterPosData = room.getAllUserPos();
+      // 게임 시작 알림 데이터
+      const gameStartNotiData = {
+        gameState: gameStateData,
+        users: allUserDatas,
+        characterPositions: characterPosData,
+      };
+      const users = room.getAllUsers();
+      users.forEach((notiUser) => {
+        if (notiUser.socket === socket) {
+          // 새로 연결된 소켓인지 확인
+          console.log('게임 시작 알림 전송: ', notiUser.nickname);
+          gameStartNotification(socket, notiUser, gameStartNotiData);
+        }
+      });
+
+      // await gameStartRequestHandler({ socket });
+      return;
+    }
+
     // 게임이 시작 중이거나 역할 분배 중일 땐 들어갈 수 없다.
     if (room.state !== config.roomStateType.wait) return;
+
+    setUserRedis(redisUserData);
 
     room.addUser(user);
 
@@ -55,7 +107,6 @@ const joinRoomHandler = async ({ socket, payload }) => {
 
     socket.write(joinRoomResponse);
     joinRoomNotification(socket, user.id, userData, room);
-    //console.log(userData);
   } catch (error) {
     handleError(socket, error);
   }

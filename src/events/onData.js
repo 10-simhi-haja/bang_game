@@ -25,6 +25,7 @@ const onData = (socket) => async (data) => {
       );
     }
 
+    const test = socket.buffer;
     socket.buffer = Buffer.concat([socket.buffer, data]);
     const totalHeaderLength = config.packet.totalHeaderLength;
 

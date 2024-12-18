@@ -6,7 +6,7 @@ import handleError from '../../utils/errors/errorHandler.js';
 import gameStartNotification from '../../utils/notification/gameStartNotification.js';
 import { shuffle } from '../../utils/util/shuffle.js';
 import { loadSpawnPoint } from '../../database/character/spawnPoint.db.js';
-import { setGameStateRedis } from '../../redis/game.redis.js';
+import { getGameRedis, setGameRedis, setGameStateRedis } from '../../redis/game.redis.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -57,6 +57,13 @@ export const gameStartRequestHandler = async ({ socket, payload }) => {
       nextPhaseAt: Date.now() + time * 1000, // 단위  1초
     };
 
+    const redisData = {
+      id: game.id,
+      users: game.userOrder,
+      nextPhaseAt: gameStateData.nextPhaseAt,
+    };
+    setGameRedis(redisData);
+
     // 게임 시작 알림 데이터
     const gameStartNotiData = {
       gameState: gameStateData,
@@ -67,10 +74,15 @@ export const gameStartRequestHandler = async ({ socket, payload }) => {
     const users = game.getAllUsers();
 
     users.forEach((notiUser) => {
+      if (notiUser.socket === socket) {
+        // 새로 연결된 소켓인지 확인
+        console.log('게임 시작 알림 전송: ', notiUser.nickname);
+      }
+
       gameStartNotification(socket, notiUser, gameStartNotiData);
     });
     // 모든 유저마다 만들어 줄 필요는 없음.
-    game.setUserSyncInterval();
+    // game.setUserSyncInterval();
     // 페이즈 넘어가는 시간 넣어야함
 
     game.setPhaseUpdateInterval(time);

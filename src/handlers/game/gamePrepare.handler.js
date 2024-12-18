@@ -92,7 +92,7 @@ const prepareCharacter = (playersCount) => {
 
   // 플레이어에게 랜덤 배정
   const prepareCharacters = characterArray.slice(1, playersCount + 1);
-  console.log(prepareCharacters);
+  console.log('캐릭터: ', prepareCharacters);
   return prepareCharacters;
 };
 
@@ -120,7 +120,7 @@ const prepareRole = (playersCount) => {
     [roles[i], roles[randomIndex]] = [roles[randomIndex], roles[i]];
   }
 
-  console.log(roles);
+  console.log('역할: ', roles);
   return roles;
 };
 
