@@ -58,7 +58,6 @@ const handlePositionUpdate = async ({ socket, payload }) => {
         };
       }),
     );
-    console.log(characterPositions);
 
     const notiData = {
       characterPositions: characterPositions,
