@@ -853,7 +853,7 @@ class Game {
     if (containmentUnitUser) {
       const containmentCharacter = this.getCharacter(containmentUnitUser.id);
 
-      if (Math.random() < 1) {
+      if (Math.random() < 0.5) {
         this.users[containmentUnitUser.id].character.isContain = true;
       } else {
         const containmentIndex = containmentCharacter.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
