@@ -55,7 +55,7 @@ const onData = (socket) => async (data) => {
       const result = validateSequence(socket, sequence);
       switch (result.status) {
         case 'success':
-          console.log(result.message);
+          // console.log(result.message);
           break;
 
         case 'duplicate':

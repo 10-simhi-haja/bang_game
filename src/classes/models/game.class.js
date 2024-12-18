@@ -318,26 +318,23 @@ class Game {
   }
 
   // 캐릭터, 역할 분배 설정
-  setPrepare(preparedCharacter, preparedRole) {
+  async setPrepare(preparedCharacter, preparedRole) {
     if (
       this.getUserLength() !== preparedCharacter.length ||
       this.getUserLength() !== preparedRole.length
     ) {
       throw new Error('캐릭터 및 역할 배열의 길이가 유저 수와 일치하지 않습니다.');
     }
-
     // 룸 상태 prepare로 변경
     this.state = PREPARE;
     setGameStateRedis(this.id, this.state);
 
-    // 역할 배분에 순서가 중요하진 않음.
-    Object.values(this.users).forEach(async (userEntry, index) => {
+    for (let index = 0; index < Object.values(this.users).length; index++) {
+      const userEntry = Object.values(this.users)[index];
       const characterType = preparedCharacter[index];
       const roleType = preparedRole[index];
-
       userEntry.character.characterType = characterType;
       userEntry.character.roleType = roleType;
-
       // 체력정보도 나중에 상수화 시키면 좋을듯.
       if (
         characterType === CHARACTER_TYPE.DINOSAUR ||
@@ -347,7 +344,6 @@ class Game {
       } else {
         userEntry.character.hp = 4;
       }
-
       if (roleType === ROLE_TYPE.TARGET) {
         userEntry.character.hp++;
         this.targetCount++;
@@ -366,7 +362,7 @@ class Game {
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [];
-
+      console.log(`캐릭터배분`);
       const drawCard = await this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
@@ -374,7 +370,7 @@ class Game {
       userEntry.character.isContain = false;
       userEntry.character.maxBbangCount = 1;
       userEntry.character.isDeath = false; // 죽는 순간 판별위해서 사용
-    });
+    }
   }
 
   // 유저 제거
