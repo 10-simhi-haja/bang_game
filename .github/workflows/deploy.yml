@@ -42,4 +42,4 @@ jobs:
             echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
             git pull origin main
             npm install
-            pm2 restart src/server.js || pm2 start src/server.js
+            pm2 restart src/ecosystem.config.js || pm2 start src/ecosystem.config.js
