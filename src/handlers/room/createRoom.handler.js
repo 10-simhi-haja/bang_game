@@ -5,7 +5,7 @@ import { addGameSession } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import { setGameRedis, setUserRedis } from '../../redis/game.redis.js';
 
-let count = 1;
+let count = 0;
 const createRoomHandler = async ({ socket, payload }) => {
   try {
     const { name, maxUserNum } = payload;
