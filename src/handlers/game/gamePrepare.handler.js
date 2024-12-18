@@ -143,7 +143,7 @@ export const gamePrepareRequestHandler = async ({ socket, payload }) => {
     const preparedCharacter = prepareCharacter(playerCount); // 배열
     const preparedRole = prepareRole(playerCount); // 배열
 
-    game.setPrepare(preparedCharacter, preparedRole);
+    await game.setPrepare(preparedCharacter, preparedRole);
 
     const roomData = game.getRoomData();
 

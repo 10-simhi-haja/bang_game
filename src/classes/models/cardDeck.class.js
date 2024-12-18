@@ -59,25 +59,14 @@ class CardDeck {
 
   // 여러장뽑기 리턴값은 배열
   async drawMultipleCards(count) {
-    const deckData = await redisManager.getClient().get(this.deckKey);
-    if (!deckData) {
-      throw new Error('Deck not initialized');
+    const cards = [];
+
+    for (let i = 0; i < count; i++) {
+      const card = await this.drawCard(); // drawCard를 호출하여 각 카드를 개별적으로 뽑음
+      cards.push(card);
     }
 
-    const deck = JSON.parse(deckData);
-    if (deck.length < count) {
-      // 덱이 부족할 경우 남은 카드만 뽑고 재생성 후 추가로 뽑음
-      const remainingCards = deck.splice(-deck.length);
-      await this.useCardToDeck();
-      const additionalCards = await this.drawMultipleCards(count - remainingCards.length);
-      console.log('remainingCards:', remainingCards);
-      console.log('additionalCards:', additionalCards);
-      return [...remainingCards, ...additionalCards];
-    }
-
-    const cards = deck.splice(-count, count);
-    await redisManager.getClient().set(this.deckKey, JSON.stringify(deck));
-    return cards.map((card) => ({ type: card.type, count: 1 }));
+    return cards;
   }
 
   async addUseCard(cardType) {
