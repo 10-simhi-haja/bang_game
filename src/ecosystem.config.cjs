@@ -6,7 +6,7 @@ module.exports = {
       instances: 2, // 클러스터 모드 인스턴스 수
       exec_mode: 'cluster', // 클러스터 모드 활성화
       env: {
-        BASE_PORT: 5556, // 기본 시작 포트
+        BASE_PORT: 5555, // 기본 시작 포트
       },
     },
   ],
