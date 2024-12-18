@@ -22,6 +22,7 @@ jobs:
           script: |
             cd /home/ubuntu/bang_game
             echo "HOST=${{ secrets.HOST }}" > .env
+            echo "BASE_PORT=5555" >> .env # 기본 포트를 추가
             echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
             echo "DB_USER=${{ secrets.DB_USER }}" >> .env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
