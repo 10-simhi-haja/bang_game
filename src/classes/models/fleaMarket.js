@@ -11,9 +11,12 @@ class FleaMarket {
     this.cards = [];
     this.indexs = [];
     this.gameId = game.id;
+  }
 
+  async initialize(game) {
     const liveUsers = game.getLiveUsers();
-    const drawCards = game.cardDeck.drawMultipleCards(liveUsers.length);
+    const drawCards = await game.cardDeck.drawMultipleCards(liveUsers.length);
+    console.log(`drawCards: ${drawCards}`);
     for (let i = 0; i < liveUsers.length; i++) {
       this.cards.push(drawCards[i].type);
     }

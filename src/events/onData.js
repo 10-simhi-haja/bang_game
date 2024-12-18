@@ -6,75 +6,95 @@ import packetParser from './../utils/packet/parser/packetParser.js';
 import { getHandlerByPacketType } from './../handlers/index.js';
 import handleError from './../utils/errors/errorHandler.js';
 
+const moveBuffer = (buffer, offset) => buffer.subarray(offset);
+
+const validateRemainingData = (buffer, totalHeaderLength) => {
+  if (buffer.length < totalHeaderLength) return false;
+
+  const nextPayloadLength = buffer.readUInt32BE(totalHeaderLength - 4);
+  return buffer.length >= totalHeaderLength + nextPayloadLength;
+};
+
 const onData = (socket) => async (data) => {
-  if (!socket) {
-    throw new CustomError(
-      ErrorCodes.SOCKET_ERROR,
-      `소켓을 찾을 수 없거나 연결이 끊겼다.`,
-      socket.sequence,
-    );
-  }
-
-  socket.buffer = Buffer.concat([socket.buffer, data]);
-
-  const totalHeaderLength = config.packet.totalHeaderLength;
-  while (socket.buffer.length >= totalHeaderLength) {
-    // 1. 패킷 타입 길이만큼 버퍼 읽을 위치 지정
-    let offset = 0;
-
-    // 2. 패킷 타입 - 핸들러 (2 bytes)
-    const packetType = socket.buffer.readUInt16BE(offset);
-    offset += config.packet.payloadOneofCaseLength; // 2
-
-    // 3. 클라이언트 버전 길이 (1 byte)
-    const versionLength = socket.buffer.readUInt8(offset);
-    offset += config.packet.versionLength; // 1
-
-    // 4. 클라이언트 버전 (versionLength bytes)
-    const version = socket.buffer.subarray(offset, offset + versionLength).toString('utf-8');
-    offset += versionLength;
-    // 4-1. 버전이 일치하는지 검증
-    if (version !== config.client.version) {
+  try {
+    if (!socket) {
       throw new CustomError(
-        ErrorCodes.CLIENT_VERSION_MISMATCH,
-        '클라이언트 버전이 일치하지 않습니다.',
+        ErrorCodes.SOCKET_ERROR,
+        `소켓을 찾을 수 없거나 연결이 끊겼다.`,
         socket.sequence,
       );
     }
 
-    // 5. 패킷 시퀀스 (4 bytes)
-    const sequence = socket.buffer.readUInt32BE(offset);
-    offset += config.packet.sequenceLength;
-    const isValidSequence = validateSequence(socket, sequence);
-    if (!isValidSequence) {
-      throw new CustomError(
-        ErrorCodes.INVALID_SEQUENCE,
-        `패킷이 중복되거나 누락되었다: 예상 시퀀스: ${socket.sequence + 1}, 받은 시퀀스: ${sequence}`,
-        socket.sequence,
-      );
-    }
-    // 6. 페이로드 길이 (4 bytes)
-    const payloadLength = socket.buffer.readUInt32BE(offset);
-    offset += config.packet.payloadLength;
+    const test = socket.buffer;
+    socket.buffer = Buffer.concat([socket.buffer, data]);
+    const totalHeaderLength = config.packet.totalHeaderLength;
 
-    if (socket.buffer.length >= payloadLength + totalHeaderLength) {
-      // 7. 페이로드 (payloadLength bytes)
-      const payloadBuffer = socket.buffer.subarray(offset, offset + payloadLength);
+    while (socket.buffer.length >= totalHeaderLength) {
+      let offset = 0;
 
-      try {
+      const packetType = socket.buffer.readUInt16BE(offset);
+      offset += config.packet.payloadOneofCaseLength;
+
+      const versionLength = socket.buffer.readUInt8(offset);
+      offset += config.packet.versionLength;
+
+      const version = socket.buffer.subarray(offset, offset + versionLength).toString('utf-8');
+      offset += versionLength;
+
+      if (version !== config.client.version) {
+        throw new CustomError(
+          ErrorCodes.CLIENT_VERSION_MISMATCH,
+          '클라이언트 버전이 일치하지 않습니다.',
+          socket.sequence,
+        );
+      }
+
+      const sequence = socket.buffer.readUInt32BE(offset);
+      offset += config.packet.sequenceLength;
+
+      const result = validateSequence(socket, sequence);
+      switch (result.status) {
+        case 'success':
+          console.log(result.message);
+          break;
+
+        case 'duplicate':
+          console.warn(result.message);
+          const duplicatePayloadLength = socket.buffer.readUInt32BE(offset);
+          offset += config.packet.payloadLength;
+          socket.buffer = moveBuffer(socket.buffer, offset + duplicatePayloadLength);
+          continue;
+
+        case 'missing':
+          console.error(result.message);
+          return;
+
+        default:
+          console.error('예상 못한 상황');
+          return;
+      }
+
+      const payloadLength = socket.buffer.readUInt32BE(offset);
+      offset += config.packet.payloadLength;
+
+      if (socket.buffer.length >= payloadLength + totalHeaderLength) {
+        const payloadBuffer = socket.buffer.subarray(offset, offset + payloadLength);
         const { payload } = packetParser(payloadBuffer);
 
-        socket.buffer = socket.buffer.subarray(offset + payloadLength);
+        socket.buffer = moveBuffer(socket.buffer, offset + payloadLength);
+
         const handler = getHandlerByPacketType(packetType);
         await handler({ socket, payload });
-        break;
-      } catch (error) {
-        handleError(socket, error);
+      } else {
         break;
       }
-    } else {
-      break;
     }
+
+    if (socket.buffer.length > 0 && !validateRemainingData(socket.buffer, totalHeaderLength)) {
+      console.warn('잔여 데이터가 불완전합니다. 대기합니다.');
+    }
+  } catch (error) {
+    handleError(socket, error);
   }
 };
 

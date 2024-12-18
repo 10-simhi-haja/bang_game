@@ -1,4 +1,6 @@
+import CardDeck from '../../classes/models/cardDeck.class.js';
 import config from '../../config/config.js';
+import { deleteGameFolderRedis } from '../../redis/game.redis.js';
 import { removeGameSessionById } from '../../sessions/game.session.js';
 import { createResponse } from '../packet/response/createResponse.js';
 
@@ -9,7 +11,7 @@ const {
 } = config;
 
 // 게임시작 알림
-const gameEndNotification = (users, gameId, payload) => {
+const gameEndNotification = async (users, gameId, payload) => {
   users.forEach((notiUser) => {
     const noti = createResponse(
       PACKET_TYPE.GAME_END_NOTIFICATION,
@@ -18,7 +20,13 @@ const gameEndNotification = (users, gameId, payload) => {
     );
     notiUser.socket.write(noti);
   });
+
+  const cardDeck = new CardDeck(gameId);
+  await cardDeck.clearDeck();
+
   removeGameSessionById(gameId);
+  console.log('게임 종료!!');
+  deleteGameFolderRedis(gameId);
 };
 
 export default gameEndNotification;

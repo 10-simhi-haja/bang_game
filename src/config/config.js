@@ -18,6 +18,16 @@ import {
   DB_HOST,
   DB_PORT,
   JWT_SECRET_KEY,
+  DB_NAME2,
+  DB_USER2,
+  DB_PASSWORD2,
+  DB_HOST2,
+  DB_PORT2,
+  REDIS_USER,
+  REDIS_PASSWORD,
+  REDIS_HOST,
+  REDIS_PORT,
+  REDIS_NAME,
 } from '../constants/env.js';
 import {
   TOTAL_HEADER_LENGTH,
@@ -26,23 +36,24 @@ import {
   SEQUENCE_LENGTH,
   PAYLOAD_LENGTH,
   PACKET_TYPE,
-  CHARACTER_TYPE,
-  ROLE_TYPE,
-  ROLES_DISTRIBUTION,
-  CHARACTER_STATE_TYPE,
   ROOM_STATE_TYPE,
-  CHARACTER_SPAWN_POINT,
-  CARD_TYPE,
   GLOBAL_FAIL_CODE,
-  INTERVAL,
-  INTERVAL_TYPE,
   PHASE_TYPE,
   WIN_TYPE,
-  CARD_POOL,
   WARNING_TYPE,
   ANIMATION_TYPE,
   PROBABILITY,
 } from '../constants/header.js';
+
+import {
+  CHARACTER_TYPE,
+  ROLE_TYPE,
+  ROLES_DISTRIBUTION,
+  CHARACTER_STATE_TYPE,
+} from '../constants/character.js';
+
+import { INTERVAL, INTERVAL_TYPE } from '../constants/interval.js';
+import { CARD_TYPE, CARD_POOL } from '../constants/card.js';
 
 const config = {
   server: {
@@ -63,7 +74,6 @@ const config = {
   character: {
     characterType: CHARACTER_TYPE,
     characterStateType: CHARACTER_STATE_TYPE,
-    characterSpawnPoint: CHARACTER_SPAWN_POINT,
   },
   card: {
     cardType: CARD_TYPE,
@@ -82,11 +92,27 @@ const config = {
     globalFailCode: GLOBAL_FAIL_CODE,
   },
   databases: {
-    database: DB_NAME,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    host: DB_HOST,
-    port: DB_PORT,
+    UESR_DB: {
+      database: DB_NAME,
+      user: DB_USER,
+      password: DB_PASSWORD,
+      host: DB_HOST,
+      port: DB_PORT,
+    },
+    GAME_DB: {
+      database: DB_NAME2,
+      user: DB_USER2,
+      password: DB_PASSWORD2,
+      host: DB_HOST2,
+      port: DB_PORT2,
+    },
+    REDIS: {
+      database: REDIS_NAME,
+      user: REDIS_USER,
+      password: REDIS_PASSWORD,
+      host: REDIS_HOST,
+      port: REDIS_PORT,
+    },
   },
   jwt: {
     key: JWT_SECRET_KEY,

@@ -5,6 +5,7 @@ import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import CustomError from '../../utils/errors/customError.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
+import { getUserRedis, setUserPositionRedis } from '../../redis/game.redis.js';
 
 const packetType = config.packet.packetType;
 
@@ -43,14 +44,20 @@ const handlePositionUpdate = async ({ socket, payload }) => {
 
     currentUser.setPos(x, y);
     currentUser.lastUpdateTime = now;
+    setUserPositionRedis(gameSession.id, currentUser.id, x, y);
 
     const allUser = gameSession.getAllUsers();
 
-    const characterPositions = allUser.map((user) => ({
-      id: user.id,
-      x: user.x,
-      y: user.y,
-    }));
+    const characterPositions = await Promise.all(
+      allUser.map(async (user) => {
+        const redisData = await getUserRedis(gameSession.id, user.id); // 비동기 Redis 데이터 가져오기
+        return {
+          id: user.id,
+          x: redisData?.x || 0, // redisData가 없으면 기본값 0
+          y: redisData?.y || 0,
+        };
+      }),
+    );
 
     const notiData = {
       characterPositions: characterPositions,

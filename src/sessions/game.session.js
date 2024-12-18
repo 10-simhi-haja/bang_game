@@ -56,7 +56,7 @@ export const getGameSessionByUser = (user) => {
     throw new CustomError(
       ErrorCodes.GAME_NOT_FOUND,
       '유저가 속한 게임을 찾을 수 없다',
-      socket.sequence,
+      user.socket.sequence,
     );
   }
   return game;

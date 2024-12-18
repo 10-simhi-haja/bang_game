@@ -1,5 +1,6 @@
 import config from '../../config/config.js';
 import { shuffle } from '../../utils/util/shuffle.js';
+import redisManager from '../managers/redis.manager.js';
 
 const {
   card: { cardType: CARD_TYPE, cardPool: CARD_POOL },
@@ -11,8 +12,14 @@ const CARD_TYPE_NAME_MAP = Object.fromEntries(
 
 class CardDeck {
   // 다수의 유저 데이터를 담아야하기 때문에 배열로 저장
-  constructor() {
-    this.deck = Object.entries(CARD_TYPE).reduce((deck, [key, value]) => {
+  constructor(gameId) {
+    this.gameId = gameId;
+    this.useCardsKey = `GAME${gameId}:USECARDS`;
+    this.deckKey = `GAME${gameId}:DECK`;
+  }
+
+  async initializeDeck() {
+    const deck = Object.entries(CARD_TYPE).reduce((deck, [key, value]) => {
       if (key === 'NONE') return deck;
 
       const cardCount = this.getCardCount(value);
@@ -22,8 +29,9 @@ class CardDeck {
       return deck;
     }, []);
 
-    this.deck = shuffle(this.deck);
-    this.useCards = [];
+    const shuffledDeck = shuffle(deck);
+    await redisManager.getClient().set(this.deckKey, JSON.stringify(shuffledDeck));
+    await redisManager.getClient().del(this.useCardsKey);
   }
 
   // 카드 수량 확인
@@ -32,39 +40,62 @@ class CardDeck {
   }
 
   // 1장뽑기
-  drawCard() {
-    if (this.deck.length === 0 && this.useCards.length !== 0) {
-      this.useCardToDeck();
+  async drawCard() {
+    const deckData = await redisManager.getClient().get(this.deckKey);
+    if (!deckData) {
+      throw new Error('Deck not initialized');
     }
 
-    if (this.deck.length === 0) {
-      return null;
+    const deck = JSON.parse(deckData);
+    if (deck.length === 0) {
+      await this.useCardToDeck(); // 사용된 카드로 덱 재생성
+      return this.drawCard(); // 재귀 호출로 다시 카드 뽑기
     }
-    const card = this.deck.pop();
+
+    const card = deck.pop();
+    await redisManager.getClient().set(this.deckKey, JSON.stringify(deck));
     return { type: card.type, count: 1 };
   }
 
   // 여러장뽑기 리턴값은 배열
-  drawMultipleCards(count) {
-    const cards = [];
-    for (let i = 0; i < count; i++) {
-      const card = this.drawCard();
-      if (card === null) {
-        return cards;
-      }
-      cards.push(card);
+  async drawMultipleCards(count) {
+    const deckData = await redisManager.getClient().get(this.deckKey);
+    if (!deckData) {
+      throw new Error('Deck not initialized');
     }
-    return cards;
+
+    const deck = JSON.parse(deckData);
+    if (deck.length < count) {
+      // 덱이 부족할 경우 남은 카드만 뽑고 재생성 후 추가로 뽑음
+      const remainingCards = deck.splice(-deck.length);
+      await this.useCardToDeck();
+      const additionalCards = await this.drawMultipleCards(count - remainingCards.length);
+      console.log('remainingCards:', remainingCards);
+      console.log('additionalCards:', additionalCards);
+      return [...remainingCards, ...additionalCards];
+    }
+
+    const cards = deck.splice(-count, count);
+    await redisManager.getClient().set(this.deckKey, JSON.stringify(deck));
+    return cards.map((card) => ({ type: card.type, count: 1 }));
   }
 
-  addUseCard(cardType) {
-    this.useCards.push(cardType);
+  async addUseCard(cardType) {
+    console.log('addUseCard실행');
+    // this.useCards.push(cardType);
+    const usedCards = JSON.parse((await redisManager.getClient().get(this.useCardsKey)) || '[]');
+    usedCards.push(cardType);
+    await redisManager.getClient().set(this.useCardsKey, JSON.stringify(usedCards));
   }
 
-  useCardToDeck() {
+  async useCardToDeck() {
     // 사용한 카드로 덱 재생성
-    this.deck = shuffle(
-      this.useCards.reduce((deck, type) => {
+    const usedCardsData = await redisManager.getClient().get(this.useCardsKey);
+    if (!usedCardsData) return;
+
+    const usedCards = JSON.parse(usedCardsData);
+    const newDeck = shuffle(
+      usedCards.reduce((deck, type) => {
         const name = CARD_TYPE_NAME_MAP[type];
         if (name) {
           deck.push({ type, name });
@@ -73,7 +104,14 @@ class CardDeck {
       }, []),
     );
 
-    this.useCards = [];
+    await redisManager.getClient().set(this.deckKey, JSON.stringify(newDeck));
+    await redisManager.getClient().del(this.useCardsKey);
+  }
+
+  async clearDeck() {
+    // 게임 종료 시 Redis 데이터 삭제
+    await redisManager.getClient().del(this.deckKey);
+    await redisManager.getClient().del(this.useCardsKey);
   }
 }
 

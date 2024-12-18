@@ -1,9 +1,12 @@
 import onData from './onData.js';
 import onEnd from './onEnd.js';
 import onError from './onError.js';
+import { socketPool } from '../sessions/sessions.js';
 
 const onConnection = (socket) => {
   console.log(`클라이언트 연결: ${socket.remoteAddress}:${socket.remotePort}`);
+  socket.id = `${socket.remoteAddress}:${socket.remotePort}`;
+  socketPool.set(socket.id, socket);
 
   // 각 클라이언트마다 고유의 버퍼를 유지하기 위해 빈 버퍼 생성
   socket.buffer = Buffer.alloc(0);

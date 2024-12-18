@@ -10,7 +10,7 @@ import fleaMarketNotification from '../../utils/notification/fleaMarketNotificat
 import FleaMarket from '../../classes/models/fleaMarket.js';
 import animationNotification from '../../utils/notification/animationNotification.js';
 import { useBbang } from '../../utils/util/card/useCardFunction.js';
-import { CHARACTER_TYPE } from '../../constants/header.js';
+import { CHARACTER_TYPE } from '../../constants/character.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const {
@@ -21,7 +21,7 @@ const {
   interval: INTERVAL,
 } = config;
 
-const useCardHandler = ({ socket, payload }) => {
+const useCardHandler = async ({ socket, payload }) => {
   try {
     const { cardType, targetUserId } = payload; // 사용카드, 타켓userId
 
@@ -33,7 +33,7 @@ const useCardHandler = ({ socket, payload }) => {
     const userId = user.id;
     const handCards = game.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
-    console.log(`useCard 실행 ${cardType}, userId: ${userId}, tartgetId: ${targetUserId.low}`);
+    // console.log(`useCard 실행 ${cardType}, userId: ${userId}, tartgetId: ${targetUserId.low}`);
 
     const responsePayload = {
       success: true,
@@ -192,6 +192,7 @@ const useCardHandler = ({ socket, payload }) => {
         case CARD_TYPE.FLEA_MARKET:
           // 플리마켓 사용하면 플리마켓 노티를 생존한 유저들에게 알림
           const fleaMarket = new FleaMarket(game);
+          await fleaMarket.initialize(game);
           game.fleaMarket = fleaMarket;
           fleaMarketNotification(game, user);
           break;
@@ -225,10 +226,8 @@ const useCardHandler = ({ socket, payload }) => {
         //^ 장비
         case CARD_TYPE.LASER_POINTER:
         case CARD_TYPE.RADAR:
-        case CARD_TYPE.RADAR:
         case CARD_TYPE.AUTO_SHIELD:
         case CARD_TYPE.STEALTH_SUIT:
-          // 실제로 에러가 나오면서 장착은 안되지만 클라에선 카드가 소모된 것 처럼 보임, 카드덱을 나갔다가 키면 카드는 존재함
           if (!game.getCharacter(user.id).equips.includes(cardType)) {
             game.addEquip(user.id, cardType);
           }
