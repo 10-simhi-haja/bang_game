@@ -433,6 +433,7 @@ class Game {
       if (user.id !== userId) this.users[user.id].character.hp += 1;
     });
   }
+
   // 만기 적금
   async MaturedSavings(userId) {
     const giveCard = await this.cardDeck.drawMultipleCards(2);
@@ -440,6 +441,7 @@ class Game {
     const newHandCard = [...handCard, ...giveCard];
     return (this.getCharacter(userId).handCards = newHandCard);
   }
+
   // 복권방
 
   async winLottery(userId) {
