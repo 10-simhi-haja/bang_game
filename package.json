@@ -5,7 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test src/test/unit/*.test.js",
+    "test:position": "node --test src/test/unit/position.handler.test.js",
+    "test:game": "node --test src/test/unit/game.handler.test.js",
+    "test:attack": "node --test src/test/unit/attack.handler.test.js",
+    "load": "node src/test/load/server-load.test.js",
+    "register": "node src/test/load/register-users.js",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "db": "node src/database/migration/createSchema.js"
@@ -22,6 +27,7 @@
   },
   "homepage": "https://github.com/10-simhi-haja/bang_game#readme",
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.7",
     "prettier": "^3.3.3"
   },
