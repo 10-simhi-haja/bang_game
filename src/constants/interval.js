@@ -10,6 +10,7 @@ export const INTERVAL = {
   BOMB: 25,
   BOMB_ANIMATION: 5,
   ATTACK: 10,
+  GAME_RUN: 30,
 };
 
 export const INTERVAL_TYPE = {
@@ -19,4 +20,5 @@ export const INTERVAL_TYPE = {
   CHARACTER_STATE: 3,
   BOMB: 4,
   BOMB_ANIMATION: 5,
+  GAME_RUN: 6,
 };

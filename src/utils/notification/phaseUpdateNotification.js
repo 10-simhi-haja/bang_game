@@ -1,5 +1,6 @@
 import config from '../../config/config.js';
 import { PHASE_TYPE } from '../../constants/header.js';
+import { setGameRedis } from '../../redis/game.redis.js';
 import { createResponse } from '../packet/response/createResponse.js';
 import handCardNotification from './handCardsNotification.js';
 import userUpdateNotification from './userUpdateNotification.js';
@@ -30,6 +31,11 @@ const phaseUpdateNotification = (game) => {
     nextPhaseAt: Date.now() + time * 1000,
     characterPositions: characterPosData,
   };
+  const redisData = {
+    id: game.id,
+    nextPhaseAt: phaseUpdateNotiData.nextPhaseAt,
+  };
+  setGameRedis(redisData);
 
   const users = game.getLiveUsers();
 
