@@ -1,5 +1,6 @@
 import config from '../../config/config.js';
 import { PHASE_TYPE } from '../../constants/header.js';
+import { setGameRedis } from '../../redis/game.redis.js';
 import { createResponse } from '../packet/response/createResponse.js';
 import handCardNotification from './handCardsNotification.js';
 import userUpdateNotification from './userUpdateNotification.js';
@@ -12,7 +13,7 @@ const {
 } = config;
 
 // 페이즈 업데이트 알림
-const phaseUpdateNotification = (game) => {
+const phaseUpdateNotification = async (game) => {
   game.nextPhase();
   let time = 0;
 
@@ -30,10 +31,15 @@ const phaseUpdateNotification = (game) => {
     nextPhaseAt: Date.now() + time * 1000,
     characterPositions: characterPosData,
   };
+  const redisData = {
+    id: game.id,
+    nextPhaseAt: phaseUpdateNotiData.nextPhaseAt,
+  };
+  setGameRedis(redisData);
 
   const users = game.getLiveUsers();
 
-  users.forEach(async (notiUser) => {
+  for (const notiUser of users) {
     const phaseUpdateNoti = createResponse(
       PACKET_TYPE.PHASE_UPDATE_NOTIFICATION,
       notiUser.socket.sequence,
@@ -57,7 +63,7 @@ const phaseUpdateNotification = (game) => {
         // 카드 버리는 부분
         for (let i = 0; i < count; i++) {
           const card = userCharacter.handCards.pop();
-          game.cardDeck.addUseCard(card.type); // 버린카드는 사용한 카드더미에 추가
+          await game.cardDeck.addUseCard(card.type); // 버린카드는 사용한 카드더미에 추가
         }
       }
 
@@ -67,7 +73,7 @@ const phaseUpdateNotification = (game) => {
       handCardNotification(notiUser, game);
       userUpdateNotification(game);
     }
-  });
+  }
   if (game.phase === PHASE_TYPE.DAY) {
     game.debuffUpdate();
   }

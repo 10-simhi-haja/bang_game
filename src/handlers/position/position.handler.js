@@ -27,33 +27,37 @@ const handlePositionUpdate = async ({ socket, payload }) => {
     const gameSession = getGameSessionBySocket(socket);
     const currentUser = getUserBySocket(socket);
 
-    // const prevX = currentUser.x;
-    // const prevY = currentUser.y;
+    const prevX = currentUser.x;
+    const prevY = currentUser.y;
 
-    // const now = Date.now();
-    // if (now - currentUser.lastUpdateTime < 250) {
-    //   // console.log('아직 시간이 안 됐다.');
-    //   return;
-    // }
+    const now = Date.now();
+    if (now - currentUser.lastUpdateTime < 250) {
+      // console.log('아직 시간이 안 됐다.');
+      return;
+    }
 
-    // const distance = Math.sqrt(Math.pow(x - prevX, 2) + Math.pow(y - prevY, 2));
-    // if (distance < 0.25) {
-    //   // console.log('아직 거리가 안 됐다.');
-    //   return;
-    // }
+    const distance = Math.sqrt(Math.pow(x - prevX, 2) + Math.pow(y - prevY, 2));
+    if (distance < 0.25) {
+      // console.log('아직 거리가 안 됐다.');
+      return;
+    }
 
     currentUser.setPos(x, y);
-    // currentUser.lastUpdateTime = now;
+    currentUser.lastUpdateTime = now;
     setUserPositionRedis(gameSession.id, currentUser.id, x, y);
 
     const allUser = gameSession.getAllUsers();
-    const userRedis = await getUserRedis(gameSession.id, currentUser.id);
 
-    const characterPositions = allUser.map((user) => ({
-      id: user.id,
-      x: userRedis.x,
-      y: userRedis.y,
-    }));
+    const characterPositions = await Promise.all(
+      allUser.map(async (user) => {
+        const redisData = await getUserRedis(gameSession.id, user.id); // 비동기 Redis 데이터 가져오기
+        return {
+          id: user.id,
+          x: redisData?.x || 0, // redisData가 없으면 기본값 0
+          y: redisData?.y || 0,
+        };
+      }),
+    );
 
     const notiData = {
       characterPositions: characterPositions,

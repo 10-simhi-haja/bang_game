@@ -20,7 +20,6 @@ import {
   delUserRedis,
   setGameStateRedis,
   setUserPositionRedis,
-  setUserRedis,
   setUserStateRedis,
 } from '../../redis/game.redis.js';
 
@@ -334,26 +333,23 @@ class Game {
   }
 
   // 캐릭터, 역할 분배 설정
-  setPrepare(preparedCharacter, preparedRole) {
+  async setPrepare(preparedCharacter, preparedRole) {
     if (
       this.getUserLength() !== preparedCharacter.length ||
       this.getUserLength() !== preparedRole.length
     ) {
       throw new Error('캐릭터 및 역할 배열의 길이가 유저 수와 일치하지 않습니다.');
     }
-
     // 룸 상태 prepare로 변경
     this.state = PREPARE;
     setGameStateRedis(this.id, this.state);
 
-    // 역할 배분에 순서가 중요하진 않음.
-    Object.values(this.users).forEach(async (userEntry, index) => {
+    for (let index = 0; index < Object.values(this.users).length; index++) {
+      const userEntry = Object.values(this.users)[index];
       const characterType = preparedCharacter[index];
       const roleType = preparedRole[index];
-
       userEntry.character.characterType = characterType;
       userEntry.character.roleType = roleType;
-
       // 체력정보도 나중에 상수화 시키면 좋을듯.
       if (
         characterType === CHARACTER_TYPE.DINOSAUR ||
@@ -363,7 +359,6 @@ class Game {
       } else {
         userEntry.character.hp = 4;
       }
-
       if (roleType === ROLE_TYPE.TARGET) {
         userEntry.character.hp++;
         this.targetCount++;
@@ -399,7 +394,7 @@ class Game {
       userEntry.character.isContain = false;
       userEntry.character.maxBbangCount = 1;
       userEntry.character.isDeath = false; // 죽는 순간 판별위해서 사용
-    });
+    }
   }
 
   // 유저 제거
@@ -461,6 +456,7 @@ class Game {
       if (user.id !== userId) this.users[user.id].character.hp += 1;
     });
   }
+
   // 만기 적금
   async MaturedSavings(userId) {
     const giveCard = await this.cardDeck.drawMultipleCards(2);
@@ -468,6 +464,7 @@ class Game {
     const newHandCard = [...handCard, ...giveCard];
     return (this.getCharacter(userId).handCards = newHandCard);
   }
+
   // 복권방
 
   async winLottery(userId) {
@@ -837,34 +834,38 @@ class Game {
     return userCharacter.debuffs.includes(debuff);
   }
 
-  // 디버프 들고 있는 유저를 찾는 방식.
-  getDebuffUser(debuff) {
+  // 디버프 들고 있는 유저들을 찾는 방식.
+  getDebuffUsers(debuff) {
     const users = this.getAllUserDatas();
-    let debuffUser = 0;
+    const debuffUsers = [];
     users.forEach((user) => {
       const character = this.getCharacter(user.id);
       if (this.debuffCheck(character, debuff)) {
         console.dir(user, null);
-        debuffUser = user;
+        debuffUsers.push(user);
       }
     });
-    return debuffUser;
+    return debuffUsers;
   }
 
   // 위성타겟 디버프 가졌는지 확인하고 다음유저에게 넘기기까지
   debuffUpdate() {
     // 위성 타겟 디버프 처리
-    const satelliteTargetUser = this.getDebuffUser(CARD_TYPE.SATELLITE_TARGET);
-    if (satelliteTargetUser) {
+    const satelliteTargetUsers = this.getDebuffUsers(CARD_TYPE.SATELLITE_TARGET);
+    satelliteTargetUsers.forEach((satelliteTargetUser) => {
       const satelliteCharacter = this.getCharacter(satelliteTargetUser.id);
 
       const satelIndex = satelliteCharacter.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET);
       if (satelIndex !== -1) {
         satelliteCharacter.debuffs.splice(satelIndex, 1);
+        // 디버프 제거 확인
+        if (satelliteCharacter.debuffs.indexOf(CARD_TYPE.SATELLITE_TARGET) === -1) {
+          console.log(`${satelliteTargetUser.nickname}의 위성 타겟 디버프 제거.`);
+        }
       }
 
-      const range = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
-      if (range <= config.probability.SATELLITE_TARGET) {
+      const satleRange = Math.floor(Math.random() * 100) + 1; // 1 ~ 100 사이 난수
+      if (satleRange <= config.probability.SATELLITE_TARGET) {
         console.log(`위성 터졌다!`);
 
         // 효과가 발동되었을 때
@@ -875,23 +876,31 @@ class Game {
         const nextUserCharacter = this.getCharacter(nextUser.id);
         nextUserCharacter.debuffs.push(CARD_TYPE.SATELLITE_TARGET);
       }
-    }
+    });
 
     // 감옥 디버프 처리
-    const containmentUnitUser = this.getDebuffUser(CARD_TYPE.CONTAINMENT_UNIT);
-    if (containmentUnitUser) {
+    const containmentUnitUsers = this.getDebuffUsers(CARD_TYPE.CONTAINMENT_UNIT);
+    containmentUnitUsers.forEach((containmentUnitUser) => {
       const containmentCharacter = this.getCharacter(containmentUnitUser.id);
 
-      if (Math.random() < 1) {
+      ////////////////////확률 50프로 꼭 수정하자!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      const containRange = Math.floor(Math.random() * 100) + 1;
+      if (containRange <= config.probability.CONTAINMENT_UNIT) {
         this.users[containmentUnitUser.id].character.isContain = true;
       } else {
         const containmentIndex = containmentCharacter.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT);
         if (containmentIndex !== -1) {
           containmentCharacter.debuffs.splice(containmentIndex, 1);
+          // 디버프 제거 확인
+          if (containmentCharacter.debuffs.indexOf(CARD_TYPE.CONTAINMENT_UNIT) === -1) {
+            console.log(`${containmentUnitUser.nickname}의 감옥 디버프 제거.`);
+          }
         }
         this.users[containmentUnitUser.id].character.isContain = false;
       }
-    }
+    });
+
+    userUpdateNotification(this);
   }
 
   ///////////////////// intervalManager 관련.

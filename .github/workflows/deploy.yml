@@ -22,6 +22,7 @@ jobs:
           script: |
             cd /home/ubuntu/bang_game
             echo "HOST=${{ secrets.HOST }}" > .env
+            echo "BASE_PORT=5555" >> .env # 기본 포트를 추가
             echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
             echo "DB_USER=${{ secrets.DB_USER }}" >> .env
             echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
@@ -42,4 +43,4 @@ jobs:
             echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> .env
             git pull origin main
             npm install
-            pm2 restart src/server.js || pm2 start src/server.js
+            pm2 restart src/ecosystem.config.cjs || pm2 start src/ecosystem.config.cjs

@@ -1,9 +1,11 @@
 import config from '../../config/config.js';
+import { deleteGameFolderRedis } from '../../redis/game.redis.js';
 import { getGameSessionByUser, removeGameSessionById } from '../../sessions/game.session.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
 import handleError from '../../utils/errors/errorHandler.js';
 import leaveRoomNotification from '../../utils/notification/leaveRoomNotification.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
+
 const leaveRoomHandler = async ({ socket, payload }) => {
   try {
     // 방에서 나가려는 유저와 해당 방 찾기
@@ -18,6 +20,7 @@ const leaveRoomHandler = async ({ socket, payload }) => {
     let usersLength = room.getUserLength();
     if (user.id === room.ownerId) {
       leaveRoomNotification(socket, user.id, room, true);
+      deleteGameFolderRedis(room.id);
       usersLength = 0;
     }
 
