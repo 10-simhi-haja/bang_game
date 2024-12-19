@@ -376,16 +376,7 @@ class Game {
       }; // 캐릭터 스테이트 타입
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
-      userEntry.character.handCards = [
-        {
-          type: CARD_TYPE.ABSORB,
-          count: 1,
-        },
-        {
-          type: CARD_TYPE.HALLUCINATION,
-          count: 1,
-        },
-      ];
+      userEntry.character.handCards = [];
 
       const drawCard = await this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
@@ -497,10 +488,9 @@ class Game {
       case 1: //장비
         if (!isAbsorbing) {
           this.removeCard(targetId, selectCard);
-        } else {
-          removeCard = targetCards.filter((index) => index !== selectCard);
-          this.getCharacter(targetId).equips = removeCard;
         }
+        removeCard = targetCards.filter((index) => index !== selectCard);
+        this.getCharacter(targetId).equips = removeCard;
         break;
       case 2: // 무기
         if (!isAbsorbing) {
