@@ -55,17 +55,19 @@ const onData = (socket) => async (data) => {
       const result = validateSequence(socket, sequence);
       switch (result.status) {
         case 'success':
-          // console.log(result.message);
+          // 정상
           break;
 
         case 'duplicate':
-          console.warn(result.message);
+          // 중복
+          console.error(result.message);
           const duplicatePayloadLength = socket.buffer.readUInt32BE(offset);
           offset += config.packet.payloadLength;
           socket.buffer = moveBuffer(socket.buffer, offset + duplicatePayloadLength);
           continue;
 
         case 'missing':
+          // 누락
           console.error(result.message);
           return;
 
