@@ -6,7 +6,6 @@ import { createResponse } from '../../utils/packet/response/createResponse.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
-  card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
   character: { characterStateType: CHARACTER_STATE_TYPE },
 } = config;

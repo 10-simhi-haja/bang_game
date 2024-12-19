@@ -22,9 +22,8 @@ import {
 
 const {
   packet: { packetType: PACKET_TYPE },
-  globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
   character: { characterType: CHARACTER_TYPE, characterStateType: CHARACTER_STATE_TYPE },
-  role: { roleType: ROLE_TYPE, rolesDistribution: ROLES_DISTRIBUTION },
+  role: { roleType: ROLE_TYPE },
   roomStateType: { wait: WAIT, prepare: PREPARE, inGame: INGAME },
   interval: INTERVAL,
   intervalType: INTERVAL_TYPE,
@@ -302,17 +301,6 @@ class Game {
         ...defaultStateInfo,
       },
     };
-
-    // const redisUserData = {
-    //   id: this.id,
-    //   userData: {
-    //     id: user.id,
-    //     // socketId: `${socket.remoteAddress}:${socket.remotePort}`,
-    //     // ...defaultStateInfo,
-    //     // socket: user.socket,
-    //   },
-    // };
-    // setUserRedis(redisUserData);
 
     this.userOrder.push(user.id);
   }

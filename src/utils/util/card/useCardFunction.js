@@ -1,20 +1,8 @@
-// import { getGameSessionByUser } from '../../sessions/game.session.js';
-// import { getUserBySocket } from '../../sessions/user.session.js';
-// import handleError from '../../utils/errors/errorHandler.js';
-// import cardEffectNotification from '../../utils/notification/cardEffectNotification.js';
-// import equipNotification from '../../utils/notification/equipCardNotification.js';
-// import useCardNotification from '../../utils/notification/useCardNotification.js';
-// import { createResponse } from '../../utils/packet/response/createResponse.js';
-// import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
-// import fleaMarketNotification from '../../utils/notification/fleaMarketNotification.js';
-// import FleaMarket from '../../classes/models/fleaMarket.js';
-// import animationNotification from '../../utils/notification/animationNotification.js';
 import config from '../../../config/config.js';
 import { CHARACTER_TYPE } from '../../../constants/character.js';
 import animationNotification from '../../notification/animationNotification.js';
 
 const {
-  packet: { packetType: PACKET_TYPE },
   card: { cardType: CARD_TYPE },
   globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
   character: { characterStateType: CHARACTER_STATE_TYPE },

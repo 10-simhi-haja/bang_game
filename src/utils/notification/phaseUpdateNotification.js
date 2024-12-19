@@ -8,8 +8,6 @@ import userUpdateNotification from './userUpdateNotification.js';
 const {
   packet: { packetType: PACKET_TYPE },
   interval: INTERVAL,
-  character: { characterStateType: CHARACTER_STATE_TYPE },
-  card: { cardType: CARD_TYPE },
 } = config;
 
 // 페이즈 업데이트 알림
@@ -24,8 +22,6 @@ const phaseUpdateNotification = async (game) => {
   }
 
   const characterPosData = game.getAllUserPos();
-  const characterDatas = game.getAllUserDatas();
-
   const phaseUpdateNotiData = {
     phaseType: game.phase,
     nextPhaseAt: Date.now() + time * 1000,

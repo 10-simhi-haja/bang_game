@@ -1,13 +1,23 @@
 import config from '../../config/config.js';
+import { loadCardType } from '../../database/card/card.db.js';
 import { shuffle } from '../../utils/util/shuffle.js';
 import redisManager from '../managers/redis.manager.js';
 
 const {
-  card: { cardType: CARD_TYPE, cardPool: CARD_POOL },
+  card: { cardPool: CARD_POOL },
 } = config;
 
+// DB에서 가져온 데이터를 기존 CARD_TYPE 형식으로 변환
+const card_type_from_db = await loadCardType();
+
+// DB 데이터를 { card_name: card_id } 형태로 변환
+const card_type = card_type_from_db.reduce((acc, { card_name, card_id }) => {
+  acc[card_name] = card_id;
+  return acc;
+}, {});
+
 const CARD_TYPE_NAME_MAP = Object.fromEntries(
-  Object.entries(CARD_TYPE).map(([key, value]) => [value, key]),
+  Object.entries(card_type).map(([key, value]) => [value, key]),
 );
 
 class CardDeck {
@@ -19,7 +29,7 @@ class CardDeck {
   }
 
   async initializeDeck() {
-    const deck = Object.entries(CARD_TYPE).reduce((deck, [key, value]) => {
+    const deck = Object.entries(card_type).reduce((deck, [key, value]) => {
       if (key === 'NONE') return deck;
 
       const cardCount = this.getCardCount(value);
