@@ -5,7 +5,10 @@ import IntervalManager from '../managers/interval.manager.js';
 import CardDeck from './cardDeck.class.js';
 import warningNotification from '../../utils/notification/warningNotification.js';
 import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
-import { setFleaMarketPickInterval } from '../../utils/util/intervalFunction.js';
+import {
+  selectCardInterval,
+  setFleaMarketPickInterval,
+} from '../../utils/util/intervalFunction.js';
 import updateNotification from '../../utils/notification/updateNotification.js';
 import animationNotification from '../../utils/notification/animationNotification.js';
 import { bbangInterval } from '../../utils/util/bbangFunction.js';
@@ -232,10 +235,22 @@ class Game {
         );
         break;
       case CHARACTER_STATE_TYPE.ABSORBING:
+        this.intervalManager.addInterval(
+          curUserId,
+          () => selectCardInterval(this, this.users[curUserId].user),
+          time,
+          INTERVAL_TYPE.CHARACTER_STATE,
+        );
         break;
       case CHARACTER_STATE_TYPE.ABSORB_TARGET:
         break;
       case CHARACTER_STATE_TYPE.HALLUCINATING:
+        this.intervalManager.addInterval(
+          curUserId,
+          () => selectCardInterval(this, this.users[curUserId].user),
+          time,
+          INTERVAL_TYPE.CHARACTER_STATE,
+        );
         break;
       case CHARACTER_STATE_TYPE.HALLUCINATION_TARGET:
         break;
@@ -362,7 +377,7 @@ class Game {
       userEntry.character.equips = [];
       userEntry.character.debuffs = [];
       userEntry.character.handCards = [];
-      console.log(`캐릭터배분`);
+
       const drawCard = await this.cardDeck.drawMultipleCards(userEntry.character.hp + 2);
       userEntry.character.handCards.push(...drawCard);
       userEntry.character.bbangCount = 0; // 빵을 사용한 횟수.
@@ -454,6 +469,7 @@ class Game {
   mirage(isAbsorbing, type, targetId, selectCard, targetCards, range) {
     let removeCard;
 
+    console.log(`흡수인지?? ${isAbsorbing}`);
     switch (type) {
       case 0: // 핸드
         if (!isAbsorbing) {
@@ -472,10 +488,9 @@ class Game {
       case 1: //장비
         if (!isAbsorbing) {
           this.removeCard(targetId, selectCard);
-        } else {
-          removeCard = targetCards.filter((index) => index !== selectCard);
-          this.getCharacter(targetId).equips = removeCard;
         }
+        removeCard = targetCards.filter((index) => index !== selectCard);
+        this.getCharacter(targetId).equips = removeCard;
         break;
       case 2: // 무기
         if (!isAbsorbing) {

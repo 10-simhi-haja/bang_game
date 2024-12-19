@@ -160,14 +160,14 @@ const useCardHandler = async ({ socket, payload }) => {
             user.id,
             CHARACTER_STATE_TYPE.ABSORBING,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             targetId,
           );
           game.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.ABSORB_TARGET,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            3,
+            INTERVAL.ATTACK,
             user.id,
           );
           break;
@@ -177,14 +177,14 @@ const useCardHandler = async ({ socket, payload }) => {
             user.id,
             CHARACTER_STATE_TYPE.HALLUCINATING,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            10,
+            INTERVAL.ATTACK,
             targetId,
           );
           game.setCharacterState(
             targetId,
             CHARACTER_STATE_TYPE.HALLUCINATION_TARGET,
             CHARACTER_STATE_TYPE.NONE_CHARACTER_STATE,
-            10,
+            INTERVAL.ATTACK,
             user.id,
           );
 
