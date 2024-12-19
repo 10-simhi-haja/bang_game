@@ -3,12 +3,8 @@ import config from '../../config/config.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
-  winType: WIN_TYPE,
-  role: { roleType: ROLE_TYPE },
   character: { characterStateType: CHARACTER_STATE_TYPE, characterType: CHARACTER_TYPE },
   card: { cardType: CARD_TYPE },
-  interval: INTERVAL,
-  intervalType: INTERVAL_TYPE,
 } = config;
 
 // 주기적으로 업데이트 노티를 모두에게 보내면서.

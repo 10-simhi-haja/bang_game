@@ -4,3 +4,10 @@ CREATE TABLE IF NOT EXISTS characters_spawn_point
     x FLOAT NOT NULL,
     y FLOAT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS card_type
+(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    card_id INT NOT NULL UNIQUE,
+    card_name VARCHAR(255) UNIQUE
+);

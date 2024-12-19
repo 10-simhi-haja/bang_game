@@ -8,6 +8,7 @@ import handleError from './../utils/errors/errorHandler.js';
 
 const moveBuffer = (buffer, offset) => buffer.subarray(offset);
 
+// 중복 패킷이 오면 건너 띈다
 const validateRemainingData = (buffer, totalHeaderLength) => {
   if (buffer.length < totalHeaderLength) return false;
 

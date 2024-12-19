@@ -4,17 +4,11 @@ import { createResponse } from '../packet/response/createResponse.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
-  card: { cardType: CARD_TYPE },
-  globalFailCode: { globalFailCode: GLOBAL_FAIL_CODE },
 } = config;
 
 const useCardNotification = (socket, userId, room, payload) => {
   try {
     const { cardType, targetUserId } = payload;
-    // console.log('useCardNotification: cardType: ', cardType);
-    // console.log('useCardNotification: userId: ', userId.toString());
-    // console.log('useCardNotification: targetUserId: ', targetUserId.toString());
-
     const responseData = {
       cardType,
       userId,
@@ -26,8 +20,6 @@ const useCardNotification = (socket, userId, room, payload) => {
       socket.sequence,
       responseData,
     );
-    const users = room.getAllUserDatas(userId);
-    // console.log('게임 내 유저들', JSON.stringify(users, null, 2));
 
     // 다른 사람에게 알림
     room.getAllUsers().forEach((user) => {

@@ -1,11 +1,9 @@
-import { getGameSessionBySocket, getGameSessionByUser } from '../../sessions/game.session.js';
+import { getGameSessionByUser } from '../../sessions/game.session.js';
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import { PACKET_TYPE } from '../../constants/header.js';
 import { CARD_TYPE } from '../../constants/card.js';
 import handleError from '../../utils/errors/errorHandler.js';
-import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 import { getUserBySocket } from '../../sessions/user.session.js';
-import animationNotification from '../../utils/notification/animationNotification.js';
 import config from '../../config/config.js';
 import CustomError from '../../utils/errors/customError.js';
 import ErrorCodes from '../../utils/errors/errorCodes.js';
@@ -40,7 +38,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
       );
     }
 
-    // const gameSession = await getGameSessionBySocket(socket);
     const user = getUserBySocket(socket);
     const game = getGameSessionByUser(user);
     const users = game.getAllUserDatas();
@@ -53,7 +50,6 @@ const handleReactionRequest = async ({ socket, payload }) => {
     }
 
     // `reactionType`가 NONE_REACTION일시 피해 적용
-
     if (reactionType === REACTION_TYPE.NONE_REACTION) {
       // 대미지 받는 부분
       // 데저트 이글 끼고 있으면 2배 데미지

@@ -8,10 +8,8 @@ import useCardNotification from '../../utils/notification/useCardNotification.js
 import { createResponse } from '../../utils/packet/response/createResponse.js';
 import fleaMarketNotification from '../../utils/notification/fleaMarketNotification.js';
 import FleaMarket from '../../classes/models/fleaMarket.js';
-import animationNotification from '../../utils/notification/animationNotification.js';
 import { useBbang } from '../../utils/util/card/useCardFunction.js';
 import { CHARACTER_TYPE } from '../../constants/character.js';
-import userUpdateNotification from '../../utils/notification/userUpdateNotification.js';
 
 const {
   packet: { packetType: PACKET_TYPE },
@@ -33,7 +31,6 @@ const useCardHandler = async ({ socket, payload }) => {
     const userId = user.id;
     const handCards = game.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
-    // console.log(`useCard 실행 ${cardType}, userId: ${userId}, tartgetId: ${targetUserId.low}`);
 
     const responsePayload = {
       success: true,
@@ -41,10 +38,6 @@ const useCardHandler = async ({ socket, payload }) => {
     };
 
     const targetUser = game.getAllUserDatas().find((user) => user.id === targetId);
-    const userStateInfo = game.getCharacter(user.id).stateInfo;
-    const bbangCount = game.getCharacter(user.id).bbangCount;
-    // console.log('살아있는 유저', game.getLiveUsersId());
-
     if (index !== -1)
       switch (cardType) {
         //^ 공격
@@ -271,30 +264,3 @@ const useCardHandler = async ({ socket, payload }) => {
 };
 
 export default useCardHandler;
-
-// enum CardType {
-//   NONE = 0;
-//   BBANG = 1;              // 20장
-//   BIG_BBANG = 2;          // 1장
-//   SHIELD = 3;             // 10장
-//   VACCINE = 4;            // 6장
-//   CALL_119 = 5;           // 2장
-//   DEATH_MATCH = 6;        // 4장
-//   GUERRILLA = 7;          // 1장
-//   ABSORB = 8;             // 4장
-//   HALLUCINATION = 9;      // 4장
-//   FLEA_MARKET = 10;       // 3장
-//   MATURED_SAVINGS = 11;   // 2장
-//   WIN_LOTTERY = 12;       // 1장
-//   SNIPER_GUN = 13;        // 1장
-//   HAND_GUN = 14;          // 2장
-//   DESERT_EAGLE = 15;      // 3장
-//   AUTO_RIFLE = 16;        // 2장
-//   LASER_POINTER = 17;     // 1장
-//   RADAR = 18;             // 1장
-//   AUTO_SHIELD = 19;       // 2장
-//   STEALTH_SUIT = 20;      // 2장
-//   CONTAINMENT_UNIT = 21;  // 3장
-//   SATELLITE_TARGET = 22;  // 1장
-//   BOMB = 23;              // 1장
-// }
