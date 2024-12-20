@@ -31,6 +31,7 @@ const useCardHandler = async ({ socket, payload }) => {
     const userId = user.id;
     const handCards = game.getCharacter(userId).handCards;
     const index = handCards.findIndex((card) => card.type === cardType);
+    const liveUsers = game.getLiveUsers();
 
     const responsePayload = {
       success: true,
@@ -142,7 +143,7 @@ const useCardHandler = async ({ socket, payload }) => {
           if (targetId !== 0) {
             game.plusHp(targetId);
           } else {
-            game.plusAllUsersHp(user.id, users);
+            game.plusAllUsersHp(user.id, liveUsers);
           }
           break;
 

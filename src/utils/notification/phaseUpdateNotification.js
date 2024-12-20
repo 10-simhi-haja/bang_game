@@ -64,7 +64,7 @@ const phaseUpdateNotification = async (game) => {
       }
 
       // 낮이 되어서 카드 뽑는 부분.
-      const drawCard = await game.cardDeck.drawMultipleCards(3);
+      const drawCard = await game.cardDeck.drawMultipleCards(3 + game.getDieUsersCount());
       userCharacter.handCards.push(...drawCard);
       handCardNotification(notiUser, game);
       userUpdateNotification(game);

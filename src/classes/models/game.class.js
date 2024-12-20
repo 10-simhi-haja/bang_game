@@ -64,6 +64,11 @@ class Game {
     this.intervalManager.clearAll();
   }
 
+  // 게임내에서 사망해있는 유저숫자
+  getDieUsersCount() {
+    return this.userOrder.filter((id) => this.users[id].character.hp <= 0).length;
+  }
+
   // 들어온 순서대로 반영.
   // 유저의 계정 user클래스
   getAllUsers() {
