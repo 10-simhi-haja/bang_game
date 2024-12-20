@@ -1,13 +1,10 @@
 import { getGameSessionByUser, removeGameSessionById } from '../sessions/game.session.js';
 import { getUserBySocket, getUserSessions, removeUserBySocket } from '../sessions/user.session.js';
-import leaveRoomNotification from '../utils/notification/leaveRoomNotification.js';
-import { createResponse } from '../utils/packet/response/createResponse.js';
 import config from '../config/config.js';
 import CustomError from '../utils/errors/customError.js';
 import ErrorCodes from '../utils/errors/errorCodes.js';
 import handleError from '../utils/errors/errorHandler.js';
 import userUpdateNotification from '../utils/notification/userUpdateNotification.js';
-import { getGameRedis } from '../redis/game.redis.js';
 import leaveRoomHandler from '../handlers/room/leaveRoom.handler.js';
 
 // ! 게임 중에 방장이 나가면 오류 발생!!!!
