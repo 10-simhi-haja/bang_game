@@ -81,7 +81,6 @@ class CardDeck {
 
   async addUseCard(cardType) {
     console.log('addUseCard실행');
-    // this.useCards.push(cardType);
     const usedCards = JSON.parse((await redisManager.getClient().get(this.useCardsKey)) || '[]');
     usedCards.push(cardType);
     await redisManager.getClient().set(this.useCardsKey, JSON.stringify(usedCards));
