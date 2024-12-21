@@ -25,8 +25,9 @@ export const onEnd = (socket) => async () => {
       console.error('유저를 찾을 수 없다: ', socket.id);
       throw new CustomError(ErrorCodes.USER_NOT_FOUND, '유저를 찾을 수 없다', socket.sequence);
     }
-    const room = getGameSessionByUser(user);
+    removeUserBySocket(socket); // 유저 세션에서 유저 삭제
 
+    const room = getGameSessionByUser(user);
     // 유저에게 방이 있고, 게임 중에 나갔을 경우
     if (room && room.state === config.roomStateType.inGame) {
       console.log('게임 중에 나갔다.');
@@ -40,7 +41,6 @@ export const onEnd = (socket) => async () => {
       console.log('이쪽에서 방을 나갔다!!');
       leaveRoomHandler({ socket });
     }
-    removeUserBySocket(socket); // 유저 세션에서 유저 삭제
   } catch (error) {
     handleError(socket, error);
   }
